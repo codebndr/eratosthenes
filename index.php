@@ -37,6 +37,11 @@ else if($data == "list-external")
 {
 	$response["list"] = $handler->listExternal();
 }
+else if($data == "fetch-description-external")
+{
+	$name = $_REQUEST['name'];
+	$response["description"] = $handler->fetchDescriptionExternal($name);
+}
 else
 {
 	$response["success"] = 0;
@@ -105,6 +110,14 @@ class LibraryHandler
 			$list[] = $array[2];
 		}
 		return $list;
+	}
+
+	public function fetchDescriptionExternal($name)
+	{
+		$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name."/README.txt");
+		if($response->isOK())
+			return $response->body;
+		else return "none";
 	}
 
 	private function generateUrls($examples)
