@@ -88,7 +88,7 @@ class LibraryHandler
 	private function generateExamples($examples, $cat_no)
 	{
 		$list = array();
-		foreach($examples as &$example)
+		foreach($examples as $example)
 		{
 			$array = explode("/", $example["path"]);
 			// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
