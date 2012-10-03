@@ -68,7 +68,7 @@ class LibraryHandler
 
 	public function getExternalExamples()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries', 'pcre' => '/(\.ino|\.pde)/i'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries', 'pcre' => '/(\.ino|\.pde|README\.txt)/i'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 4);
@@ -91,9 +91,16 @@ class LibraryHandler
 		foreach($examples as $example)
 		{
 			$array = explode("/", $example["path"]);
-			// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
-			$list[$array[2]] = array_merge((array) $list[$array[2]], array(array("name" => $array[$cat_no], "url" => $example["url"])));
-			// var_dump($example);
+			if(strpos($example["path"], "README.txt") !== FALSE)
+			{
+				$list[$array[2]]["description"] = array("name" => $array[$cat_no-1], "url" => $example["url"]);
+			}
+			else
+			{
+				// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
+				$list[$array[2]]["examples"] = array_merge((array) $list[$array[2]]["examples"], array(array("name" => $array[$cat_no], "url" => $example["url"])));
+				// var_dump($example);
+			}
 		}
 
 		return $list;
