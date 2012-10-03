@@ -29,6 +29,14 @@ else if($data == "external")
 {
 	$response["list"] = $handler->getExternalExamples();	
 }
+else if($data == "list-included")
+{
+	$response["list"] = $handler->listIncluded();	
+}
+else if($data == "list-external")
+{
+	$response["list"] = $handler->listExternal();
+}
 else
 {
 	$response["success"] = 0;
@@ -68,13 +76,37 @@ class LibraryHandler
 
 	public function getExternalExamples()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries', 'pcre' => '/(\.ino|\.pde|README\.txt)/i'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries', 'pcre' => '/(\.ino|\.pde)/i'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 4);
 		return $response;
 	}
 	
+	public function listIncluded()
+	{
+		$list = array();
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/libraries/', "delimiter" => "/"));
+		foreach($response as $key=>$value)
+		{
+			$array = explode("/", $value);
+			$list[] = $array[2];
+		}
+		return $list;
+	}
+
+	public function listExternal()
+	{
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries/', "delimiter" => "/"));
+		$list = array();
+		foreach($response as $key=>$value)
+		{
+			$array = explode("/", $value);
+			$list[] = $array[2];
+		}
+		return $list;
+	}
+
 	private function generateUrls($examples)
 	{
 		foreach($examples as &$example)
@@ -91,16 +123,9 @@ class LibraryHandler
 		foreach($examples as $example)
 		{
 			$array = explode("/", $example["path"]);
-			if(strpos($example["path"], "README.txt") !== FALSE)
-			{
-				$list[$array[2]]["description"] = array("name" => $array[$cat_no-1], "url" => $example["url"]);
-			}
-			else
-			{
 				// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
-				$list[$array[2]]["examples"] = array_merge((array) $list[$array[2]]["examples"], array(array("name" => $array[$cat_no], "url" => $example["url"])));
+				$list[$array[2]] = array_merge((array) $list[$array[2]], array(array("name" => $array[$cat_no], "url" => $example["url"])));
 				// var_dump($example);
-			}
 		}
 
 		return $list;
