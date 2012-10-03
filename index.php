@@ -15,7 +15,7 @@ require_once 'AWSSDKforPHP/sdk.class.php';
 $handler = new LibraryHandler();
 
 $response["success"] = 1;
-$response["text"] = "Successfuly Compiled!";
+$response["text"] = "Successful Request!";
 
 if($data == "builtin")
 {
