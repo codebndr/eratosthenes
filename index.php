@@ -114,10 +114,31 @@ class LibraryHandler
 
 	public function fetchDescriptionExternal($name)
 	{
-		$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name."/README.txt");
-		if($response->isOK())
-			return $response->body;
-		else return "none";
+		$response="";
+		$list = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries/'.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
+		$description = "none";
+		foreach($list as $key => $filename)
+		{
+			if(strpos($filename, "README.") !== FALSE)
+			{
+				$response = $this->s3->get_object($this->bucket, $list[$key]);
+				if($response->isOK())
+				{
+					if(strpos($filename, "html") !== FALSE)
+						$description = $response->body;
+					else if(strpos($filename, "md") !== FALSE)
+					{
+						$description = $response->body;
+						include_once "markdown.php";
+						$description = Markdown($description);
+					}
+					else if(strpos($filename, "txt") !== FALSE)
+						$description = $response->body;
+				}
+				break;
+			}
+		}
+		return $description;
 	}
 
 	private function generateUrls($examples)
