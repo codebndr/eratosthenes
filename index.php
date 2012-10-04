@@ -40,7 +40,7 @@ else if($data == "list-external")
 else if($data == "fetch-description-external")
 {
 	$name = $_REQUEST['name'];
-	$response["description"] = $handler->fetchDescriptionExternal($name);
+	$response = array_merge($response,$handler->fetchDescriptionExternal($name));
 }
 else
 {
@@ -115,6 +115,7 @@ class LibraryHandler
 	public function fetchDescriptionExternal($name)
 	{
 		$response="";
+		$array = array();
 		$list = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries/'.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
 		$description = "none";
 		foreach($list as $key => $filename)
@@ -138,7 +139,14 @@ class LibraryHandler
 				break;
 			}
 		}
-		return $description;
+		$array["description"] = $description;
+
+		$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name.'/URL.txt');
+		if($response->isOK())
+		{
+				$array["url"] = $response->body;
+		}
+		return $array;
 	}
 
 	private function generateUrls($examples)
