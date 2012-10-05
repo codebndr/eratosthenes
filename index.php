@@ -120,7 +120,7 @@ class LibraryHandler
 		$description = "none";
 		foreach($list as $key => $filename)
 		{
-			if(strpos($filename, "README.") !== FALSE)
+			if(strpos(strtolower($filename), strtolower("README.")) !== FALSE)
 			{
 				$response = $this->s3->get_object($this->bucket, $list[$key]);
 				if($response->isOK())
@@ -142,6 +142,8 @@ class LibraryHandler
 		$array["description"] = $description;
 
 		$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name.'/URL.txt');
+		if(!$response->isOK())
+			$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name.'/url.txt');
 		if($response->isOK())
 		{
 				$array["url"] = $response->body;
