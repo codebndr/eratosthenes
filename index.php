@@ -66,7 +66,7 @@ class LibraryHandler
 		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'examples', 'pcre' => '/\.ino/'));
 
 		$response = $this->generateUrls($response);
-		$response = $this->generateExamples($response, 3);
+		$response = $this->generateExamples($response, 2);
 		return $response;
 	}
 	
@@ -75,7 +75,7 @@ class LibraryHandler
 		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'libraries', 'pcre' => '/\.ino/'));
 
 		$response = $this->generateUrls($response);
-		$response = $this->generateExamples($response, 4);
+		$response = $this->generateExamples($response, 3);
 		return $response;
 	}
 
@@ -84,7 +84,7 @@ class LibraryHandler
 		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries', 'pcre' => '/(\.ino|\.pde)/i'));
 
 		$response = $this->generateUrls($response);
-		$response = $this->generateExamples($response, 4);
+		$response = $this->generateExamples($response, 3);
 		return $response;
 	}
 	
@@ -95,7 +95,7 @@ class LibraryHandler
 		foreach($response as $key=>$value)
 		{
 			$array = explode("/", $value);
-			$list[] = $array[2];
+			$list[] = $array[1];
 		}
 		return $list;
 	}
@@ -107,7 +107,7 @@ class LibraryHandler
 		foreach($response as $key=>$value)
 		{
 			$array = explode("/", $value);
-			$list[] = $array[2];
+			$list[] = $array[1];
 		}
 		return $list;
 	}
@@ -168,7 +168,7 @@ class LibraryHandler
 		{
 			$array = explode("/", $example["path"]);
 				// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
-				$list[$array[2]] = array_merge((array) $list[$array[2]], array(array("name" => $array[$cat_no], "url" => $example["url"])));
+				$list[$array[1]] = array_merge((array) $list[$array[1]], array(array("name" => $array[$cat_no], "url" => $example["url"])));
 				// var_dump($example);
 		}
 
