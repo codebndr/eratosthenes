@@ -54,7 +54,7 @@ echo json_encode($response);
 class LibraryHandler
 {
 	private $s3;
-	private $bucket = 'codebender-testing';
+	private $bucket = 'codebender_libraries';
 	
 	function __construct() 
 	{
@@ -63,7 +63,7 @@ class LibraryHandler
 	
 	public function getBuiltinExamples()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/examples', 'pcre' => '/\.ino/'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'examples', 'pcre' => '/\.ino/'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 3);
@@ -72,7 +72,7 @@ class LibraryHandler
 	
 	public function getIncludedExamples()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/libraries', 'pcre' => '/\.ino/'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'libraries', 'pcre' => '/\.ino/'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 4);
@@ -81,7 +81,7 @@ class LibraryHandler
 
 	public function getExternalExamples()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries', 'pcre' => '/(\.ino|\.pde)/i'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries', 'pcre' => '/(\.ino|\.pde)/i'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 4);
@@ -91,7 +91,7 @@ class LibraryHandler
 	public function listIncluded()
 	{
 		$list = array();
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/libraries/', "delimiter" => "/"));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'libraries/', "delimiter" => "/"));
 		foreach($response as $key=>$value)
 		{
 			$array = explode("/", $value);
@@ -102,7 +102,7 @@ class LibraryHandler
 
 	public function listExternal()
 	{
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries/', "delimiter" => "/"));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries/', "delimiter" => "/"));
 		$list = array();
 		foreach($response as $key=>$value)
 		{
@@ -116,7 +116,7 @@ class LibraryHandler
 	{
 		$response="";
 		$array = array();
-		$list = $this->s3->get_object_list($this->bucket, array('prefix' => 'arduino-files-static/extra-libraries/'.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
+		$list = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries/'.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
 		$description = "none";
 		foreach($list as $key => $filename)
 		{
@@ -141,9 +141,9 @@ class LibraryHandler
 		}
 		$array["description"] = $description;
 
-		$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name.'/URL.txt');
+		$response = $this->s3->get_object($this->bucket, 'external-libraries/'.$name.'/URL.txt');
 		if(!$response->isOK())
-			$response = $this->s3->get_object($this->bucket, 'arduino-files-static/extra-libraries/'.$name.'/url.txt');
+			$response = $this->s3->get_object($this->bucket, 'external-libraries/'.$name.'/url.txt');
 		if($response->isOK())
 		{
 				$array["url"] = $response->body;
