@@ -168,6 +168,8 @@ class LibraryHandler
 		{
 			$array = explode("/", $example["path"]);
 				// $example = array("category" => $array[2], "name" => $array[$cat_no], "url" => $example["url"]);
+				if(!isset($list[$array[1]]))
+					$list[$array[1]] = array();
 				$list[$array[1]] = array_merge((array) $list[$array[1]], array(array("name" => $array[$cat_no], "url" => $example["url"])));
 				// var_dump($example);
 		}
