@@ -37,10 +37,10 @@ else if($data == "list-external")
 {
 	$response["list"] = $handler->listExternal();
 }
-else if($data == "fetch-description-external")
+else if($data == "fetch-info-external")
 {
 	$name = $_REQUEST['name'];
-	$response = array_merge($response,$handler->fetchDescriptionExternal($name));
+	$response = array_merge($response,$handler->fetchInfoExternal($name));
 }
 else
 {
@@ -112,7 +112,7 @@ class LibraryHandler
 		return $list;
 	}
 
-	public function fetchDescriptionExternal($name)
+	public function fetchInfoExternal($name)
 	{
 		$response="";
 		$array = array();
