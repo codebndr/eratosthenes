@@ -148,6 +148,13 @@ class LibraryHandler
 		{
 				$array["url"] = $response->body;
 		}
+
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries/'.$name."/examples", 'pcre' => '/(\.ino|\.pde)/i'));
+
+		$response = $this->generateUrls($response);
+		$response = $this->generateExamples($response, 3);
+		$array["examples"] = $response[$name];
+
 		return $array;
 	}
 
