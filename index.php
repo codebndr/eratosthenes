@@ -114,9 +114,14 @@ class LibraryHandler
 
 	public function fetchInfoExternal($name)
 	{
+		return $this->fetchInfo($name, 'external-libraries/');
+	}
+
+	public function fetchInfo($name, $dir)
+	{
 		$response="";
 		$array = array();
-		$list = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries/'.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
+		$list = $this->s3->get_object_list($this->bucket, array('prefix' => $dir.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
 		$description = "none";
 		foreach($list as $key => $filename)
 		{
@@ -141,15 +146,15 @@ class LibraryHandler
 		}
 		$array["description"] = $description;
 
-		$response = $this->s3->get_object($this->bucket, 'external-libraries/'.$name.'/URL.txt');
+		$response = $this->s3->get_object($this->bucket, $dir.$name.'/URL.txt');
 		if(!$response->isOK())
-			$response = $this->s3->get_object($this->bucket, 'external-libraries/'.$name.'/url.txt');
+			$response = $this->s3->get_object($this->bucket, $dir.$name.'/url.txt');
 		if($response->isOK())
 		{
 				$array["url"] = $response->body;
 		}
 
-		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'external-libraries/'.$name."/examples", 'pcre' => '/(\.ino|\.pde)/i'));
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => $dir.$name."/examples", 'pcre' => '/(\.ino|\.pde)/i'));
 
 		$response = $this->generateUrls($response);
 		$response = $this->generateExamples($response, 3);
