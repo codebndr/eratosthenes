@@ -37,6 +37,11 @@ else if($data == "list-external")
 {
 	$response["list"] = $handler->listExternal();
 }
+else if($data == "fetch-info-included")
+{
+	$name = $_REQUEST['name'];
+	$response = array_merge($response,$handler->fetchInfoIncluded($name));
+}
 else if($data == "fetch-info-external")
 {
 	$name = $_REQUEST['name'];
@@ -110,6 +115,11 @@ class LibraryHandler
 			$list[] = $array[1];
 		}
 		return $list;
+	}
+
+	public function fetchInfoIncluded($name)
+	{
+		return $this->fetchInfo($name, 'libraries/');
 	}
 
 	public function fetchInfoExternal($name)
