@@ -37,6 +37,11 @@ else if($data == "list-external")
 {
 	$response["list"] = $handler->listExternal();
 }
+else if($data == "fetch-info-builtin")
+{
+	$name = $_REQUEST['name'];
+	$response = array_merge($response,$handler->fetchInfoBuiltin($name));
+}
 else if($data == "fetch-info-included")
 {
 	$name = $_REQUEST['name'];
@@ -115,6 +120,53 @@ class LibraryHandler
 			$list[] = $array[1];
 		}
 		return $list;
+	}
+
+	public function fetchInfoBuiltin($name)
+	{
+		$dir = "examples/";
+		$response="";
+		$array = array();
+		$list = $this->s3->get_object_list($this->bucket, array('prefix' => $dir.$name.'/', "delimiter" => "/", 'pcre' => '/(README\.)/i'));
+		$description = "none";
+		foreach($list as $key => $filename)
+		{
+			if(strpos(strtolower($filename), strtolower("README.")) !== FALSE)
+			{
+				$response = $this->s3->get_object($this->bucket, $list[$key]);
+				if($response->isOK())
+				{
+					if(strpos($filename, "html") !== FALSE)
+						$description = $response->body;
+					else if(strpos($filename, "md") !== FALSE)
+					{
+						$description = $response->body;
+						include_once "markdown.php";
+						$description = Markdown($description);
+					}
+					else if(strpos($filename, "txt") !== FALSE)
+						$description = $response->body;
+				}
+				break;
+			}
+		}
+		$array["description"] = $description;
+
+		$response = $this->s3->get_object($this->bucket, $dir.$name.'/URL.txt');
+		if(!$response->isOK())
+			$response = $this->s3->get_object($this->bucket, $dir.$name.'/url.txt');
+		if($response->isOK())
+		{
+				$array["url"] = $response->body;
+		}
+
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => $dir.$name."/", 'pcre' => '/(\.ino|\.pde)/i'));
+
+		$response = $this->generateUrls($response);
+		$response = $this->generateExamples($response, 3);
+		$array["examples"] = $response[$name];
+
+		return $array;
 	}
 
 	public function fetchInfoIncluded($name)
