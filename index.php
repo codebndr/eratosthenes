@@ -29,6 +29,10 @@ else if($data == "external")
 {
 	$response["list"] = $handler->getExternalExamples();	
 }
+else if($data == "list-builtin")
+{
+	$response["list"] = $handler->listBuiltin();
+}
 else if($data == "list-included")
 {
 	$response["list"] = $handler->listIncluded();	
@@ -98,6 +102,18 @@ class LibraryHandler
 		return $response;
 	}
 	
+	public function listBuiltin()
+	{
+		$list = array();
+		$response = $this->s3->get_object_list($this->bucket, array('prefix' => 'examples/', "delimiter" => "/"));
+		foreach($response as $key=>$value)
+		{
+			$array = explode("/", $value);
+			$list[] = $array[1];
+		}
+		return $list;
+	}
+
 	public function listIncluded()
 	{
 		$list = array();
