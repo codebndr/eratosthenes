@@ -1,4 +1,6 @@
 <?php
+header("Cache-Control: must-revalidate, max-age=3600");
+header("Vary: Accept-Encoding");
 
 $response = array('success' => 0, 'text' => "NO DATA!");
 
