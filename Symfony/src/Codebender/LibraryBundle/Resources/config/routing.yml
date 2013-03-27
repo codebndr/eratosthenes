@@ -1,0 +1,7 @@
+codebender_library_homepage:
+    pattern:  /
+    defaults: { _controller: CodebenderLibraryBundle:Default:list }
+
+codebender_library_getcode:
+    pattern:  /get
+    defaults: { _controller: CodebenderLibraryBundle:Default:getCode }
