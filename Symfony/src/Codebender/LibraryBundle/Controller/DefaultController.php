@@ -114,7 +114,7 @@ class DefaultController extends Controller
 			// Print the relative path to the file
 //			print $file->getRelativePathname()."<br />\n";
 
-			$path = str_replace("/examples/", "/", $file->getRelativePath());
+			$path = str_ireplace("/examples/", "/", $file->getRelativePath());
 			$library_name = strtok($path, "/");
 			$example_name = strtok("/");
 			$url = $this->get('router')->generate('codebender_library_getcode', array(),true).'?file='.$file->getRelativePathname();
