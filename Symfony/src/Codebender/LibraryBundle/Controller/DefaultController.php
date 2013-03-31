@@ -7,7 +7,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-const directory = "/mnt/codebender_libraries/";
 
 class DefaultController extends Controller
 {
@@ -24,23 +23,23 @@ class DefaultController extends Controller
 	    $finder3->files()->name('*.ino')->name('*.pde');
 
 	    $built_examples = array();
-	    if (is_dir(directory."examples"))
+	    if (is_dir($this->container->getParameter('arduino_directory')."examples"))
 	    {
-		    $finder->in(directory."examples");
+		    $finder->in($this->container->getParameter('arduino_directory')."examples");
 		    $built_examples = $this->iterateDir($finder);
 	    }
 
 	    $included_libraries = array();
-	    if(is_dir(directory."libraries"))
+	    if(is_dir($this->container->getParameter('arduino_directory')."libraries"))
 	    {
-		    $finder2->in(directory."libraries");
+		    $finder2->in($this->container->getParameter('arduino_directory')."libraries");
 		    $included_libraries = $this->iterateDir($finder2);
 	    }
 
 	    $external_libraries = array();
-	    if (is_dir(directory."external-libraries"))
+	    if (is_dir($this->container->getParameter('arduino_directory')."external-libraries"))
 	    {
-		    $finder3->in(directory."external-libraries");
+		    $finder3->in($this->container->getParameter('arduino_directory')."external-libraries");
 		    $external_libraries = $this->iterateDir($finder3);
 	    }
 
@@ -71,19 +70,19 @@ class DefaultController extends Controller
 		$directory = substr($file, 0, $last_slash);
 
 		$finder->files()->name($filename);
-		if (is_dir(directory."examples"))
+		if (is_dir($this->container->getParameter('arduino_directory')."examples"))
 		{
-			$finder->in(directory."examples");
+			$finder->in($this->container->getParameter('arduino_directory')."examples");
 		}
 
-		if (is_dir(directory."libraries"))
+		if (is_dir($this->container->getParameter('arduino_directory')."libraries"))
 		{
-			$finder->in(directory."libraries");
+			$finder->in($this->container->getParameter('arduino_directory')."libraries");
 		}
 
-		if (is_dir(directory."external-libraries"))
+		if (is_dir($this->container->getParameter('arduino_directory')."external-libraries"))
 		{
-			$finder->in(directory."external-libraries");
+			$finder->in($this->container->getParameter('arduino_directory')."external-libraries");
 		}
 
 		$finder->path($directory);
