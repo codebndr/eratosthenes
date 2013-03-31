@@ -19,8 +19,11 @@ class DefaultController extends Controller
 	    $finder2 = new Finder();
 	    $finder3 = new Finder();
 
+	    $finder->files()->name('*.ino')->name('*.pde');
+	    $finder2->files()->name('*.ino')->name('*.pde');
+	    $finder3->files()->name('*.ino')->name('*.pde');
+
 	    $built_examples = array();
-	    $finder->files()->name('*.ino');
 	    if (is_dir(directory."examples"))
 	    {
 		    $finder->in(directory."examples");
@@ -28,7 +31,6 @@ class DefaultController extends Controller
 	    }
 
 	    $included_libraries = array();
-	    $finder2->files()->name('*.ino');
 	    if(is_dir(directory."libraries"))
 	    {
 		    $finder2->in(directory."libraries");
@@ -36,7 +38,6 @@ class DefaultController extends Controller
 	    }
 
 	    $external_libraries = array();
-	    $finder3->files()->name('*.ino');
 	    if (is_dir(directory."external-libraries"))
 	    {
 		    $finder3->in(directory."external-libraries");
