@@ -14,4 +14,4 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    arduino_library_directory: /opt/codebender/codebender-arduino-libraries/
+    arduino_library_directory: /opt/codebender/codebender-arduino-library-files
