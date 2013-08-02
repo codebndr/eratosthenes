@@ -1,0 +1,1786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2163bdef-4efb-409a-92c7-be039e127005" name="Default" comment="" />
+    <ignored path="tzikis.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <file path="/Project.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365414665822" ignored="false" />
+    <file path="/OptionsController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365377378987" ignored="false" />
+    <file path="/info_karma.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471001455" ignored="false" />
+    <file path="/options.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365377449769" ignored="false" />
+    <file path="/find.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365357082829" ignored="false" />
+    <file path="/codebender_copies.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365276225921" ignored="false" />
+    <file path="/donate.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365274547094" ignored="false" />
+    <file path="/info_points.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368305272993" ignored="false" />
+    <file path="/referinfo.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365273911011" ignored="false" />
+    <file path="/codebender_karma.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365265164975" ignored="false" />
+    <file path="/security.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365363913205" ignored="false" />
+    <file path="/ReferralCodeController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365173673644" ignored="false" />
+    <file path="/services.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368300258999" ignored="false" />
+    <file path="/ReferralController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365168474935" ignored="false" />
+    <file path="/ReferralCode.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365167868121" ignored="false" />
+    <file path="/page5.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471123074" ignored="false" />
+    <file path="/page4.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365106948802" ignored="false" />
+    <file path="/register_scripts.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365029447638" ignored="false" />
+    <file path="/container.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365019407676" ignored="false" />
+    <file path="/base.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368484961340" ignored="false" />
+    <file path="/template.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365117195603" ignored="false" />
+    <file path="/supporters.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365161433581" ignored="false" />
+    <file path="/Dummy.txt" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375409620546" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs_new/Symfony/src/Codebender/LibraryBundle/Controller/DefaultController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364421252935" ignored="false" />
+    <file path="/DefaultController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375410214914" ignored="false" />
+    <file path="/a.dummy" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291064685" ignored="false" />
+    <file path="/libraries.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364603691610" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs_new/Symfony/src/Codebender/LibraryBundle/Resources/config/routing.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364420561570" ignored="false" />
+    <file path="/config.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230685382" ignored="false" />
+    <file path="/parameters.ini.dist" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364429507469" ignored="false" />
+    <file path="/parameters.ini" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375409644522" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs/Symfony/src/Codebender/LibraryBundle/Controller/DefaultController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365607500371" ignored="false" />
+    <file path="/flasher_scripts.js.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374728555501" ignored="false" />
+    <file path="/project_wrapper.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364598862444" ignored="false" />
+    <file path="/page1.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471100006" ignored="false" />
+    <file path="/routing.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375409061910" ignored="false" />
+    <file path="/digispark.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364604237153" ignored="false" />
+    <file path="/skeleton.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365105586795" ignored="false" />
+    <file path="/arno.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364691866736" ignored="false" />
+    <file path="/sidebar.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368492951844" ignored="false" />
+    <file path="/editor.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470873308" ignored="false" />
+    <file path="/editor_scripts.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368496900426" ignored="false" />
+    <file path="/info_modal.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368574770230" ignored="false" />
+    <file path="/confirmed.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364596555973" ignored="false" />
+    <file path="/project.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470840428" ignored="false" />
+    <file path="/project_embeddable.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365045481500" ignored="false" />
+    <file path="/page2.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365106407662" ignored="false" />
+    <file path="/verify_section.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364660415976" ignored="false" />
+    <file path="/usbflash_section.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364660434919" ignored="false" />
+    <file path="/serialmonitor_section.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364660549566" ignored="false" />
+    <file path="/page3.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471113211" ignored="false" />
+    <file path="/register_inline.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471150002" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs/Symfony/app/config/parameters.dist.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364739571389" ignored="false" />
+    <file path="/parameters.dist.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374538093056" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs/Symfony/app/config/config.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364737412513" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs/Symfony/app/config/parameters.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364739576320" ignored="false" />
+    <file path="/parameters.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230268583" ignored="false" />
+    <file path="$PROJECT_DIR$/../../libs/Symfony/app/cache/dev/appDevDebugProjectContainer.xml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364739729991" ignored="false" />
+    <file path="/hero.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364920235125" ignored="false" />
+    <file path="/aprilfools.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364767723304" ignored="false" />
+    <file path="/list.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368710825971" ignored="false" />
+    <file path="/User.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365425499301" ignored="false" />
+    <file path="/RegistrationFormType.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364784090655" ignored="false" />
+    <file path="/RegistrationController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368295081201" ignored="false" />
+    <file path="/register_content.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471143226" ignored="false" />
+    <file path="/register.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365047001098" ignored="false" />
+    <file path="/RegistrationFormHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368299447824" ignored="false" />
+    <file path="/ChangePasswordFormHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364788790953" ignored="false" />
+    <file path="/layout.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364907043444" ignored="false" />
+    <file path="/about.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470980464" ignored="false" />
+    <file path="/user.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365357776415" ignored="false" />
+    <file path="/common_javascript.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1370262173119" ignored="false" />
+    <file path="/common_stylesheets.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365036779841" ignored="false" />
+    <file path="/codebender_points.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364936818031" ignored="false" />
+    <file path="/index.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368304610510" ignored="false" />
+    <file path="/features.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1364947852432" ignored="false" />
+    <file path="/getstarted.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470911726" ignored="false" />
+    <file path="/tech.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471057615" ignored="false" />
+    <file path="/footer.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1365007969684" ignored="false" />
+    <file path="/parameters.dist.ini" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1366051610548" ignored="false" />
+    <file path="/BoardControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368355187441" ignored="false" />
+    <file path="/DefaultControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375412428622" ignored="false" />
+    <file path="/BoardController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1366737364513" ignored="false" />
+    <file path="/DefaultHandlerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368355661428" ignored="false" />
+    <file path="/DefaultHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1366748870282" ignored="false" />
+    <file path="/ReferralCodeControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1366818226264" ignored="false" />
+    <file path="/plugin.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1367251694593" ignored="false" />
+    <file path="/config_test.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1367258993474" ignored="false" />
+    <file path="/blog.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1367291167746" ignored="false" />
+    <file path="/DefaultControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368874220483" ignored="false" />
+    <file path="/config_dev.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368298768233" ignored="false" />
+    <file path="/ProjectController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368581697827" ignored="false" />
+    <file path="/SketchController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368481229695" ignored="false" />
+    <file path="/DiskFilesController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368296882453" ignored="false" />
+    <file path="/ProjectControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359109158" ignored="false" />
+    <file path="/BoardControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368378112699" ignored="false" />
+    <file path="/ReferralCodeControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368355167715" ignored="false" />
+    <file path="/ReferralCodeControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368355174377" ignored="false" />
+    <file path="/UploadHandlerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368355683208" ignored="false" />
+    <file path="/DefaultControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368557626680" ignored="false" />
+    <file path="/EditorControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368456353905" ignored="false" />
+    <file path="/EditorControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368575071311" ignored="false" />
+    <file path="/OptionsControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359260516" ignored="false" />
+    <file path="/RegistrationControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359281666" ignored="false" />
+    <file path="/OptionsControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359313692" ignored="false" />
+    <file path="/RegistrationControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359321566" ignored="false" />
+    <file path="/PasswordConstraintValidatorUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359443205" ignored="false" />
+    <file path="/SketchControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359671282" ignored="false" />
+    <file path="/DiskFilesControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359687520" ignored="false" />
+    <file path="/FilesControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359697099" ignored="false" />
+    <file path="/FilesControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359785566" ignored="false" />
+    <file path="/DiskFilesControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359797358" ignored="false" />
+    <file path="/MongoFilesControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359805612" ignored="false" />
+    <file path="/ProjectControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359827114" ignored="false" />
+    <file path="/SketchControllerFunctionalTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368359844699" ignored="false" />
+    <file path="/ProjectControllerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368379413834" ignored="false" />
+    <file path="/DefaultHandlerUnitTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368383787232" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/SearchBundle_AceSearchBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593985" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Controller_SketchController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593985" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Document_ProjectFiles.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593985" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_Controller_DefaultController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593985" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Validator_Constraints_PasswordConstraint.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Controller_FilesController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/GenericBundle_AceGenericBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_Handler_DefaultHandler.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Repository_ProjectFileRepository.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/SenderBundle_AceSenderBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Controller_OptionsController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/GenericBundle_Controller_EditorController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Controller_RegistrationController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/StaticBundle_Entity_Contact.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/StaticBundle_AceStaticBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Controller_DefaultController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Entity_PrivateProjects.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/OwnerBundle_Controller_DefaultController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/SenderBundle_Controller_DefaultController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Entity_Project.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_Handler_UploadHandler.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Controller_ProjectController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Controller_MongoFilesController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_Controller_DiskFilesController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_Entity_Board.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/BlogBundle_AceBlogBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Form_Type_RegistrationFormType.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_Controller_ReferralCodeController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/BlogBundle_Entity_BlogPost.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/BlogBundle_Controller_DefaultController.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Validator_Constraints_PasswordConstraintValidator.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UtilitiesBundle_AceUtilitiesBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_Security_Provider_ExperimentalProvider.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/UserBundle_AceUserBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/ProjectBundle_AceProjectBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/coverage/OwnerBundle_AceOwnerBundle.php.html" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368389593986" ignored="false" />
+    <file path="/EditorController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368494160981" ignored="false" />
+    <file path="/PrivateProjects.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368489126728" ignored="false" />
+    <file path="/codebender_priv_proj_avail.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368489789444" ignored="false" />
+    <file path="/minor_error.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470819291" ignored="false" />
+    <file path="/project_privacy_view.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368492908380" ignored="false" />
+    <file path="/project_privacy_view.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368492897702" ignored="false" />
+    <file path="/info_private_projects.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368583437376" ignored="false" />
+    <file path="/ProjectErrorsHelper.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1368580915238" ignored="false" />
+    <file path="/boards.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470781178" ignored="false" />
+    <file path="/UploadHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1370250486361" ignored="false" />
+    <file path="/editor_javascript.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1370374078821" ignored="false" />
+    <file path="/blog_rss.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371470748234" ignored="false" />
+    <file path="/tutorials.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471075820" ignored="false" />
+    <file path="/confirmation.email.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471168308" ignored="false" />
+    <file path="/confirmation_email.html.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471199345" ignored="false" />
+    <file path="/resetting.email.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1371471208402" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Controller/DefaultController.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375289711464" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/CompilerHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291495167" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Resources/config/routing.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375131603300" ignored="false" />
+    <file path="/CompilerHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291342295" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/UtilitiesHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374087009070" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/compiler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374101100394" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/dafuq.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374094913721" ignored="false" />
+    <file path="/dafuq.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374094911608" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/config/config.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230721789" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/config/parameters.dist.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374541443999" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/config/parameters.yml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230790359" ignored="false" />
+    <file path="/compiler_scripts.js.twig" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374535345163" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/cache/dev/appDevDebugProjectContainer.xml" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374877506659" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/MCUHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374868154763" ignored="false" />
+    <file path="/MCUHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374539302729" ignored="false" />
+    <file path="/a.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374699451503" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/config/parameters.yml.dist" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230769579" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/app/phpunit.xml.dist" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1374868154763" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Tests/Controller/DefaultControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375140005980" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Acme/DemoBundle/Tests/Controller/DemoControllerTest.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375118086858" ignored="false" />
+    <file path="$PROJECT_DIR$/Symfony/app/cache/dev/classes.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230040284" ignored="false" />
+    <file path="/parameters.yml.dist" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375230770149" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/PreprocessorHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291049192" ignored="false" />
+    <file path="$PROJECT_DIR$/../compiler/Symfony/src/Codebender/CompilerBundle/Handler/PreprocessingHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291338093" ignored="false" />
+    <file path="/PreprocessingHandler.php" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375291338093" ignored="false" />
+    <file path="$PROJECT_DIR$/../website/Symfony/app/config/parameters.ini" changelist="2163bdef-4efb-409a-92c7-be039e127005" time="1375409646909" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/tzikis$Local_Testing.coverage" NAME="Local Testing Coverage Results" MODIFIED="1368412169975" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="PhpCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/tzikis$DefaultControllerFunctionalTest_testBoardsAction.coverage" NAME="DefaultControllerFunctionalTest.testBoardsAction Coverage Results" MODIFIED="1368386374335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="PhpCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ErrorTreeViewConfiguration">
+    <option name="autoscrollToSource" value="true" />
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="true" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="tzikis" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="DefaultController.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Controller/DefaultController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="0" selection-start="631" selection-end="631" vertical-scroll-proportion="-7.2">
+              <folding>
+                <element signature="e#55#112#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DefaultControllerTest.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Tests/Controller/DefaultControllerTest.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="58" column="0" selection-start="1335" selection-end="1335" vertical-scroll-proportion="0.7614841">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DemoControllerTest.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Symfony/src/Acme/DemoBundle/Tests/Controller/DemoControllerTest.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="3" selection-start="427" selection-end="427" vertical-scroll-proportion="-10.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="parameters.yml.dist" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Symfony/app/config/parameters.yml.dist">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="17" selection-start="491" selection-end="524" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="parameters.yml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Symfony/app/config/parameters.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="0" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="routing.yml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Resources/config/routing.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="23" selection-start="276" selection-end="276" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="GitLogSettings">
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UserBundle/Resources/views/Registration/register_inline.html.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UserBundle/Resources/views/User/confirmation.email.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UserBundle/Resources/views/User/confirmation_email.html.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UserBundle/Resources/views/User/resetting.email.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UtilitiesBundle/Resources/config/routing.yml" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/CompilerFlasher/compiler_scripts.js.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/UtilitiesBundle/Controller/DefaultController.php" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/CompilerFlasher/flasher_scripts.js.twig" />
+        <option value="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/Editor/editor.html.twig" />
+        <option value="$PROJECT_DIR$/Symfony/app/config/parameters.ini" />
+        <option value="$PROJECT_DIR$/Symfony/app/config/parameters.yml.dist" />
+        <option value="$PROJECT_DIR$/Symfony/app/config/parameters.yml" />
+        <option value="$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Resources/config/routing.yml" />
+        <option value="$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Controller/DefaultController.php" />
+        <option value="$PROJECT_DIR$/Symfony/src/Acme/DemoBundle/Tests/Controller/DemoControllerTest.php" />
+        <option value="$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Tests/Controller/DefaultControllerTest.php" />
+      </list>
+    </option>
+  </component>
+  <component name="PhpServers">
+    <option name="servers">
+      <server host="localhost" name="localhost" use_path_mappings="true">
+        <path_mappings>
+          <path_mapping local_path="$PROJECT_DIR$/Symfony" remote_path="$PROJECT_DIR$/Symfony" />
+          <path_mapping local_path="$PROJECT_DIR$/Symfony/vendor/doctrine/tools/sandbox" remote_path="/Applications/XAMPP/xamppfiles/htdocs/xampp" />
+        </path_mappings>
+      </server>
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="XAMPP">
+    <include_path>
+      <path value="/Applications/XAMPP/xamppfiles/lib/php" />
+      <path value="/Applications/XAMPP/xamppfiles/lib/php/pear" />
+      <path value="." />
+    </include_path>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="22" />
+    <option name="width" value="1280" />
+    <option name="height" value="774" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>CoffeeScript</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents ProjectPane="true" />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Codebender" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LibraryBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Codebender" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LibraryBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Tests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Controller" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Codebender" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LibraryBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Codebender" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LibraryBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Codebender" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LibraryBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Controller" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Acme" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DemoBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Acme" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DemoBundle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Tests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Controller" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tzikis" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Symfony" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="82" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="97" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="92" />
+    <property name="recentsLimit" value="5" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../codebender/compiler" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="101" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="825" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="828" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="97" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="94" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FullScreen" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="options.lastSelected" value="preferences.sourceCode" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Symfony/app/Resources/views" />
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/StaticBundle/Tests/Controller" />
+      <recent name="$PROJECT_DIR$/Symfony/web" />
+      <recent name="$PROJECT_DIR$/Symfony/web/images" />
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/StaticBundle/Resources/views/Default" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/Index" />
+      <recent name="$PROJECT_DIR$/Symfony/web/images" />
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/Editor" />
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/Editor/Modals" />
+      <recent name="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Resources/views/CompilerFlasher" />
+    </key>
+  </component>
+  <component name="RunManager" selected="PHPUnit.Local Testing">
+    <configuration default="false" name="DefaultControllerFunctionalTest.testEmbeddedCompilerFlasherAction" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner class="Ace\GenericBundle\Tests\Controller\DefaultControllerFunctionalTest" configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" file="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Tests/Controller/DefaultControllerFunctionalTest.php" method="testEmbeddedCompilerFlasherAction" scope="Method" options="--stderr" use_alternative_configuration_file="true" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DefaultControllerFunctionalTest.testProjectfilesAction" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner class="Ace\GenericBundle\Tests\Controller\DefaultControllerFunctionalTest" configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" file="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Tests/Controller/DefaultControllerFunctionalTest.php" method="testProjectfilesAction" scope="Method" options="--stderr" use_alternative_configuration_file="true" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DefaultControllerFunctionalTest.testProjectfilesAction_Success_test_project" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner class="Ace\GenericBundle\Tests\Controller\DefaultControllerFunctionalTest" configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" file="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Tests/Controller/DefaultControllerFunctionalTest.php" method="testProjectfilesAction_Success_test_project" scope="Method" options="--stderr" use_alternative_configuration_file="true" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DefaultControllerFunctionalTest.testProjectfilesAction_ProjectNotFound" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner class="Ace\GenericBundle\Tests\Controller\DefaultControllerFunctionalTest" configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" file="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Tests/Controller/DefaultControllerFunctionalTest.php" method="testProjectfilesAction_ProjectNotFound" scope="Method" options="--stderr" use_alternative_configuration_file="true" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DefaultControllerFunctionalTest.testIndexAction_PrivateProjectCreation" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner class="Ace\GenericBundle\Tests\Controller\DefaultControllerFunctionalTest" configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" file="$PROJECT_DIR$/Symfony/src/Ace/GenericBundle/Tests/Controller/DefaultControllerFunctionalTest.php" method="testIndexAction_PrivateProjectCreation" scope="Method" options="--stderr" use_alternative_configuration_file="true" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <method />
+    </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <CommandLine workingDirectory="$PROJECT_DIR$/Symfony" />
+      <TestRunner configuration_file="$PROJECT_DIR$/Symfony/app/phpunit.xml" scope="XML" options="--stderr" use_alternative_configuration_file="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpBuiltInWebServerConfigurationType" factoryName="PHP Built-in Web Server">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpRemoteDebugRunConfigurationType" factoryName="PHP Remote Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpHttpRequestRunConfigurationType" factoryName="PHP HTTP Request">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="PHPUnit.Local Testing" />
+      <item index="1" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testEmbeddedCompilerFlasherAction" />
+      <item index="2" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction" />
+      <item index="3" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction_Success_test_project" />
+      <item index="4" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction_ProjectNotFound" />
+      <item index="5" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testIndexAction_PrivateProjectCreation" />
+    </list>
+    <recent_temporary>
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testIndexAction_PrivateProjectCreation" />
+        <item index="1" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction_ProjectNotFound" />
+        <item index="2" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction_Success_test_project" />
+        <item index="3" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testProjectfilesAction" />
+        <item index="4" class="java.lang.String" itemvalue="PHPUnit.DefaultControllerFunctionalTest.testEmbeddedCompilerFlasherAction" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="sslv3">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <configuration useDefault="true">$USER_HOME$/.subversion</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2163bdef-4efb-409a-92c7-be039e127005" name="Default" comment="" />
+      <created>1354279196233</created>
+      <updated>1354279196233</updated>
+    </task>
+    <task id="LOCAL-00001" summary="added active users fetching">
+      <created>1354316269485</created>
+      <updated>1354316269485</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added accordeons for the examples to keep the list short">
+      <created>1354396316644</created>
+      <updated>1354396316644</updated>
+    </task>
+    <task id="LOCAL-00003" summary="moved active to enabled, created new 'active' with users logged in today">
+      <created>1354416146128</created>
+      <updated>1354416146128</updated>
+    </task>
+    <task id="LOCAL-00004" summary="file downloading: now using zip files containing the whole arduino sketch. added support for multi-file projects">
+      <created>1354759107049</created>
+      <updated>1354759107049</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fixed the download project link in the editor page">
+      <created>1354759699484</created>
+      <updated>1354759699484</updated>
+    </task>
+    <task id="LOCAL-00006" summary="removed empty tests">
+      <created>1355254941899</created>
+      <updated>1355254941899</updated>
+    </task>
+    <task id="LOCAL-00007" summary="replaced old faulty tests with failing tests">
+      <created>1355255292570</created>
+      <updated>1355255292570</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added initial tests in Utility DefaultHandler">
+      <created>1355255324294</created>
+      <updated>1355255324294</updated>
+    </task>
+    <task id="LOCAL-00009" summary="removed unused json_encode function">
+      <created>1355261708885</created>
+      <updated>1355261708885</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added test for default_text()">
+      <created>1355262171360</created>
+      <updated>1355262171360</updated>
+    </task>
+    <task id="LOCAL-00011" summary="removed unused inputs for get_gravatar">
+      <created>1355262399378</created>
+      <updated>1355262399378</updated>
+    </task>
+    <task id="LOCAL-00012" summary="added test for get_gravatar()">
+      <created>1355262994092</created>
+      <updated>1355262994092</updated>
+    </task>
+    <task id="LOCAL-00013" summary="streamlined get_gravatar()">
+      <created>1355265828740</created>
+      <updated>1355265828740</updated>
+    </task>
+    <task id="LOCAL-00014" summary="moved the common javascript includes to their own file">
+      <created>1355504038662</created>
+      <updated>1355504038662</updated>
+    </task>
+    <task id="LOCAL-00015" summary="moved the common stylesheets includes to their own file">
+      <created>1355504515652</created>
+      <updated>1355504515652</updated>
+    </task>
+    <task id="LOCAL-00016" summary="moved the project wrapper to its own file and created embeddable view. added code embedding the project wrapper in the project view page">
+      <created>1355509305945</created>
+      <updated>1355509305945</updated>
+    </task>
+    <task id="LOCAL-00017" summary="fixed bug in code wrapper (set overflow on y axis to scroll)">
+      <created>1355509812338</created>
+      <updated>1355509812343</updated>
+    </task>
+    <task id="LOCAL-00018" summary="fixed bug in project view that returned the editor page instead of the embeddable view for the owner">
+      <created>1355510562456</created>
+      <updated>1355510562456</updated>
+    </task>
+    <task id="LOCAL-00019" summary="hiding scrollbar when it's not needed (stupid firefox)">
+      <created>1355511775760</created>
+      <updated>1355511775760</updated>
+    </task>
+    <task id="LOCAL-00020" summary="hiding scrollbar when it's not needed in code pre as well (stupid firefox)">
+      <created>1355512336916</created>
+      <updated>1355512336916</updated>
+    </task>
+    <task id="LOCAL-00021" summary="added tooltips for download and delete buttons in the editor view">
+      <created>1355539385434</created>
+      <updated>1355539385434</updated>
+    </task>
+    <task id="LOCAL-00022" summary="replaced jplayer with vimeo">
+      <created>1355869372769</created>
+      <updated>1355869372769</updated>
+    </task>
+    <task id="LOCAL-00023" summary="renamed the tabs in the editor sidebar to better reflect their contents">
+      <created>1355871310521</created>
+      <updated>1355871310523</updated>
+    </task>
+    <task id="LOCAL-00024" summary="added clone project link in the editor">
+      <created>1355871866312</created>
+      <updated>1355871866312</updated>
+    </task>
+    <task id="LOCAL-00025" summary="added embed project code in the editor">
+      <created>1355872196112</created>
+      <updated>1355872196112</updated>
+    </task>
+    <task id="LOCAL-00026" summary="moved the total number of lines text in the editor's bottom-right corner">
+      <created>1355874020275</created>
+      <updated>1355874020275</updated>
+    </task>
+    <task id="LOCAL-00027" summary="fixed user image and name layout colision in firefox">
+      <created>1355874904793</created>
+      <updated>1355874904793</updated>
+    </task>
+    <task id="LOCAL-00028" summary="fixed footer (removed unnecessary contact link and report bugs link, reinstated tutorials and glyphicons links">
+      <created>1355876763194</created>
+      <updated>1355876763194</updated>
+    </task>
+    <task id="LOCAL-00029" summary="added plugin video in tutorials">
+      <created>1355877405262</created>
+      <updated>1355877405262</updated>
+    </task>
+    <task id="LOCAL-00030" summary="minor ui change in the total line counter div">
+      <created>1357652550169</created>
+      <updated>1357652550169</updated>
+    </task>
+    <task id="LOCAL-00031" summary="added logging on syslog for the editor's save button">
+      <created>1357776961245</created>
+      <updated>1357776961245</updated>
+    </task>
+    <task id="LOCAL-00032" summary="added logging on syslog for the downloads">
+      <created>1357778425040</created>
+      <updated>1357778425040</updated>
+    </task>
+    <task id="LOCAL-00033" summary="added logging on syslog for project creation">
+      <created>1357778476099</created>
+      <updated>1357778476099</updated>
+    </task>
+    <task id="LOCAL-00034" summary="added logging for compiling (verify) and flashing">
+      <created>1357935784319</created>
+      <updated>1357935784319</updated>
+    </task>
+    <task id="LOCAL-00035" summary="added logging for project cloning">
+      <created>1357938003282</created>
+      <updated>1357938003282</updated>
+    </task>
+    <task id="LOCAL-00036" summary="vastly cleaned the editor page's html/css/js code, split the compiler and flasher codes, and added a new page that has only the compiler and flashing divs">
+      <created>1360276706606</created>
+      <updated>1360276706606</updated>
+    </task>
+    <task id="LOCAL-00037" summary="merge change pushing plugin version to 1.5.4">
+      <created>1360277653425</created>
+      <updated>1360277653425</updated>
+    </task>
+    <task id="LOCAL-00038" summary="merging: add placeholders for ip and serial message">
+      <created>1360277769463</created>
+      <updated>1360277769463</updated>
+    </task>
+    <task id="LOCAL-00039" summary="correctly merged my previous commit (removed duplicates in the editor_scripts.html.twig">
+      <created>1360279760596</created>
+      <updated>1360279760596</updated>
+    </task>
+    <task id="LOCAL-00040" summary="fixed Serial Monitor's Disconnect button having a caret for no reason">
+      <created>1360279891362</created>
+      <updated>1360279891362</updated>
+    </task>
+    <task id="LOCAL-00041" summary="fixed the issue when the links in the embedded project view would link inside the iframe, and not in the parent window">
+      <created>1360282731449</created>
+      <updated>1360282731449</updated>
+    </task>
+    <task id="LOCAL-00042" summary="moved disconnect() inside flashusb(()">
+      <created>1360283141862</created>
+      <updated>1360283141862</updated>
+    </task>
+    <task id="LOCAL-00043" summary="renamed most of the Compiler/Flasher files containing the scripts and html/css code">
+      <created>1360284562707</created>
+      <updated>1360284562707</updated>
+    </task>
+    <task id="LOCAL-00044" summary="moved chrome webstore link to the embedded view (via script), moved a hanging div back to the editor view and improved the alert creation divs">
+      <created>1360286042485</created>
+      <updated>1360286042485</updated>
+    </task>
+    <task id="LOCAL-00045" summary="fixed new alerts for both installation and update">
+      <created>1360286204689</created>
+      <updated>1360286204689</updated>
+    </task>
+    <task id="LOCAL-00046" summary="cleaned the plugin detection scripts. now making sure the user will only view the plugin if it makes sense, otherwise they will get an error">
+      <created>1360290316001</created>
+      <updated>1360290316001</updated>
+    </task>
+    <task id="LOCAL-00047" summary="fixed an issue where there was no selected board until you manually selected one in the boards list">
+      <created>1360539995918</created>
+      <updated>1360539995918</updated>
+    </task>
+    <task id="LOCAL-00048" summary="fixed the embedded project view's download button gradient (used to look pressed down)">
+      <created>1360546603522</created>
+      <updated>1360546603522</updated>
+    </task>
+    <task id="LOCAL-00049" summary="added CORS support for boardslist and projectfiles requests">
+      <created>1360593443447</created>
+      <updated>1360593443447</updated>
+    </task>
+    <task id="LOCAL-00050" summary="added CORS support for generic logging requests">
+      <created>1360593744874</created>
+      <updated>1360593744874</updated>
+    </task>
+    <task id="LOCAL-00051" summary="fixed the cb_cf to generate full-url requests instead of relative paths, in order to work on non-codebender-hosted pages">
+      <created>1360593809255</created>
+      <updated>1360593809255</updated>
+    </task>
+    <task id="LOCAL-00052" summary="fixed an issue with the comparison of the binary sizes boards">
+      <created>1360614375199</created>
+      <updated>1360614375199</updated>
+    </task>
+    <task id="LOCAL-00053" summary="updated the cb_cf section with a better way to define sections">
+      <created>1360616056681</created>
+      <updated>1360616056681</updated>
+    </task>
+    <task id="LOCAL-00054" summary="fix the new height for embedding the project view">
+      <created>1360622664578</created>
+      <updated>1360622664579</updated>
+    </task>
+    <task id="LOCAL-00055" summary="fixed over-zealous logging of Leonardo resets">
+      <created>1360629146584</created>
+      <updated>1360629146585</updated>
+    </task>
+    <task id="LOCAL-00056" summary="fixed port loading bug (using Lawnchair)">
+      <created>1360631675068</created>
+      <updated>1360631675068</updated>
+    </task>
+    <task id="LOCAL-00057" summary="fixed auto-picking correct last_selected port">
+      <created>1360633530571</created>
+      <updated>1360633530571</updated>
+    </task>
+    <task id="LOCAL-00058" summary="removed the dependency for an id variable in the embedded view, moved the window.files creation into the populate() function">
+      <created>1360634890902</created>
+      <updated>1360634890902</updated>
+    </task>
+    <task id="LOCAL-00059" summary="created a new plugin installation warning message for Firefox">
+      <created>1360638424853</created>
+      <updated>1360638424853</updated>
+    </task>
+    <task id="LOCAL-00060" summary="bullet-proofed the url to the plugins page (made it work with non-codebender-hosted pages)">
+      <created>1360639413074</created>
+      <updated>1360639413075</updated>
+    </task>
+    <task id="LOCAL-00061" summary="removed the selected port requirement when &quot;using&quot; something to upload, like the DigiSpark or an ISP">
+      <created>1362406106022</created>
+      <updated>1362406106023</updated>
+    </task>
+    <task id="LOCAL-00062" summary="fixed a bug where the javascript for the embeddable code wrapper would blow fore multi-file projects">
+      <created>1362407803205</created>
+      <updated>1362407803206</updated>
+    </task>
+    <task id="LOCAL-00063" summary="centered the pagination div in the blog posts view">
+      <created>1362409022545</created>
+      <updated>1362409022545</updated>
+    </task>
+    <task id="LOCAL-00064" summary="removed the selected port requirement when &quot;using&quot; something to upload, like the DigiSpark or an ISP vol.2 (fixed a remaining bug)">
+      <created>1362504247752</created>
+      <updated>1362504247753</updated>
+    </task>
+    <task id="LOCAL-00065" summary="changed the verify button to make it more clear to the user that it verifies his code">
+      <created>1362648641714</created>
+      <updated>1362648641714</updated>
+    </task>
+    <task id="LOCAL-00066" summary="added a cool icon in the open serial monitor button">
+      <created>1362667096642</created>
+      <updated>1362667096643</updated>
+    </task>
+    <task id="LOCAL-00067" summary="complete redesign of the editor view. fixes all the layout issues, and also fixed the loadcode() issues when clicking verify and usb_flash">
+      <created>1362702595971</created>
+      <updated>1362702595973</updated>
+    </task>
+    <task id="LOCAL-00068" summary="fixed a bug where the &quot;open serial monitor&quot; button's icon would disappear after opening and closing the monitor">
+      <created>1362751823823</created>
+      <updated>1362751823823</updated>
+    </task>
+    <task id="LOCAL-00069" summary="fixed the Editor's left container's backgroupnd, set it to transparent">
+      <created>1362751896504</created>
+      <updated>1362751896505</updated>
+    </task>
+    <task id="LOCAL-00070" summary="changed the 'upload successful' text to make it compatible with the digispark output">
+      <created>1362759645659</created>
+      <updated>1362759645660</updated>
+    </task>
+    <task id="LOCAL-00071" summary="added an awesome getting started guide for the plugin, the drivers etc">
+      <created>1362760208114</created>
+      <updated>1362760208114</updated>
+    </task>
+    <task id="LOCAL-00072" summary="added an an onkeypress for the serial monitor, now you can send a message by pressing enter :)">
+      <created>1362767827789</created>
+      <updated>1362767827789</updated>
+    </task>
+    <task id="LOCAL-00073" summary="removed the hardcoded width from the serial monitor's baudrate dropdown menu">
+      <created>1362770548165</created>
+      <updated>1362770548166</updated>
+    </task>
+    <task id="LOCAL-00074" summary="updated the plugin to 1.5.4.16 (with additional driver installation abilities)">
+      <created>1362777619713</created>
+      <updated>1362777619714</updated>
+    </task>
+    <task id="LOCAL-00075" summary="added a proper cloudflash div, as well as a proper webserial monitor!">
+      <created>1362777672240</created>
+      <updated>1362777672240</updated>
+    </task>
+    <task id="LOCAL-00076" summary="improved the footer layout in the project wrapper, especially for smaller screens and shorter widths">
+      <created>1363986550829</created>
+      <updated>1363986550829</updated>
+    </task>
+    <task id="LOCAL-00077" summary="moved the project wrapper's operation output above the footer">
+      <created>1363988291733</created>
+      <updated>1363988291733</updated>
+    </task>
+    <task id="LOCAL-00078" summary="added a new license file">
+      <created>1364306970765</created>
+      <updated>1364306970766</updated>
+    </task>
+    <task id="LOCAL-00079" summary="updated the library page and controler to use our new, Symfony-based &amp; filesystem-backend-based library management subsystem">
+      <created>1364422818026</created>
+      <updated>1364422818027</updated>
+    </task>
+    <task id="LOCAL-00080" summary="updated all codebender logo files to the new logo">
+      <created>1364493162223</created>
+      <updated>1364493162226</updated>
+    </task>
+    <task id="LOCAL-00081" summary="set a max height for the sidebar's project list">
+      <created>1364506678150</created>
+      <updated>1364506678150</updated>
+    </task>
+    <task id="LOCAL-00082" summary="minor improvement to the editor's line count">
+      <created>1364585978891</created>
+      <updated>1364585978891</updated>
+    </task>
+    <task id="LOCAL-00083" summary="fixed a bug where the selected file would not be properly shown in firefox">
+      <created>1364587016509</created>
+      <updated>1364587016510</updated>
+    </task>
+    <task id="LOCAL-00084" summary="project view: moved the clone button insite the embeddable view">
+      <created>1364599471050</created>
+      <updated>1364599471050</updated>
+    </task>
+    <task id="LOCAL-00085" summary="added a redirect to the homepage after a user registers successfully">
+      <created>1364599522631</created>
+      <updated>1364599522631</updated>
+    </task>
+    <task id="LOCAL-00086" summary="reestablished descriptions for libraries (non of them has any yet)">
+      <created>1364603787581</created>
+      <updated>1364603787581</updated>
+    </task>
+    <task id="LOCAL-00087" summary="fixes project download for .zip for large projects and general bug (fucking SHIT!!!)">
+      <created>1364658970779</created>
+      <updated>1364658970779</updated>
+    </task>
+    <task id="LOCAL-00088" summary="added titles (popover info) to all important buttons in the editor">
+      <created>1364660595079</created>
+      <updated>1364660595079</updated>
+    </task>
+    <task id="LOCAL-00089" summary="added a link to the USB Flashing Troubleshooting page in the usbflash error output">
+      <created>1364661818711</created>
+      <updated>1364661818711</updated>
+    </task>
+    <task id="LOCAL-00090" summary="added a landing page in the walkthrough">
+      <created>1364664237302</created>
+      <updated>1364664237302</updated>
+    </task>
+    <task id="LOCAL-00091" summary="renamed the sample projects to make them more explicit">
+      <created>1364682100690</created>
+      <updated>1364682100690</updated>
+    </task>
+    <task id="LOCAL-00092" summary="added a friendly, conversational default text to the info div of the sign up section (index page)">
+      <created>1364683491205</created>
+      <updated>1364683491205</updated>
+    </task>
+    <task id="LOCAL-00093" summary="set the Glyphicons link to open in a new tab">
+      <created>1364687925305</created>
+      <updated>1364687925306</updated>
+    </task>
+    <task id="LOCAL-00094" summary="updated Arno page">
+      <created>1364734456918</created>
+      <updated>1364734456918</updated>
+    </task>
+    <task id="LOCAL-00095" summary="added april fool's day special to the homepage as well">
+      <created>1364765194703</created>
+      <updated>1364765194703</updated>
+    </task>
+    <task id="LOCAL-00096" summary="added a notice that digispark doesn't work on os x for the april fools page">
+      <created>1364767758535</created>
+      <updated>1364767758535</updated>
+    </task>
+    <task id="LOCAL-00097" summary="added referrers and referral codes for each user">
+      <created>1364782338959</created>
+      <updated>1364782338959</updated>
+    </task>
+    <task id="LOCAL-00098" summary="improved email validation regex to support subdomains">
+      <created>1364783523334</created>
+      <updated>1364783523334</updated>
+    </task>
+    <task id="LOCAL-00099" summary="removed april fool's special sections from index and homepage">
+      <created>1364920312611</created>
+      <updated>1364920312611</updated>
+    </task>
+    <task id="LOCAL-00100" summary="copied the registration greeting from the inline registration view to the registration page">
+      <created>1364926626504</created>
+      <updated>1364926626504</updated>
+    </task>
+    <task id="LOCAL-00101" summary="updated the tech section of the about page">
+      <created>1364927584480</created>
+      <updated>1364927584480</updated>
+    </task>
+    <task id="LOCAL-00102" summary="reduced the height of the inline register function, and made some minor layout changes to the index page to accoutn for that">
+      <created>1364948105318</created>
+      <updated>1364948105318</updated>
+    </task>
+    <task id="LOCAL-00103" summary="moved about page to a new page called tech. about is now a placeholder">
+      <created>1365008066186</created>
+      <updated>1365008066187</updated>
+    </task>
+    <task id="LOCAL-00104" summary="completely redesigned the index page">
+      <created>1365021762325</created>
+      <updated>1365021762325</updated>
+    </task>
+    <task id="LOCAL-00105" summary="fixed the Sign Up anchor not being a proper link">
+      <created>1365028437877</created>
+      <updated>1365028437877</updated>
+    </task>
+    <task id="LOCAL-00106" summary="renamed Revert to Undo All">
+      <created>1365029015144</created>
+      <updated>1365029015144</updated>
+    </task>
+    <task id="LOCAL-00107" summary="added the ability to check if an email is already used">
+      <created>1365029841889</created>
+      <updated>1365029841889</updated>
+    </task>
+    <task id="LOCAL-00108" summary="added a check if an email is already being used">
+      <created>1365030011458</created>
+      <updated>1365030011459</updated>
+    </task>
+    <task id="LOCAL-00109" summary="made the embeddable code view's background transparent">
+      <created>1365033586135</created>
+      <updated>1365033586135</updated>
+    </task>
+    <task id="LOCAL-00110" summary="finally fixed the stupid chrome issue with the plugin having a size for some stupid reason and fucking up everything else's layout">
+      <created>1365034512651</created>
+      <updated>1365034512652</updated>
+    </task>
+    <task id="LOCAL-00111" summary="stupid piece of fucking shit">
+      <created>1365080564565</created>
+      <updated>1365080564565</updated>
+    </task>
+    <task id="LOCAL-00112" summary="the supporters' header was a tad too big. fixed it">
+      <created>1365121040559</created>
+      <updated>1365121040559</updated>
+    </task>
+    <task id="LOCAL-00113" summary="fixed the supporters' links to open in a new tab">
+      <created>1365121295089</created>
+      <updated>1365121295089</updated>
+    </task>
+    <task id="LOCAL-00114" summary="added our partners on the index page">
+      <created>1365121345481</created>
+      <updated>1365121345482</updated>
+    </task>
+    <task id="LOCAL-00115" summary="post-registration errors now show up red">
+      <created>1365122746350</created>
+      <updated>1365122746350</updated>
+    </task>
+    <task id="LOCAL-00116" summary="added a section showing all our supporters at a glance">
+      <created>1365161779363</created>
+      <updated>1365161779363</updated>
+    </task>
+    <task id="LOCAL-00117" summary="beautified the error 500 page to look like a proper codebender page">
+      <created>1365197723391</created>
+      <updated>1365197723392</updated>
+    </task>
+    <task id="LOCAL-00118" summary="secured the options page to redirect to index for unauthenticated users">
+      <created>1365198592945</created>
+      <updated>1365198592945</updated>
+    </task>
+    <task id="LOCAL-00119" summary="icorporated Pascal's suggestions for the About page">
+      <created>1365253852877</created>
+      <updated>1365253852877</updated>
+    </task>
+    <task id="LOCAL-00120" summary="minor layout fix on points view, added similar view for karma">
+      <created>1365273515209</created>
+      <updated>1365273515209</updated>
+    </task>
+    <task id="LOCAL-00121" summary="added initial page for information about codebender points">
+      <created>1365275571300</created>
+      <updated>1365275571301</updated>
+    </task>
+    <task id="LOCAL-00122" summary="replaced the editor's &quot;clone project&quot; icon with a better one from Font Awesome">
+      <created>1365276471466</created>
+      <updated>1365276471466</updated>
+    </task>
+    <task id="LOCAL-00123" summary="added a new view for the number copies, to be used for showing the number of times a project has been cloned">
+      <created>1365276521892</created>
+      <updated>1365276521892</updated>
+    </task>
+    <task id="LOCAL-00124" summary="added an API for fetching the top n users (based on karma)">
+      <created>1365280041725</created>
+      <updated>1365280041725</updated>
+    </task>
+    <task id="LOCAL-00125" summary="redesigned the new homepage">
+      <created>1365280443588</created>
+      <updated>1365280443588</updated>
+    </task>
+    <task id="LOCAL-00126" summary="user search now also returns karma in the user info">
+      <created>1365356913259</created>
+      <updated>1365356913259</updated>
+    </task>
+    <task id="LOCAL-00127" summary="added Karma on search page">
+      <created>1365357162244</created>
+      <updated>1365357162244</updated>
+    </task>
+    <task id="LOCAL-00128" summary="replaced codebender points with karma on the user info page">
+      <created>1365357524281</created>
+      <updated>1365357524281</updated>
+    </task>
+    <task id="LOCAL-00129" summary="removed the gravatar link from the user info page">
+      <created>1365357900697</created>
+      <updated>1365357900698</updated>
+    </task>
+    <task id="LOCAL-00130" summary="added initial page for karma information">
+      <created>1365360494963</created>
+      <updated>1365360494963</updated>
+    </task>
+    <task id="LOCAL-00131" summary="karma and codebender points in the homepage are now links, to the equivalent info pages">
+      <created>1365361138060</created>
+      <updated>1365361138060</updated>
+    </task>
+    <task id="LOCAL-00132" summary="added twitter and facebook sections in the codebender points info page">
+      <created>1365363838128</created>
+      <updated>1365363838128</updated>
+    </task>
+    <task id="LOCAL-00133" summary="secured the codebender points info page to show up only for logged in users">
+      <created>1365363963506</created>
+      <updated>1365363963506</updated>
+    </task>
+    <task id="LOCAL-00134" summary="completed the codebender points info page with explanation and t-shirt info">
+      <created>1365366250745</created>
+      <updated>1365366250745</updated>
+    </task>
+    <task id="LOCAL-00135" summary="fixed the image title for the t-shirt image">
+      <created>1365370064613</created>
+      <updated>1365370064613</updated>
+    </task>
+    <task id="LOCAL-00136" summary="added info page for karma">
+      <created>1365370078482</created>
+      <updated>1365370078482</updated>
+    </task>
+    <task id="LOCAL-00137" summary="moved the upload section from the modal to the container">
+      <created>1365370877651</created>
+      <updated>1365370877652</updated>
+    </task>
+    <task id="LOCAL-00138" summary="fixed the size of the option form's inputs to work with small res">
+      <created>1365377274466</created>
+      <updated>1365377274466</updated>
+    </task>
+    <task id="LOCAL-00139" summary="added points and karma in the options page">
+      <created>1365377560307</created>
+      <updated>1365377560307</updated>
+    </task>
+    <task id="LOCAL-00140" summary="added parents for cloned projects">
+      <created>1365415512163</created>
+      <updated>1365415512163</updated>
+    </task>
+    <task id="LOCAL-00141" summary="added walkthrough_status field for Users, to save whether they have completed our walkthrough or not">
+      <created>1365426029386</created>
+      <updated>1365426029386</updated>
+    </task>
+    <task id="LOCAL-00142" summary="now hiding the getting started section for users who have completed the guide">
+      <created>1365426068284</created>
+      <updated>1365426068284</updated>
+    </task>
+    <task id="LOCAL-00143" summary="the walkthrough will now properly give you codebender points!">
+      <created>1365429335930</created>
+      <updated>1365429335930</updated>
+    </task>
+    <task id="LOCAL-00144" summary="the getting started section of the homepage will now disappear only after you've completed the whole walkthrough">
+      <created>1365429367905</created>
+      <updated>1365429367906</updated>
+    </task>
+    <task id="LOCAL-00145" summary="typos">
+      <created>1365429408727</created>
+      <updated>1365429408727</updated>
+    </task>
+    <task id="LOCAL-00146" summary="moved the utilities service to its own container (Bundle)">
+      <created>1365446178273</created>
+      <updated>1365446178273</updated>
+    </task>
+    <task id="LOCAL-00147" summary="moved the usercontroller service to its own container (Bundle)">
+      <created>1365447374047</created>
+      <updated>1365447374047</updated>
+    </task>
+    <task id="LOCAL-00148" summary="moved the optionscontroller service to its own container (Bundle)">
+      <created>1365447891570</created>
+      <updated>1365447891571</updated>
+    </task>
+    <task id="LOCAL-00149" summary="moved the ownercontroller service to its own container (Bundle)">
+      <created>1365448100842</created>
+      <updated>1365448100842</updated>
+    </task>
+    <task id="LOCAL-00150" summary="moved the projectfiles service to its own container (Bundle)">
+      <created>1365448950560</created>
+      <updated>1365448950560</updated>
+    </task>
+    <task id="LOCAL-00151" summary="moved the mongofilecontroller service to its own container (Bundle)">
+      <created>1365449564229</created>
+      <updated>1365449564229</updated>
+    </task>
+    <task id="LOCAL-00152" summary="setting the login box to open on an unsuccessful login">
+      <created>1365461060342</created>
+      <updated>1365461060343</updated>
+    </task>
+    <task id="LOCAL-00153" summary="typo fix">
+      <created>1365524291964</created>
+      <updated>1365524291964</updated>
+    </task>
+    <task id="LOCAL-00154" summary="replaced the outdated mention of the java applet">
+      <created>1365524345610</created>
+      <updated>1365524345610</updated>
+    </task>
+    <task id="LOCAL-00155" summary="baltas being an asshole">
+      <created>1365702880023</created>
+      <updated>1365702880023</updated>
+    </task>
+    <task id="LOCAL-00156" summary="aligned the social buttons on the right with the feedback button">
+      <created>1365778672262</created>
+      <updated>1365778672262</updated>
+    </task>
+    <task id="LOCAL-00157" summary="resized the editor to take care of the conflict with the floating buttons on the right">
+      <created>1365779199876</created>
+      <updated>1365779199876</updated>
+    </task>
+    <task id="LOCAL-00158" summary="set all projects to private for nanosatisfi users">
+      <created>1365792392548</created>
+      <updated>1365792392548</updated>
+    </task>
+    <task id="LOCAL-00159" summary="developed first test for BoardController">
+      <created>1366746902072</created>
+      <updated>1366746902072</updated>
+    </task>
+    <task id="LOCAL-00160" summary="developed first test for BoardController">
+      <created>1366746949547</created>
+      <updated>1366746949547</updated>
+    </task>
+    <task id="LOCAL-00161" summary="added phpunit configuration for phpstorm">
+      <created>1366748226551</created>
+      <updated>1366748226551</updated>
+    </task>
+    <task id="LOCAL-00162" summary="fixed default_text test to set the correct working dir (the same as in production)">
+      <created>1366749114049</created>
+      <updated>1366749114049</updated>
+    </task>
+    <task id="LOCAL-00163" summary="added tests for getUserAction, to make sure it works correctly both when the user exists and when they don't">
+      <created>1366898841219</created>
+      <updated>1366898841219</updated>
+    </task>
+    <task id="LOCAL-00164" summary="added initializer for UserBundle Controller tests">
+      <created>1366903293600</created>
+      <updated>1366903293600</updated>
+    </task>
+    <task id="LOCAL-00165" summary="added tests for existsAction, to make sure it works correctly both when the user exists and when they don't">
+      <created>1366903670950</created>
+      <updated>1366903670950</updated>
+    </task>
+    <task id="LOCAL-00166" summary="added tests for emailExistsAction, to make sure it works correctly both when the user exists and when they don't">
+      <created>1366904093532</created>
+      <updated>1366904093532</updated>
+    </task>
+    <task id="LOCAL-00167" summary="added test in case user doesn't exist for user page">
+      <created>1368384423510</created>
+      <updated>1368384423510</updated>
+    </task>
+    <task id="LOCAL-00168" summary="added incomplete functional tests for each GenericBundle::DefaultController Action">
+      <created>1368384571810</created>
+      <updated>1368384571810</updated>
+    </task>
+    <task id="LOCAL-00169" summary="removed duplicate list boards action from GenericBundle, replaced with the one on UtilitiesBundle">
+      <created>1368385432937</created>
+      <updated>1368385432937</updated>
+    </task>
+    <task id="LOCAL-00170" summary="added incomplete boardsAction test">
+      <created>1368386858006</created>
+      <updated>1368386858006</updated>
+    </task>
+    <task id="LOCAL-00171" summary="added exampleAction test">
+      <created>1368387455311</created>
+      <updated>1368387455311</updated>
+    </task>
+    <task id="LOCAL-00172" summary="added incomplete projectAction test">
+      <created>1368387623716</created>
+      <updated>1368387623716</updated>
+    </task>
+    <task id="LOCAL-00173" summary="added incomplete projectfilesAction test">
+      <created>1368387674131</created>
+      <updated>1368387674131</updated>
+    </task>
+    <task id="LOCAL-00174" summary="fucking phpunit headers">
+      <created>1368388095895</created>
+      <updated>1368388095895</updated>
+    </task>
+    <task id="LOCAL-00175" summary="added test for projectAction using test_project">
+      <created>1368389510849</created>
+      <updated>1368389510849</updated>
+    </task>
+    <task id="LOCAL-00176" summary="added test for embeddable sketch view (projectfilesAction) using test_project">
+      <created>1368389591163</created>
+      <updated>1368389591163</updated>
+    </task>
+    <task id="LOCAL-00177" summary="fixed the tftpAction in the SenderBundle">
+      <created>1368390322937</created>
+      <updated>1368390322937</updated>
+    </task>
+    <task id="LOCAL-00178" summary="moved the embeddedCompilerFlasher (compilerflasher.js) view to the Default Controller">
+      <created>1368398660400</created>
+      <updated>1368398660400</updated>
+    </task>
+    <task id="LOCAL-00179" summary="paltas: doesn't know how to type">
+      <created>1368486903097</created>
+      <updated>1368486903097</updated>
+    </task>
+    <task id="LOCAL-00180" summary="setting projects_links' class to public or private on the sidebar">
+      <created>1368486985267</created>
+      <updated>1368486985267</updated>
+    </task>
+    <task id="LOCAL-00181" summary="fixed title on minor error page">
+      <created>1368490653517</created>
+      <updated>1368490653518</updated>
+    </task>
+    <task id="LOCAL-00182" summary="Added input type=file beautifier to make them look consistent with bootstrap input fields">
+      <created>1368708091124</created>
+      <updated>1368708091124</updated>
+    </task>
+    <task id="LOCAL-00183" summary="minor typo fix">
+      <created>1374728610265</created>
+      <updated>1374728610266</updated>
+    </task>
+    <option name="localTasksCounter" value="184" />
+    <servers />
+  </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="22" width="1280" height="774" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874617" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Framework" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6707504" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36790925" sideWeight="0.7743902" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.39939025" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="348" width="1280" height="448" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39939025" sideWeight="0.4943274" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4235474" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.28899083" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" x="327" y="177" width="1138" height="527" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22560975" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.49675852" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.5764526" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39969373" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="true" />
+    <option name="myTodoPanelSettings">
+      <value>
+        <are-packages-shown value="false" />
+        <are-modules-shown value="false" />
+        <flatten-packages value="false" />
+        <is-autoscroll-to-source value="false" />
+      </value>
+    </option>
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
+    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
+    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
+    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
+    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORISONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
+    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
+    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
+    <option name="LIMIT_HISTORY" value="true" />
+    <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
+    <option name="UPDATE_FILTER_SCOPE_NAME" />
+    <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
+    <option name="COMMIT_MESSAGE_MARGIN_SIZE" value="72" />
+    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor typo fix" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="set all projects to private for nanosatisfi users" />
+    <MESSAGE value="developed first test for BoardController" />
+    <MESSAGE value="added phpunit configuration for phpstorm" />
+    <MESSAGE value="fixed default_text test to set the correct working dir (the same as in production)" />
+    <MESSAGE value="added tests for getUserAction, to make sure it works correctly both when the user exists and when they don't" />
+    <MESSAGE value="added initializer for UserBundle Controller tests" />
+    <MESSAGE value="added tests for existsAction, to make sure it works correctly both when the user exists and when they don't" />
+    <MESSAGE value="added tests for emailExistsAction, to make sure it works correctly both when the user exists and when they don't" />
+    <MESSAGE value="added test in case user doesn't exist for user page" />
+    <MESSAGE value="added incomplete functional tests for each GenericBundle::DefaultController Action" />
+    <MESSAGE value="removed duplicate list boards action from GenericBundle, replaced with the one on UtilitiesBundle" />
+    <MESSAGE value="added incomplete boardsAction test" />
+    <MESSAGE value="added exampleAction test" />
+    <MESSAGE value="added incomplete projectAction test" />
+    <MESSAGE value="added incomplete projectfilesAction test" />
+    <MESSAGE value="fucking phpunit headers" />
+    <MESSAGE value="added test for projectAction using test_project" />
+    <MESSAGE value="added test for embeddable sketch view (projectfilesAction) using test_project" />
+    <MESSAGE value="fixed the tftpAction in the SenderBundle" />
+    <MESSAGE value="moved the embeddedCompilerFlasher (compilerflasher.js) view to the Default Controller" />
+    <MESSAGE value="paltas: doesn't know how to type" />
+    <MESSAGE value="setting projects_links' class to public or private on the sidebar" />
+    <MESSAGE value="fixed title on minor error page" />
+    <MESSAGE value="Added input type=file beautifier to make them look consistent with bootstrap input fields" />
+    <MESSAGE value="minor typo fix" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/Symfony/src/Ace/ProjectBundle/Controller/ProjectController.php</url>
+          <line>491</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="54" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Symfony/app/config/parameters.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="0" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Symfony/app/config/parameters.yml.dist">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="17" selection-start="491" selection-end="524" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Resources/config/routing.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="23" selection-start="276" selection-end="276" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Symfony/src/Acme/DemoBundle/Tests/Controller/DemoControllerTest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="3" selection-start="427" selection-end="427" vertical-scroll-proportion="-10.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Controller/DefaultController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="631" selection-end="631" vertical-scroll-proportion="-7.2">
+          <folding>
+            <element signature="e#55#112#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Symfony/src/Codebender/LibraryBundle/Tests/Controller/DefaultControllerTest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="0" selection-start="1335" selection-end="1335" vertical-scroll-proportion="0.7614841">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
+
