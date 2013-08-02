@@ -64,9 +64,24 @@ class DefaultControllerTest extends WebTestCase
 		$this->assertArrayHasKey("External Libraries", $categories);
 		$this->assertNotEmpty($categories["External Libraries"]);
 
-		$this->assertEquals($categories["Examples"]["01.Basics"]["examples"][0]["name"], "AnalogReadSerial");
-		$this->assertEquals($categories["Examples"]["01.Basics"]["examples"][0]["filename"], "AnalogReadSerial.ino");
-		$this->assertContains("get?file=01.Basics/AnalogReadSerial/AnalogReadSerial.ino", $categories["Examples"]["01.Basics"]["examples"][0]["url"]);
+		$basic_examples = $categories["Examples"]["01.Basics"]["examples"];
+
+
+		//Check for a specific, known example
+		$example_found = false;
+		foreach($basic_examples as $example)
+		{
+			if($example["name"] == "AnalogReadSerial")
+			{
+				$this->assertEquals($example["name"], "AnalogReadSerial");
+				$this->assertEquals($example["filename"], "AnalogReadSerial.ino");
+				$this->assertContains("get?file=01.Basics/AnalogReadSerial/AnalogReadSerial.ino", $example["url"]);
+				$example_found = true;
+			}
+		}
+
+		//Make sure the example was found
+		$this->assertTrue($example_found);
 	}
 
 	public function testGetFile()
