@@ -58,6 +58,8 @@ class DefaultController extends Controller
 
 	public function getCodeAction()
 	{
+		$arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
 		$finder = new Finder();
 
 		$request = Request::createFromGlobals();
