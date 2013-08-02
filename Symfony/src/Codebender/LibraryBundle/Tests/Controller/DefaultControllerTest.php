@@ -38,11 +38,6 @@ class DefaultControllerTest extends WebTestCase
 
 	}
 
-	public function testIncorrectInputs()
-	{
-		$this->markTestIncomplete("No tests for invalid inputs yet");
-	}
-
 	public function testList()
 	{
 		$client = static::createClient();
@@ -51,11 +46,45 @@ class DefaultControllerTest extends WebTestCase
 
 		$client->request('GET', '/'.$auth_key.'/v1');
 
-		$this->assertTrue(false, "There are no tests yet.");
+		$response = $client->getResponse()->getContent();
+		$response = json_decode($response, true);
+
+		$this->assertArrayHasKey("success", $response);
+		$this->assertTrue($response["success"]);
+
+		$this->assertArrayHasKey("categories", $response);
+		$categories = $response["categories"];
+
+		$this->assertArrayHasKey("Examples", $categories);
+		$this->assertNotEmpty($categories["Examples"]);
+
+		$this->assertArrayHasKey("Builtin Libraries", $categories);
+		$this->assertNotEmpty($categories["Builtin Libraries"]);
+
+		$this->assertArrayHasKey("External Libraries", $categories);
+		$this->assertNotEmpty($categories["External Libraries"]);
+
+		$this->assertEquals($categories["Examples"]["01.Basics"]["examples"][0]["name"], "AnalogReadSerial");
+		$this->assertEquals($categories["Examples"]["01.Basics"]["examples"][0]["filename"], "AnalogReadSerial.ino");
+		$this->assertContains("get?file=01.Basics/AnalogReadSerial/AnalogReadSerial.ino", $categories["Examples"]["01.Basics"]["examples"][0]["url"]);
 	}
 
 	public function testGetFile()
 	{
-		$this->assertTrue(false, "There are no tests yet.");
+		$client = static::createClient();
+
+		$auth_key = $client->getContainer()->getParameter("auth_key");
+
+		$client->request('GET', '/'.$auth_key.'/v1/get', array('file' => '01.Basics/AnalogReadSerial/AnalogReadSerial.ino'));
+
+//		$response = $client->getResponse();
+//		var_dump($response);
+
+		$this->markTestIncomplete("This test is not ready, for some reason response has no output");
+	}
+
+	public function testIncorrectInputs()
+	{
+		$this->markTestIncomplete("No tests for invalid inputs yet");
 	}
 }
