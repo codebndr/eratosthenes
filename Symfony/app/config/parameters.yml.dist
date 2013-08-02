@@ -15,6 +15,7 @@ parameters:
     secret:            CSRF-Token-Not-Really-Used
 
     # Path to libraries.
-    arduino_library_directory: /opt/codebender/codebender-arduino-libraries/
+    arduino_library_directory: /opt/codebender/codebender-arduino-library-files
 
     auth_key: "youMustChangeThis"
+
