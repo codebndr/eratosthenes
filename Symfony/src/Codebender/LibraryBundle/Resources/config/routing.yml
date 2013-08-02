@@ -1,7 +1,15 @@
-codebender_library_homepage:
-    pattern:  /
+codebender_library_status_check:
+    pattern:  /status
+    defaults: { _controller: CodebenderLibraryBundle:Default:status }
+
+codebender_compiler_test:
+    pattern:  /{auth_key}/test/
+    defaults: { _controller: CodebenderLibraryBundle:Default:test }
+
+codebender_library_list:
+    pattern:  /{auth_key}/{version}
     defaults: { _controller: CodebenderLibraryBundle:Default:list }
 
 codebender_library_getcode:
-    pattern:  /get
+    pattern:  /{auth_key}/{version}/get
     defaults: { _controller: CodebenderLibraryBundle:Default:getCode }

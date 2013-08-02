@@ -12,6 +12,9 @@ parameters:
 #    mailer_password:   ~
 
     locale:            en
-    secret:            ThisTokenIsNotSoSecretChangeIt
+    secret:            CSRF-Token-Not-Really-Used
 
+    # Path to libraries.
     arduino_library_directory: /opt/codebender/codebender-arduino-libraries/
+
+    auth_key: "youMustChangeThis"
