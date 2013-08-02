@@ -103,7 +103,7 @@ class DefaultController extends Controller
 
 			$finder = new Finder();
 
-			$request = Request::createFromGlobals();
+			$request = $this->getRequest();
 
 			// retrieve GET and POST variables respectively
 			$file = $request->query->get('file');
