@@ -10,6 +10,10 @@ codebender_library_list:
     pattern:  /{auth_key}/{version}
     defaults: { _controller: CodebenderLibraryBundle:Default:list }
 
-codebender_library_getcode:
+codebender_library_get_example_code:
     pattern:  /{auth_key}/{version}/get
-    defaults: { _controller: CodebenderLibraryBundle:Default:getCode }
+    defaults: { _controller: CodebenderLibraryBundle:Default:getExampleCode }
+
+codebender_library_fetch_library_code:
+    pattern:  /{auth_key}/{version}/fetch
+    defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }

@@ -90,7 +90,7 @@ class DefaultController extends Controller
 	    }
     }
 
-	public function getCodeAction($auth_key, $version)
+	public function getExampleCodeAction($auth_key, $version)
 	{
 		if ($auth_key !== $this->container->getParameter('auth_key'))
 		{
@@ -141,6 +141,67 @@ class DefaultController extends Controller
 		{
 			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
 		}
+	}
+
+	public function getLibraryCodeAction($auth_key, $version)
+	{
+		if ($auth_key !== $this->container->getParameter('auth_key'))
+		{
+			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+		}
+
+		if ($version == "v1")
+		{
+			$arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+			$finder = new Finder();
+
+			$request = $this->getRequest();
+
+			// retrieve GET and POST variables respectively
+			$library = $request->query->get('library');
+
+			$filename = $library;
+			$directory = "";
+
+			$last_slash = strrpos($library, "/");
+			if($last_slash !== false )
+			{
+				$filename = substr($library, $last_slash + 1);
+				$vendor = substr($library, 0, $last_slash);
+			}
+
+			$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+			if(empty($response))
+				$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
+
+			if(empty($response))
+				return new Response(json_encode(array("success" => false, "message" => "No Library named ".$library." found.")));
+
+			return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
+
+		}
+		else
+		{
+			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+		}
+	}
+
+	private function fetchLibraryFiles($finder, $directory)
+	{
+		if (is_dir($directory))
+		{
+			$finder->in($directory)->exclude('examples')->exclude('Examples');
+			$finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S');
+
+			$response = array();
+			foreach ($finder as $file)
+			{
+				$response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+			}
+			return $response;
+		}
+
 	}
 
 	private function iterateDir($finder, $version)
