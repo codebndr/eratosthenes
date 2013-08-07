@@ -225,7 +225,7 @@ class DefaultController extends Controller
 			$path = str_ireplace("/examples/", "/", $file->getRelativePath());
 			$library_name = strtok($path, "/");
 			$example_name = strtok("/");
-			$url = $this->get('router')->generate('codebender_library_getcode', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$file->getRelativePathname();
+			$url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$file->getRelativePathname();
 
 			if(!isset($libraries[$library_name]))
 			{
