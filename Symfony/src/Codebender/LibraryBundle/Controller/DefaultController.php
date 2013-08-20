@@ -46,11 +46,9 @@ class DefaultController extends Controller
 
 		    $finder = new Finder();
 		    $finder2 = new Finder();
-		    $finder3 = new Finder();
 
 		    $finder->files()->name('*.ino')->name('*.pde');
 		    $finder2->files()->name('*.ino')->name('*.pde');
-		    $finder3->files()->name('*.ino')->name('*.pde');
 
 		    $built_examples = array();
 		    if (is_dir($arduino_library_files."examples"))
@@ -67,12 +65,9 @@ class DefaultController extends Controller
 		    }
 
 		    $external_libraries = array();
-		    if (is_dir($arduino_library_files."external-libraries"))
-		    {
-			    $finder3->in($arduino_library_files."external-libraries");
-			    $external_libraries = $this->iterateDir($finder3, "v1");
-		    }
-
+            $em = $this->getDoctrine()->getManager();
+            $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+            $external_libraries = $this->getExternalInfo($externalMeta, $version);
 
 		    ksort($built_examples);
 		    ksort($included_libraries);
@@ -203,6 +198,34 @@ class DefaultController extends Controller
 		}
 
 	}
+
+    private function getExternalInfo($libsmeta, $version)
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $libraries = array();
+        foreach($libsmeta as $lib)
+        {
+            $libname = $lib->getMachineName();
+            if(!isset($libraries[$libname]))
+            {
+                $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
+            }
+            if(is_dir($arduino_library_files."external-libraries/".$libname."/examples/"))
+            {
+                $finder = new Finder();
+                $finder->files()->name('*.ino')->name('*.pde');
+                $finder->in($arduino_library_files."external-libraries/".$libname."/examples/");
+
+                foreach($finder as $file)
+                {
+                    $url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$libname."/examples/".$file->getRelativePathname();
+                    $libraries[$libname]["examples"][] = array("name" => strtok($file->getRelativePathname(), "/"), "filename" => $file->getFilename(), "url" => $url);
+                }
+
+            }
+        }
+        return $libraries;
+    }
 
 	private function iterateDir($finder, $version)
 	{
