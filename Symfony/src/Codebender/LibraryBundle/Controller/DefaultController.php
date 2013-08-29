@@ -242,15 +242,15 @@ class DefaultController extends Controller
             {
                 $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
             }
-            if(is_dir($arduino_library_files."external-libraries/".$libname."/examples/"))
+            if(is_dir($arduino_library_files."EXTERNAL-libraries/".$libname))
             {
                 $finder = new Finder();
                 $finder->files()->name('*.ino')->name('*.pde');
-                $finder->in($arduino_library_files."external-libraries/".$libname."/examples/");
+                $finder->in($arduino_library_files."external-libraries/".$libname);
 
                 foreach($finder as $file)
                 {
-                    $url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$libname."/examples/".$file->getRelativePathname();
+                    $url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$libname."/".$file->getRelativePathname();
                     $libraries[$libname]["examples"][] = array("name" => strtok($file->getRelativePathname(), "/"), "filename" => $file->getFilename(), "url" => $url);
                 }
 
