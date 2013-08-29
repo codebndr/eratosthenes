@@ -63,13 +63,6 @@ class ExternalLibrary
      */
     private $verified;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="libraryFilesId", type="string", length=255)
-     */
-    private $libraryFilesId;
-
 
     /**
      * Get id
@@ -219,26 +212,4 @@ class ExternalLibrary
         return $this->verified;
     }
 
-    /**
-     * Set libraryFilesId
-     *
-     * @param string $libraryFilesId
-     * @return ExternalLibrary
-     */
-    public function setLibraryFilesId($libraryFilesId)
-    {
-        $this->libraryFilesId = $libraryFilesId;
-    
-        return $this;
-    }
-
-    /**
-     * Get libraryFilesId
-     *
-     * @return string 
-     */
-    public function getLibraryFilesId()
-    {
-        return $this->libraryFilesId;
-    }
 }
