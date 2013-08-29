@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
+use Codebender\LibraryBundle\Entity\ExternalLibrary;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -181,6 +182,22 @@ class DefaultController extends Controller
 			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
 		}
 	}
+
+    private function checkIfExternalExists($library)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+        if(empty($lib))
+        {
+            return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
+        }
+        else
+        {
+            return json_encode(array("success" => true, "message" => "Library found"));
+        }
+
+    }
+
 
 	private function fetchLibraryFiles($finder, $directory)
 	{
