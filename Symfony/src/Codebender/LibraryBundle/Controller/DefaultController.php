@@ -107,6 +107,9 @@ class DefaultController extends Controller
 			$last_slash = strrpos($file, "/");
 			$filename = substr($file, $last_slash + 1);
 			$directory = substr($file, 0, $last_slash);
+            $first_slash = strpos($file, "/");
+            $libname = substr($file, 0, $first_slash);
+
 
 			$finder->files()->name($filename);
 			if (is_dir($arduino_library_files."examples"))
@@ -121,7 +124,11 @@ class DefaultController extends Controller
 
 			if (is_dir($arduino_library_files."external-libraries"))
 			{
-				$finder->in($arduino_library_files."external-libraries");
+                $exists = json_decode($this->checkIfExternalExists($libname),true);
+                if($exists['success'])
+                {
+                    $finder->in($arduino_library_files."external-libraries");
+                }
 			}
 
 			$finder->path($directory);
@@ -169,11 +176,19 @@ class DefaultController extends Controller
 
 			$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
 			if(empty($response))
-				$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
-
-			if(empty($response))
-				return new Response(json_encode(array("success" => false, "message" => "No Library named ".$library." found.")));
-
+            {
+                $response = json_decode($this->checkIfExternalExists($library),true);
+                if(!$response['success'])
+                {
+                    return new Response(json_encode($response));
+                }
+                else
+                {
+                    $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
+                    if(empty($response))
+                        return new Response(json_encode(array("success" => false, "message" => "No files for Library named ".$library." found.")));
+                }
+            }
 			return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
 
 		}
