@@ -199,43 +199,81 @@ class DefaultController extends Controller
 	}
 
 
-    public function newLibraryAction()
+    public function newLibraryAction($data = NULL)
     {
 
-        $form = $this->createFormBuilder()
-            ->add('GitOwner', 'text')
-            ->add('GitRepo', 'text')
-            ->add('HumanName', 'text')
-            ->add('Description', 'text')
-            ->add('Go!', 'submit')
-            ->getForm();
-        $form->handleRequest($this->getRequest());
+        if($data == NULL){
+            $form = $this->createFormBuilder()
+                ->add('GitOwner', 'text')
+                ->add('GitRepo', 'text')
+                ->add('HumanName', 'text')
+                ->add('Description', 'text')
+                ->add('MachineName', 'hidden')
+                ->add('Go!', 'submit')
+                ->getForm();
 
-        if ($form->isValid()) {
+            $form->handleRequest($this->getRequest());
 
-            $formData = $form->getData();
-            $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
-            if (!$lib['success'])
-                return new Response(json_encode($lib));
-            else
-                $lib = $lib['library'];
+            if ($form->isValid()) {
 
-            $headers = $this->findHeadersFromLibFiles($lib['contents']);
-            $names = $this->getLibNamesFromHeaders($headers);
-            if (count($names) == 1) {
-                $machineName = $names[0];
-                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
-                return new Response(json_encode($saved));
+                $formData = $form->getData();
+
+                $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
+                if (!$lib['success'])
+                    return new Response(json_encode($lib));
+                else
+                    $lib = $lib['library'];
+
+                if($formData["MachineName"] != NULL)
+                {
+                    $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                    return new Response(json_encode($saved));
+                }
+                $headers = $this->findHeadersFromLibFiles($lib['contents']);
+                $names = $this->getLibNamesFromHeaders($headers);
+                if (count($names) == 1) {
+                    $machineName = $names[0];
+                    $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                    return new Response(json_encode($saved));
+                }
+                else
+                {
+                    $response = $this->forward('CodebenderLibraryBundle:Default:newLibrary', array(
+                        'data'  => array('GitOwner' => $formData['GitOwner'], 'GitRepo' =>$formData['GitRepo'], 'HumanName' => $formData["HumanName"], 'Description' => $formData['Description'], 'MachineNames' => $names)
+                    ));
+
+                    return $response;
+                }
+            }
+        }
+        else
+        {
+            $machineNames = array();
+            foreach($data["MachineNames"] as $mn)
+            {
+                $machineNames[$mn] = $mn;
             }
 
-            //TODO: Make user choose name, when having more than one headers
+            $this->get('session')->getFlashBag()->add(
+                'notice',
+                'More than one header files found in directory. Please select the main one from the list below.'
+            );
+
+            $form = $this->createFormBuilder()
+                ->add('MachineName', 'choice', array('choices' => $machineNames))
+                ->add('GitOwner', 'text', array('read_only' => true, 'data' => $data['GitOwner']))
+                ->add('GitRepo', 'text', array('read_only' => true, 'data' => $data['GitRepo']))
+                ->add('HumanName', 'text', array('read_only' => true, 'data' => $data['HumanName']))
+                ->add('Description', 'text', array('read_only' => true, 'data' => $data['Description']))
+                ->add('Go!', 'submit')
+                ->getForm();
 
         }
-
-
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
             'form' => $form->createView()
         ));
+
+
 
     }
 

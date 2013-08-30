@@ -2,7 +2,7 @@
 
 {% for flashMessage in app.session.flashbag.get('notice') %}
     <div class="flash-notice">
-        {{ flashMessage }}
+        <i>{{ flashMessage }}</i>
     </div>
 {% endfor %}
 
