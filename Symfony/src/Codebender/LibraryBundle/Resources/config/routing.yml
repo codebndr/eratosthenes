@@ -17,3 +17,7 @@ codebender_library_get_example_code:
 codebender_library_fetch_library_code:
     pattern:  /{auth_key}/{version}/fetch
     defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }
+
+codebender_library_new_external:
+    pattern: /{auth_key}/{version}/new
+    defaults: {_controller:CodebenderLibraryBundle:Default:newLibrary}

@@ -1,0 +1,9 @@
+{# src/Codebender/LibraryBundle/Resources/views/Default/newLibForm.html.twig #}
+
+{% for flashMessage in app.session.flashbag.get('notice') %}
+    <div class="flash-notice">
+        {{ flashMessage }}
+    </div>
+{% endfor %}
+
+{{ form(form) }}

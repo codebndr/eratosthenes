@@ -198,6 +198,51 @@ class DefaultController extends Controller
 		}
 	}
 
+
+    public function newLibraryAction()
+    {
+
+        $form = $this->createFormBuilder()
+            ->add('GitOwner', 'text')
+            ->add('GitRepo', 'text')
+            ->add('HumanName', 'text')
+            ->add('Description', 'text')
+            ->add('Go!', 'submit')
+            ->getForm();
+        $form->handleRequest($this->getRequest());
+
+        if ($form->isValid()) {
+
+            $formData = $form->getData();
+            $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
+            if (!$lib['success'])
+                return new Response(json_encode($lib));
+            else
+                $lib = $lib['library'];
+
+            $headers = $this->findHeadersFromLibFiles($lib['contents']);
+            $names = $this->getLibNamesFromHeaders($headers);
+            if (count($names) == 1) {
+                $machineName = $names[0];
+                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                return new Response(json_encode($saved));
+            }
+
+            //TODO: Make user choose name, when having more than one headers
+
+        }
+
+
+        return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+            'form' => $form->createView()
+        ));
+
+    }
+
+
+
+
+
     private function checkIfExternalExists($library)
     {
         $em = $this->getDoctrine()->getManager();
@@ -296,4 +341,230 @@ class DefaultController extends Controller
 		}
 		return $libraries;
 	}
+
+
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $libfiles)
+    {
+        $exists = json_decode($this->checkIfExternalExists($machineName), true);
+        if($exists['success'])
+            return json_encode(array("success" => false, "message" => "Library named ".$machineName." already exists."));
+
+        $create = json_decode($this->createLibFiles($machineName, $libfiles), true);
+        if(!$create['success'])
+            return json_encode($create);
+
+        $lib = new ExternalLibrary();
+        $lib->setHumanName($humanName);
+        $lib->setMachineName($machineName);
+        $lib->setDescription($description);
+        $lib->setOwner($gitOwner);
+        $lib->setRepo($gitRepo);
+        $lib->setVerified(false);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($lib);
+        $em->flush();
+
+        return json_encode(array("success" => true));
+
+    }
+
+    private function createLibFiles($machineName, $lib)
+    {
+        $libBaseDir = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$machineName."/";
+
+        return($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
+
+
+    }
+
+    private function createLibDirectory($base, $path, $files)
+    {
+
+        if(is_dir($path))
+            return json_encode(array("success" => false, "message" => "Library directory already exists"));
+        if(!mkdir($path))
+            return json_encode(array("success" => false, "message" => "Cannot Save Library"));
+
+        foreach($files as $file)
+        {
+            $blah=$path.$file['name'] ;
+            if($file['type'] == 'dir')
+            {
+                $create = json_decode($this->createLibDirectory($base, $base.$file['name']."/", $file['contents']), true);
+                if(!$create['success'])
+                    return(json_encode($create));
+            }
+            else
+            {
+                file_put_contents($path.$file['name'], $file['contents']);
+            }
+        }
+
+        return json_encode(array('success' => true));
+    }
+    private function getLibNamesFromHeaders($headers)
+    {
+        $names = array();
+        foreach($headers as $header)
+        {
+            $dot = strpos($header['name'],'.');
+            $name = substr($header['name'], 0,$dot);
+            array_push($names, $name);
+        }
+
+        return $names;
+    }
+    private function getLibFromGithub($owner, $repo)
+    {
+
+        $url = "https://api.github.com/repos/".$owner."/".$repo."/contents";
+        $dir = json_decode($this->processGitDir($url, ""),true);
+
+        if(!$dir['success'])
+            return json_encode($dir);
+        else
+            $dir = $dir['directory'];
+        $baseDir = json_decode($this->findBaseDir($dir),true);
+        if(!$baseDir['success'])
+            return json_encode($baseDir);
+        else
+            $baseDir = $baseDir['directory'];
+
+        return json_encode(array("success" => true, "library" => $baseDir));
+    }
+
+    private function findBaseDir($dir)
+    {
+        foreach($dir['contents'] as $file)
+        {
+            if($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
+                return json_encode(array('success' => true, 'directory' => $dir));
+
+        }
+
+        foreach($dir['contents'] as $file)
+        {
+            if($file['type'] == 'dir')
+            {
+                foreach($file['contents'] as $f)
+                {
+                    if($f['type'] == 'file' && strpos($f['name'], ".h") !== false)
+                    {
+                        $file = $this->fixDirName($file);
+                        return json_encode(array('success' => true, 'directory' => $file));
+                    }
+                }
+            }
+        }
+    }
+
+    private function fixDirName($dir)
+    {
+        foreach ($dir['contents'] as &$f)
+        {
+            if($f['type'] == 'dir')
+            {
+                $first_slash = strpos($f['name'],"/");
+                $f['name'] = substr($f['name'], $first_slash + 1);
+                $f = $this->fixDirName($f);
+            }
+        }
+        return $dir;
+    }
+
+    private function findHeadersFromLibFiles($libFiles)
+    {
+        $headers = array();
+        foreach($libFiles as $file)
+        {
+            if($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
+            {
+                $headers[] = $file;
+            }
+        }
+
+        return $headers;
+    }
+    private function processGitDir($baseurl, $path)
+    {
+
+        $client_id = $this->container->getParameter('github_app_client_id');
+        $client_secret = $this->container->getParameter('github_app_client_secret');
+
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array (
+            CURLOPT_URL => ($path == "" ?  $baseurl : $baseurl."/".$path)."?client_id=".$client_id."&client_secret=".$client_secret,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ));
+
+        $contents = curl_exec($curl_req);
+        $json_contents = json_decode($contents, true);
+
+
+        if(array_key_exists('message', $json_contents))
+        {
+            return json_encode(array("success" => false, "message" => $json_contents["message"]));
+        }
+        $files = array();
+        foreach($json_contents as $c)
+        {
+
+            if($c['type'] == "file")
+            {
+                $file = json_decode($this->processGitFile($baseurl,$c), true);
+                if($file['success'])
+                    array_push($files, $file['file']);
+                else if($file['message']!="Bad Encoding")
+                    return json_encode($file);
+            }
+            else if($c['type'] == "dir")
+            {
+                $subdir = json_decode($this->processGitDir($baseurl, $c['path']), true);
+                if($subdir['success'])
+                    array_push($files, $subdir['directory']);
+                else
+                    return json_encode($subdir);
+            }
+        }
+
+        $name = ($path == "" ? "base" : $path);
+        return json_encode(array("success" => true, "directory" =>array("name" => $name, "type" => "dir", "contents"=>$files)));
+    }
+
+    private function processGitFile($baseurl, $file)
+    {
+        $client_id = $this->container->getParameter('github_app_client_id');
+        $client_secret = $this->container->getParameter('github_app_client_secret');
+
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array (
+            CURLOPT_URL => ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3.raw')
+        ));
+
+        $contents = curl_exec($curl_req);
+
+        $json_contents = json_decode($contents,true);
+        if($json_contents === NULL)
+        {
+            if(! mb_check_encoding($contents, 'UTF-8'))
+                return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+
+            return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
+        }
+
+        else
+        {
+            return json_encode(array("success" => false, "message" => $json_contents['message']));
+        }
+    }
+
 }
