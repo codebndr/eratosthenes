@@ -279,6 +279,63 @@ class DefaultController extends Controller
 
 
 
+    public function verifyBuiltInExamplesAction()
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+        $finder = new Finder();
+        $finder->files()->name('*.ino')->name('*.pde');
+        $finder->in($arduino_library_files."examples/");
+
+        $version = "100";
+        $format = "syntax";
+        $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
+        $files = array();
+
+        $response = array();
+
+        foreach ($finder as $file)
+        {
+            $files[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
+            $h_finder = new Finder();
+            $h_finder->files()->name('*.h');
+            $h_finder->in($arduino_library_files."examples/".$file->getRelativePath());
+
+            foreach($h_finder as $header)
+            {
+                $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
+            }
+
+            $libraries = array();
+            $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+
+            $response[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+
+            $files = array();
+        }
+
+        return new Response(strip_tags(json_encode($response)));
+
+    }
+
+    private function verifyReq($request_data)
+    {
+        $compiler_url = $this->container->getParameter('compiler_url');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $compiler_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data);
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+
+        return $response;
+    }
+
 
 
     private function checkIfExternalExists($library)

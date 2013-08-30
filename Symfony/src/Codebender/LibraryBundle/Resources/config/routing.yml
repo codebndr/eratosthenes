@@ -21,3 +21,8 @@ codebender_library_fetch_library_code:
 codebender_library_new_external:
     pattern: /{auth_key}/{version}/new
     defaults: {_controller:CodebenderLibraryBundle:Default:newLibrary}
+
+codebender_library_verify_built_in_examples:
+    pattern: /{auth_key}/{version}/verifybuiltin
+    defaults: {_controller:CodebenderLibraryBundle:Default:verifyBuiltInExamples}
+

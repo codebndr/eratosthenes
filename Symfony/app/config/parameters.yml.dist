@@ -23,3 +23,4 @@ parameters:
     github_app_client_id: thisIsYourClientID
     github_app_client_secret: thisIsYourClientSecret
 
+    compiler_url: http://url/to/compiler
