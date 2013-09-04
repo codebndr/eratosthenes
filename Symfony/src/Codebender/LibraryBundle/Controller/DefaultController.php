@@ -290,12 +290,13 @@ class DefaultController extends Controller
         $version = "105";
         $format = "syntax";
         $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
-        $files = array();
+
 
         $response = array();
 
         foreach ($finder as $file)
         {
+            $files = array();
             $files[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
             $h_finder = new Finder();
             $h_finder->files()->name('*.h')->name("*.cpp");
