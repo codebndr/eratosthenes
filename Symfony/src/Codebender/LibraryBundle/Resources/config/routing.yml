@@ -26,3 +26,6 @@ codebender_library_verify_built_in_examples:
     pattern: /{auth_key}/{version}/verifybuiltin
     defaults: {_controller:CodebenderLibraryBundle:Default:verifyBuiltInExamples}
 
+codebender_library_verify_external_examples:
+    pattern: /{auth_key}/{version}/verifyexternal/{library}
+    defaults: {_controller:CodebenderLibraryBundle:Default:verifyExternalExamples}

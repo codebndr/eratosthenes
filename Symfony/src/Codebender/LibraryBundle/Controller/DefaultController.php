@@ -278,7 +278,6 @@ class DefaultController extends Controller
     }
 
 
-
     public function verifyBuiltInExamplesAction()
     {
         $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
@@ -317,6 +316,138 @@ class DefaultController extends Controller
 
         return new Response(strip_tags(json_encode($response)));
 
+    }
+
+    public function verifyExternalExamplesAction($library = NULL)
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+        $em = $this->getDoctrine()->getManager();
+
+        if($library !== NULL)
+        {
+            $exists = json_decode($this->checkIfExternalExists($library), true);
+            if($exists['success'])
+            {
+                $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+            }
+            else
+            {
+                return new Response(json_encode($exists));
+            }
+        }
+        else
+        {
+            $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+        }
+
+        $version = "105";
+        $format = "syntax";
+        $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
+        $response = array();
+
+        foreach ($externalLibs as $lib)
+        {
+            $finder = new Finder();
+            $finder->files()->name('*.ino')->name('*.pde');
+            $finder->in($arduino_library_files."external-libraries/".$lib->getMachineName());
+
+            $libResponse = array();
+            foreach ($finder as $file)
+            {
+
+                $files = array();
+                $libsToInclude = array();
+
+                $content = $file->getContents();
+                $files[] = array("filename"=>$file->getBaseName(), "content" => $content);
+
+                $h_finder = new Finder();
+                $h_finder->files()->name('*.h')->name('*.cpp');
+                $h_finder->in($arduino_library_files."external-libraries/".$lib->getMachineName()."/".$file->getRelativePath());
+
+                $libsToInclude =  array_merge($libsToInclude , $this->read_headers($content));
+
+                foreach($h_finder as $header)
+                {
+                    $headerContent = $header->getContents();
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => $headerContent);
+                    $libsToInclude = array_merge($libsToInclude ,  $this->read_headers($headerContent));
+                }
+                $libraries = $this->constructLibraryFiles($libsToInclude);
+
+                $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+                $libResponse[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+
+            }
+
+            $response[$lib->getMachineName()] = $libResponse;
+
+        }
+        return new Response(strip_tags(json_encode($response)));
+
+    }
+
+    private function read_headers($code)
+{
+    // Matches preprocessor include directives, has high tolerance to
+    // spaces. The actual header (without the postfix .h) is stored in
+    // register 1.
+    //
+    // Examples:
+    // #include<stdio.h>
+    // # include "proto.h"
+    $REGEX = "/^\s*#\s*include\s*[<\"]\s*(\w*)\.h\s*[>\"]/";
+
+    $headers = array();
+    foreach (explode("\n", $code) as $line)
+        if (preg_match($REGEX, $line, $matches))
+            $headers[] = $matches[1];
+
+    return $headers;
+}
+
+    private function constructLibraryFiles($libnames)
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $libraries = array();
+
+        foreach($libnames as $lib)
+        {
+           if(is_dir($arduino_library_files."/libraries/".$lib))
+           {
+
+               $finder = new Finder;
+               $finder->files()->name('*.h')->name('*.cpp');
+               $finder->in($arduino_library_files."/libraries/".$lib);
+               $libfiles = array();
+
+               foreach($finder as $file)
+               {
+                   $libfiles[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
+               }
+               $libraries[$lib] =  $libfiles;
+
+           }
+           else
+           {
+               $exists = json_decode($this->checkIfExternalExists($lib), true);
+               if($exists['success'])
+               {
+                   $finder = new Finder;
+                   $finder->files()->name('*.h')->name('*.cpp');
+                   $finder->in($arduino_library_files."/external-libraries/".$lib);
+                   $libfiles = array();
+
+                   foreach($finder as $file)
+                   {
+                       $libfiles[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
+                   }
+                   $libraries[$lib] =  $libfiles;
+               }
+           }
+        }
+        return $libraries;
     }
 
     private function verifyReq($request_data)
