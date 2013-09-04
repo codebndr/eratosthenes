@@ -287,7 +287,7 @@ class DefaultController extends Controller
         $finder->files()->name('*.ino')->name('*.pde');
         $finder->in($arduino_library_files."examples/");
 
-        $version = "100";
+        $version = "105";
         $format = "syntax";
         $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
         $files = array();
