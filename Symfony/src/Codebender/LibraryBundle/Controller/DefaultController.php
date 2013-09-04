@@ -298,7 +298,7 @@ class DefaultController extends Controller
         {
             $files[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
             $h_finder = new Finder();
-            $h_finder->files()->name('*.h');
+            $h_finder->files()->name('*.h')->name("*.cpp");
             $h_finder->in($arduino_library_files."examples/".$file->getRelativePath());
 
             foreach($h_finder as $header)
