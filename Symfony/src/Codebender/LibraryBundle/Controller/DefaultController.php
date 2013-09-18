@@ -724,7 +724,7 @@ class DefaultController extends Controller
         $headers = array();
         foreach($libFiles as $file)
         {
-            if($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
+            if($file['type'] == 'file' && substr($file['name'], -2) === ".h" )
             {
                 $headers[] = $file;
             }
