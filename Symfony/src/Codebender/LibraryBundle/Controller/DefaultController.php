@@ -587,7 +587,7 @@ class DefaultController extends Controller
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
         $lib->setVerified(false);
-        $lib->setLastCommit($this->getLastCommit($gitOwner,$gitRepo));
+        $lib->setLastCommit($this->getLastCommitFromGithub($gitOwner,$gitRepo));
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($lib);
@@ -597,7 +597,7 @@ class DefaultController extends Controller
 
     }
 
-    private function getLastCommit($gitOwner, $gitRepo)
+    private function getLastCommitFromGithub($gitOwner, $gitRepo)
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
