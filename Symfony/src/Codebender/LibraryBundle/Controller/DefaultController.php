@@ -199,219 +199,262 @@ class DefaultController extends Controller
 	}
 
 
-    public function newLibraryAction($data = NULL)
+    public function newLibraryAction($auth_key, $version, $data = NULL)
     {
-
-        if($data == NULL){
-            $form = $this->createFormBuilder()
-                ->add('GitOwner', 'text')
-                ->add('GitRepo', 'text')
-                ->add('HumanName', 'text')
-                ->add('Description', 'text')
-                ->add('MachineName', 'hidden')
-                ->add('Go!', 'submit')
-                ->getForm();
-
-            $form->handleRequest($this->getRequest());
-
-            if ($form->isValid()) {
-
-                $formData = $form->getData();
-
-                $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
-                if (!$lib['success'])
-                    return new Response(json_encode($lib));
-                else
-                    $lib = $lib['library'];
-
-                if($formData["MachineName"] != NULL)
-                {
-                    $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
-                    return new Response(json_encode($saved));
-                }
-                $headers = $this->findHeadersFromLibFiles($lib['contents']);
-                $names = $this->getLibNamesFromHeaders($headers);
-                if (count($names) == 1) {
-                    $machineName = $names[0];
-                    $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
-                    return new Response(json_encode($saved));
-                }
-                else
-                {
-                    $response = $this->forward('CodebenderLibraryBundle:Default:newLibrary', array(
-                        'data'  => array('GitOwner' => $formData['GitOwner'], 'GitRepo' =>$formData['GitRepo'], 'HumanName' => $formData["HumanName"], 'Description' => $formData['Description'], 'MachineNames' => $names)
-                    ));
-
-                    return $response;
-                }
-            }
-        }
-        else
+        if ($auth_key !== $this->container->getParameter('auth_key'))
         {
-            $machineNames = array();
-            foreach($data["MachineNames"] as $mn)
-            {
-                $machineNames[$mn] = $mn;
-            }
-
-            $this->get('session')->getFlashBag()->add(
-                'notice',
-                'More than one header files found in directory. Please select the main one from the list below.'
-            );
-
-            $form = $this->createFormBuilder()
-                ->add('MachineName', 'choice', array('choices' => $machineNames))
-                ->add('GitOwner', 'text', array('read_only' => true, 'data' => $data['GitOwner']))
-                ->add('GitRepo', 'text', array('read_only' => true, 'data' => $data['GitRepo']))
-                ->add('HumanName', 'text', array('read_only' => true, 'data' => $data['HumanName']))
-                ->add('Description', 'text', array('read_only' => true, 'data' => $data['Description']))
-                ->add('Go!', 'submit')
-                ->getForm();
-
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
-        return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
-            'form' => $form->createView()
-        ));
-
-
-
-    }
-
-
-    public function verifyBuiltInExamplesAction()
-    {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
-
-        $finder = new Finder();
-        $finder->files()->name('*.ino')->name('*.pde');
-        $finder->in($arduino_library_files."examples/");
-
-        $version = "105";
-        $format = "binary";
-        $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
-
-
-        $response = array();
-
-        foreach ($finder as $file)
+        if ($version == "v1")
         {
-            $files = array();
-            $files[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
-            $h_finder = new Finder();
-            $h_finder->files()->name('*.h')->name("*.cpp");
-            $h_finder->in($arduino_library_files."examples/".$file->getRelativePath());
+            if($data == NULL){
+                $form = $this->createFormBuilder()
+                    ->add('GitOwner', 'text')
+                    ->add('GitRepo', 'text')
+                    ->add('HumanName', 'text')
+                    ->add('Description', 'text')
+                    ->add('MachineName', 'hidden')
+                    ->add('Go!', 'submit')
+                    ->getForm();
 
-            foreach($h_finder as $header)
-            {
-                $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
-            }
+                $form->handleRequest($this->getRequest());
 
-            $libraries = array();
-            $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+                if ($form->isValid()) {
 
-            $response[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+                    $formData = $form->getData();
 
-            $files = array();
-        }
+                    $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
+                    if (!$lib['success'])
+                        return new Response(json_encode($lib));
+                    else
+                        $lib = $lib['library'];
 
-        return new Response(strip_tags(json_encode($response)));
+                    if($formData["MachineName"] != NULL)
+                    {
+                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                        return new Response(json_encode($saved));
+                    }
+                    $headers = $this->findHeadersFromLibFiles($lib['contents']);
+                    $names = $this->getLibNamesFromHeaders($headers);
+                    if (count($names) == 1) {
+                        $machineName = $names[0];
+                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                        return new Response(json_encode($saved));
+                    }
+                    else
+                    {
+                        $response = $this->forward('CodebenderLibraryBundle:Default:newLibrary', array(
+                            'auth_key' => $auth_key,
+                            'version' => $version,
+                            'data'  => array('GitOwner' => $formData['GitOwner'], 'GitRepo' =>$formData['GitRepo'], 'HumanName' => $formData["HumanName"], 'Description' => $formData['Description'], 'MachineNames' => $names)
+                        ));
 
-    }
-
-    public function verifyExternalExamplesAction($library = NULL)
-    {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
-
-        $em = $this->getDoctrine()->getManager();
-
-        if($library !== NULL)
-        {
-            $exists = json_decode($this->checkIfExternalExists($library), true);
-            if($exists['success'])
-            {
-                $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+                        return $response;
+                    }
+                }
             }
             else
             {
-                return new Response(json_encode($exists));
+                $machineNames = array();
+                foreach($data["MachineNames"] as $mn)
+                {
+                    $machineNames[$mn] = $mn;
+                }
+
+                $this->get('session')->getFlashBag()->add(
+                    'notice',
+                    'More than one header files found in directory. Please select the main one from the list below.'
+                );
+
+                $form = $this->createFormBuilder()
+                    ->add('MachineName', 'choice', array('choices' => $machineNames))
+                    ->add('GitOwner', 'text', array('read_only' => true, 'data' => $data['GitOwner']))
+                    ->add('GitRepo', 'text', array('read_only' => true, 'data' => $data['GitRepo']))
+                    ->add('HumanName', 'text', array('read_only' => true, 'data' => $data['HumanName']))
+                    ->add('Description', 'text', array('read_only' => true, 'data' => $data['Description']))
+                    ->add('Go!', 'submit')
+                    ->getForm();
+
             }
+            return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+                'form' => $form->createView()
+            ));
+
         }
         else
         {
-            $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
         }
-
-        $version = "105";
-        $format = "binary";
-        $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
-        $response = array();
-
-        foreach ($externalLibs as $lib)
-        {
-            $finder = new Finder();
-            $finder->files()->name('*.ino')->name('*.pde');
-            $finder->in($arduino_library_files."external-libraries/".$lib->getMachineName());
-
-            $libResponse = array();
-            foreach ($finder as $file)
-            {
-
-                $files = array();
-                $libsToInclude = array();
-
-                $content = $file->getContents();
-                $files[] = array("filename"=>$file->getBaseName(), "content" => $content);
-
-                $h_finder = new Finder();
-                $h_finder->files()->name('*.h')->name('*.cpp');
-                $h_finder->in($arduino_library_files."external-libraries/".$lib->getMachineName()."/".$file->getRelativePath());
-
-                $libsToInclude =  array_merge($libsToInclude , $this->read_headers($content));
-
-                foreach($h_finder as $header)
-                {
-                    $headerContent = $header->getContents();
-                    $files[] = array("filename"=>$header->getBaseName(), "content" => $headerContent);
-                    $libsToInclude = array_merge($libsToInclude ,  $this->read_headers($headerContent));
-                }
-                $libraries = $this->constructLibraryFiles($libsToInclude);
-
-                $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
-                $libResponse[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
-
-            }
-
-            $response[$lib->getMachineName()] = $libResponse;
-
-        }
-        return new Response(strip_tags(json_encode($response)));
 
     }
 
-    public function checkForExternalUpdatesAction()
+
+    public function verifyBuiltInExamplesAction($auth_key, $version )
     {
-        $needToUpdate = array();
-        $em = $this->getDoctrine()->getManager();
-        $libraries = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
-
-        foreach($libraries as $lib)
+        if ($auth_key !== $this->container->getParameter('auth_key'))
         {
-            $gitOwner = $lib->getOwner();
-            $gitRepo = $lib->getRepo();
-
-            if($gitOwner!==null and $gitRepo!==null)
-            {
-                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
-                if($lastCommitFromGithub !== $lib->getLastCommit())
-                    $needToUpdate[]=array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
-            }
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
-        if(empty($needToUpdate))
-            $response = array("success" => true, "message" => "No Libraries need to update");
-        else
-            $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
+        if ($version == "v1")
+        {
 
-        return new Response(json_encode($response));
+            $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+            $finder = new Finder();
+            $finder->files()->name('*.ino')->name('*.pde');
+            $finder->in($arduino_library_files."examples/");
+
+            $version = "105";
+            $format = "binary";
+            $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
+
+
+            $response = array();
+
+            foreach ($finder as $file)
+            {
+                $files = array();
+                $files[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
+                $h_finder = new Finder();
+                $h_finder->files()->name('*.h')->name("*.cpp");
+                $h_finder->in($arduino_library_files."examples/".$file->getRelativePath());
+
+                foreach($h_finder as $header)
+                {
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
+                }
+
+                $libraries = array();
+                $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+
+                $response[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+
+                $files = array();
+            }
+
+            return new Response(strip_tags(json_encode($response)));
+        }
+        else
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
+    }
+
+    public function verifyExternalExamplesAction($auth_key, $version, $library = NULL)
+    {
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+        }
+        if ($version == "v1")
+        {
+            $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+            $em = $this->getDoctrine()->getManager();
+
+            if($library !== NULL)
+            {
+                $exists = json_decode($this->checkIfExternalExists($library), true);
+                if($exists['success'])
+                {
+                    $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+                }
+                else
+                {
+                    return new Response(json_encode($exists));
+                }
+            }
+            else
+            {
+                $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+            }
+
+            $version = "105";
+            $format = "binary";
+            $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
+            $response = array();
+
+            foreach ($externalLibs as $lib)
+            {
+                $finder = new Finder();
+                $finder->files()->name('*.ino')->name('*.pde');
+                $finder->in($arduino_library_files."external-libraries/".$lib->getMachineName());
+
+                $libResponse = array();
+                foreach ($finder as $file)
+                {
+
+                    $files = array();
+                    $libsToInclude = array();
+
+                    $content = $file->getContents();
+                    $files[] = array("filename"=>$file->getBaseName(), "content" => $content);
+
+                    $h_finder = new Finder();
+                    $h_finder->files()->name('*.h')->name('*.cpp');
+                    $h_finder->in($arduino_library_files."external-libraries/".$lib->getMachineName()."/".$file->getRelativePath());
+
+                    $libsToInclude =  array_merge($libsToInclude , $this->read_headers($content));
+
+                    foreach($h_finder as $header)
+                    {
+                        $headerContent = $header->getContents();
+                        $files[] = array("filename"=>$header->getBaseName(), "content" => $headerContent);
+                        $libsToInclude = array_merge($libsToInclude ,  $this->read_headers($headerContent));
+                    }
+                    $libraries = $this->constructLibraryFiles($libsToInclude);
+
+                    $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+                    $libResponse[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+
+                }
+
+                $response[$lib->getMachineName()] = $libResponse;
+
+            }
+            return new Response(strip_tags(json_encode($response)));
+        }
+        else
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
+    }
+
+    public function checkForExternalUpdatesAction($auth_key, $version)
+    {
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+        }
+        if ($version == "v1")
+        {
+            $needToUpdate = array();
+            $em = $this->getDoctrine()->getManager();
+            $libraries = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+
+            foreach($libraries as $lib)
+            {
+                $gitOwner = $lib->getOwner();
+                $gitRepo = $lib->getRepo();
+
+                if($gitOwner!==null and $gitRepo!==null)
+                {
+                    $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
+                    if($lastCommitFromGithub !== $lib->getLastCommit())
+                        $needToUpdate[]=array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
+                }
+            }
+            if(empty($needToUpdate))
+                $response = array("success" => true, "message" => "No Libraries need to update");
+            else
+                $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
+
+            return new Response(json_encode($response));
+        }
+        else
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
 
     }
 
