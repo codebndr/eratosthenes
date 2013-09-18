@@ -45,14 +45,14 @@ class ExternalLibrary
     /**
      * @var string
      *
-     * @ORM\Column(name="owner", type="string", length=255)
+     * @ORM\Column(name="owner", type="string", length=255, nullable = true)
      */
     private $owner;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="repo", type="string", length=255)
+     * @ORM\Column(name="repo", type="string", length=255, nullable = true)
      */
     private $repo;
 
