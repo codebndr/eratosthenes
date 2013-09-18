@@ -587,6 +587,7 @@ class DefaultController extends Controller
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
         $lib->setVerified(false);
+        $lib->setLastCommit($this->getLastCommit($gitOwner,$gitRepo));
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($lib);
@@ -596,6 +597,24 @@ class DefaultController extends Controller
 
     }
 
+    private function getLastCommit($gitOwner, $gitRepo)
+    {
+        $client_id = $this->container->getParameter('github_app_client_id');
+        $client_secret = $this->container->getParameter('github_app_client_secret');
+
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array (
+            CURLOPT_URL => "https://api.github.com/repos/".$gitOwner."/".$gitRepo."/commits"."?client_id=".$client_id."&client_secret=".$client_secret ,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ));
+
+        $contents = curl_exec($curl_req);
+        $json_contents = json_decode($contents, true);
+        return $json_contents[0]['sha'];
+    }
     private function createLibFiles($machineName, $lib)
     {
         $libBaseDir = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$machineName."/";
