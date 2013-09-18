@@ -388,6 +388,33 @@ class DefaultController extends Controller
 
     }
 
+    public function checkForExternalUpdatesAction()
+    {
+        $needToUpdate = array();
+        $em = $this->getDoctrine()->getManager();
+        $libraries = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+
+        foreach($libraries as $lib)
+        {
+            $gitOwner = $lib->getOwner();
+            $gitRepo = $lib->getRepo();
+
+            if($gitOwner!==null and $gitRepo!==null)
+            {
+                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
+                if($lastCommitFromGithub !== $lib->getLastCommit())
+                    $needToUpdate[]=array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
+            }
+        }
+        if(empty($needToUpdate))
+            $response = array("success" => true, "message" => "No Libraries need to update");
+        else
+            $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
+
+        return new Response(json_encode($response));
+
+    }
+
     private function read_headers($code)
 {
     // Matches preprocessor include directives, has high tolerance to

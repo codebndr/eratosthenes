@@ -29,3 +29,7 @@ codebender_library_verify_built_in_examples:
 codebender_library_verify_external_examples:
     pattern: /{auth_key}/{version}/verifyexternal/{library}
     defaults: {_controller:CodebenderLibraryBundle:Default:verifyExternalExamples, library: null}
+
+codebender_library_check_for_external_updates:
+    pattern: /{auth_key}/{version}/checkforexternalupdates
+    defaults: {_controller:CodebenderLibraryBundle:Default:checkForExternalUpdates}
