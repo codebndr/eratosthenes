@@ -287,7 +287,7 @@ class DefaultController extends Controller
         $finder->in($arduino_library_files."examples/");
 
         $version = "105";
-        $format = "syntax";
+        $format = "binary";
         $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
 
 
@@ -342,7 +342,7 @@ class DefaultController extends Controller
         }
 
         $version = "105";
-        $format = "syntax";
+        $format = "binary";
         $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
         $response = array();
 
