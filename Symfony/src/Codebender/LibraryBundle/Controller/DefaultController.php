@@ -231,14 +231,14 @@ class DefaultController extends Controller
 
                     if($formData["MachineName"] != NULL)
                     {
-                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']), $lib), true);
                         return new Response(json_encode($saved));
                     }
                     $headers = $this->findHeadersFromLibFiles($lib['contents']);
                     $names = $this->getLibNamesFromHeaders($headers);
                     if (count($names) == 1) {
                         $machineName = $names[0];
-                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lib), true);
+                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'],$this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']),  $lib), true);
                         return new Response(json_encode($saved));
                     }
                     else
@@ -640,7 +640,7 @@ class DefaultController extends Controller
 	}
 
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $libfiles)
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $libfiles)
     {
         $exists = json_decode($this->checkIfExternalExists($machineName), true);
         if($exists['success'])
@@ -657,7 +657,7 @@ class DefaultController extends Controller
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
         $lib->setVerified(false);
-        $lib->setLastCommit($this->getLastCommitFromGithub($gitOwner,$gitRepo));
+        $lib->setLastCommit($lastCommit);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($lib);
