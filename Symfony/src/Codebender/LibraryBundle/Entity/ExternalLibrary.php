@@ -63,6 +63,12 @@ class ExternalLibrary
      */
     private $verified;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="lastCommit", type="string", length=255, nullable = true)
+     */
+    private $lastCommit;
 
     /**
      * Get id
@@ -210,6 +216,29 @@ class ExternalLibrary
     public function getVerified()
     {
         return $this->verified;
+    }
+
+    /**
+     * Set lastCommit
+     *
+     * @param string $lastCommit
+     * @return ExternalLibrary
+     */
+    public function setLastCommit($lastCommit)
+    {
+        $this->lastCommit = $lastCommit;
+
+        return $this;
+    }
+
+    /**
+     * Get verified
+     *
+     * @return string
+     */
+    public function getLastCommit()
+    {
+        return $this->lastCommit;
     }
 
 }
