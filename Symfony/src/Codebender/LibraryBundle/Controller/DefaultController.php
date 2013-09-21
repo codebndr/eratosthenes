@@ -327,9 +327,8 @@ class DefaultController extends Controller
                 $libraries = array();
                 $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
 
-                $response[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+                $response[$file->getRelativePathName()] = json_decode($this->curlRequest($compiler_url = $this->container->getParameter('compiler_url'), $post_request_data = $request_data),true);
 
-                $files = array();
             }
 
             return new Response(strip_tags(json_encode($response)));
@@ -405,7 +404,7 @@ class DefaultController extends Controller
                     $libraries = $this->constructLibraryFiles($libsToInclude);
 
                     $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
-                    $libResponse[$file->getRelativePathName()] = json_decode($this->verifyReq($request_data),true);
+                    $libResponse[$file->getRelativePathName()] = json_decode($this->curlRequest($compiler_url = $this->container->getParameter('compiler_url'), $post_request_data = $request_data),true);
 
                 }
 
@@ -519,26 +518,6 @@ class DefaultController extends Controller
         }
         return $libraries;
     }
-
-    private function verifyReq($request_data)
-    {
-        $compiler_url = $this->container->getParameter('compiler_url');
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $compiler_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data);
-
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-
-        return $response;
-    }
-
-
 
     private function checkIfExternalExists($library)
     {
@@ -671,27 +650,16 @@ class DefaultController extends Controller
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
+        $url =  "https://api.github.com/repos/".$gitOwner."/".$gitRepo."/commits"."?client_id=".$client_id."&client_secret=".$client_secret;
+        $json_contents = json_decode($this->curlRequest($url), true);
 
-        $curl_req = curl_init();
-        curl_setopt_array($curl_req, array (
-            CURLOPT_URL => "https://api.github.com/repos/".$gitOwner."/".$gitRepo."/commits"."?client_id=".$client_id."&client_secret=".$client_secret ,
-            CURLOPT_HEADER => 0,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
-        ));
-
-        $contents = curl_exec($curl_req);
-        $json_contents = json_decode($contents, true);
         return $json_contents[0]['sha'];
     }
+
     private function createLibFiles($machineName, $lib)
     {
         $libBaseDir = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$machineName."/";
-
         return($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
-
-
     }
 
     private function createLibDirectory($base, $path, $files)
@@ -704,7 +672,6 @@ class DefaultController extends Controller
 
         foreach($files as $file)
         {
-            $blah=$path.$file['name'] ;
             if($file['type'] == 'dir')
             {
                 $create = json_decode($this->createLibDirectory($base, $base.$file['name']."/", $file['contents']), true);
@@ -799,7 +766,6 @@ class DefaultController extends Controller
                 $headers[] = $file;
             }
         }
-
         return $headers;
     }
     private function processGitDir($baseurl, $path)
@@ -807,19 +773,9 @@ class DefaultController extends Controller
 
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
+        $url = ($path == "" ?  $baseurl : $baseurl."/".$path)."?client_id=".$client_id."&client_secret=".$client_secret;
 
-        $curl_req = curl_init();
-        curl_setopt_array($curl_req, array (
-            CURLOPT_URL => ($path == "" ?  $baseurl : $baseurl."/".$path)."?client_id=".$client_id."&client_secret=".$client_secret,
-            CURLOPT_HEADER => 0,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
-        ));
-
-        $contents = curl_exec($curl_req);
-        $json_contents = json_decode($contents, true);
-
+        $json_contents = json_decode($this->curlRequest($url), true);
 
         if(array_key_exists('message', $json_contents))
         {
@@ -855,20 +811,11 @@ class DefaultController extends Controller
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
+        $url = ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret;
 
-        $curl_req = curl_init();
-        curl_setopt_array($curl_req, array (
-            CURLOPT_URL => ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret,
-            CURLOPT_HEADER => 0,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3.raw')
-        ));
-
-        $contents = curl_exec($curl_req);
-
+        $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw'));
         $json_contents = json_decode($contents,true);
+
         if($json_contents === NULL)
         {
             if(! mb_check_encoding($contents, 'UTF-8'))
@@ -876,11 +823,33 @@ class DefaultController extends Controller
 
             return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
         }
-
         else
         {
             return json_encode(array("success" => false, "message" => $json_contents['message']));
         }
     }
+
+    private function curlRequest($url, $post_request_data = NULL, $http_header = NULL)
+    {
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array (
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ));
+        if($post_request_data!==NULL)
+            curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
+
+        if($http_header!==NULL)
+            curl_setopt($curl_req, CURLOPT_HTTPHEADER, array('Accept: application/vnd.github.v3.raw'));
+
+        $contents = curl_exec($curl_req);
+
+        curl_close($curl_req);
+        return $contents;
+    }
+
 
 }
