@@ -4,6 +4,66 @@
     <div class="flash-notice">
         <i>{{ flashMessage }}</i>
     </div>
+
 {% endfor %}
 
+
 {{ form(form) }}
+
+<select id="machineNames">Machine Names</select>
+
+
+<p id = "newLibMessage"></p>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+        function get_lib_from_github()
+        {
+
+            if($("#newLibrary_GitOwner").val().length > 0 && $("#newLibrary_GitRepo").val().length > 0)
+            {
+                $("#newLibMessage").text("Loading Machine names.....");
+                $.post( "http://localhost/libraries/Symfony/web/app_dev.php/getlibgitmeta", { gitOwner: $("#newLibrary_GitOwner").val(), gitRepo: $("#newLibrary_GitRepo").val() })
+                        .done(function( data ) {
+                            if(data.success)
+                            {
+                                $("#newLibMessage").text("Library Found!");
+                                var $el = $("#machineNames");
+                                $el.empty();
+                                $.each(data.names, function(k,v){
+                                    $el.append($("<option></option>")
+                                            .attr("value", v).text(v));
+                                });
+                                $el.prop("selected", false);
+                            }
+                            else
+                            {
+                                $("#newLibMessage").text("There is no such library.");
+                            }
+                        });
+            }
+        }
+
+        function update_machineName()
+        {
+            $("#newLibrary_MachineName").val($("#machineNames").val());
+        }
+
+    $(document).ready(function()
+    {
+        $("#newLibMessage").text("New library!");
+        $("#newLibrary_GitOwner").change(function(){get_lib_from_github()});
+        $("#newLibrary_GitRepo").change(function(){get_lib_from_github()});
+        $("#machineNames").change(function(){update_machine_name()});
+    });
+
+
+
+
+</script>
+
+
+
+

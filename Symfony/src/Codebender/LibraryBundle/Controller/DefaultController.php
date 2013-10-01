@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-
+use Codebender\LibraryBundle\Form\NewLibraryForm;
 
 class DefaultController extends Controller
 {
@@ -198,91 +198,72 @@ class DefaultController extends Controller
 		}
 	}
 
-
-    public function newLibraryAction($auth_key, $version, $data = NULL)
+    public function getLibraryGitMetaAction()
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
-        {
+//        if ($auth_key !== $this->container->getParameter('auth_key'))
+//        {
+//            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+//        }
+//        if ($version == "v1")
+//        {
+        if ($this->getRequest()->getMethod() == 'POST') {
+
+            $owner = $this->get('request')->request->get('gitOwner');
+            $repo = $this->get('request')->request->get('gitRepo');
+            $lib = json_decode($this->getLibFromGithub($owner, $repo, true), true);
+            if (!$lib['success'])
+            {
+                $response =  new Response(json_encode($lib));
+                $response->headers->set('Content-Type', 'application/json');
+                return $response;
+            }
+
+            else
+                $lib = $lib['library'];
+
+            $headers = $this->findHeadersFromLibFiles($lib['contents']);
+            $names = $this->getLibNamesFromHeaders($headers);
+            $response =  new Response(json_encode(array("success" => true, "names" => $names )));
+            $response->headers->set('Content-Type', 'application/json');
+            return $response;
+
+
+            return $response;
+        } else {
+            return new Response(json_encode(array("success" => false)));
+        }
+    }
+
+    public function newLibraryAction($auth_key, $version)
+    {
+
+        if ($auth_key !== $this->container->getParameter('auth_key')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
-        if ($version == "v1")
-        {
-            if($data == NULL){
-                $form = $this->createFormBuilder()
-                    ->add('GitOwner', 'text')
-                    ->add('GitRepo', 'text')
-                    ->add('HumanName', 'text')
-                    ->add('Description', 'text')
-                    ->add('MachineName', 'hidden')
-                    ->add('Go!', 'submit')
-                    ->getForm();
+        if ($version == "v1") {
+            $form = $this->createForm(new NewLibraryForm());
 
-                $form->handleRequest($this->getRequest());
+            $form->handleRequest($this->getRequest());
 
-                if ($form->isValid()) {
+            if ($form->isValid()) {
 
-                    $formData = $form->getData();
+                $formData = $form->getData();
 
-                    $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
-                    if (!$lib['success'])
-                        return new Response(json_encode($lib));
-                    else
-                        $lib = $lib['library'];
+                $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
+                if (!$lib['success'])
+                    return new Response(json_encode($lib));
+                else
+                    $lib = $lib['library'];
 
-                    if($formData["MachineName"] != NULL)
-                    {
-                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']), $lib), true);
-                        return new Response(json_encode($saved));
-                    }
-                    $headers = $this->findHeadersFromLibFiles($lib['contents']);
-                    $names = $this->getLibNamesFromHeaders($headers);
-                    if (count($names) == 1) {
-                        $machineName = $names[0];
-                        $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $machineName, $formData['GitOwner'], $formData['GitRepo'], $formData['Description'],$this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']),  $lib), true);
-                        return new Response(json_encode($saved));
-                    }
-                    else
-                    {
-                        $response = $this->forward('CodebenderLibraryBundle:Default:newLibrary', array(
-                            'auth_key' => $auth_key,
-                            'version' => $version,
-                            'data'  => array('GitOwner' => $formData['GitOwner'], 'GitRepo' =>$formData['GitRepo'], 'HumanName' => $formData["HumanName"], 'Description' => $formData['Description'], 'MachineNames' => $names)
-                        ));
-
-                        return $response;
-                    }
-                }
-            }
-            else
-            {
-                $machineNames = array();
-                foreach($data["MachineNames"] as $mn)
-                {
-                    $machineNames[$mn] = $mn;
-                }
-
-                $this->get('session')->getFlashBag()->add(
-                    'notice',
-                    'More than one header files found in directory. Please select the main one from the list below.'
-                );
-
-                $form = $this->createFormBuilder()
-                    ->add('MachineName', 'choice', array('choices' => $machineNames))
-                    ->add('GitOwner', 'text', array('read_only' => true, 'data' => $data['GitOwner']))
-                    ->add('GitRepo', 'text', array('read_only' => true, 'data' => $data['GitRepo']))
-                    ->add('HumanName', 'text', array('read_only' => true, 'data' => $data['HumanName']))
-                    ->add('Description', 'text', array('read_only' => true, 'data' => $data['Description']))
-                    ->add('Go!', 'submit')
-                    ->getForm();
+                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']), $lib), true);
+                return new Response(json_encode($saved));
 
             }
             return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
                 'form' => $form->createView()
             ));
 
-        }
-        else
-        {
+        } else {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
         }
 
@@ -698,11 +679,11 @@ class DefaultController extends Controller
 
         return $names;
     }
-    private function getLibFromGithub($owner, $repo)
+    private function getLibFromGithub($owner, $repo, $onlyMeta = false)
     {
 
         $url = "https://api.github.com/repos/".$owner."/".$repo."/contents";
-        $dir = json_decode($this->processGitDir($url, ""),true);
+        $dir = json_decode($this->processGitDir($url, "", $onlyMeta),true);
 
         if(!$dir['success'])
             return json_encode($dir);
@@ -768,7 +749,7 @@ class DefaultController extends Controller
         }
         return $headers;
     }
-    private function processGitDir($baseurl, $path)
+    private function processGitDir($baseurl, $path, $onlyMeta = false)
     {
 
         $client_id = $this->container->getParameter('github_app_client_id');
@@ -787,7 +768,7 @@ class DefaultController extends Controller
 
             if($c['type'] == "file")
             {
-                $file = json_decode($this->processGitFile($baseurl,$c), true);
+                $file = json_decode($this->processGitFile($baseurl,$c, $onlyMeta), true);
                 if($file['success'])
                     array_push($files, $file['file']);
                 else if($file['message']!="Bad Encoding")
@@ -795,7 +776,7 @@ class DefaultController extends Controller
             }
             else if($c['type'] == "dir")
             {
-                $subdir = json_decode($this->processGitDir($baseurl, $c['path']), true);
+                $subdir = json_decode($this->processGitDir($baseurl, $c['path'], $onlyMeta), true);
                 if($subdir['success'])
                     array_push($files, $subdir['directory']);
                 else
@@ -807,28 +788,34 @@ class DefaultController extends Controller
         return json_encode(array("success" => true, "directory" =>array("name" => $name, "type" => "dir", "contents"=>$files)));
     }
 
-    private function processGitFile($baseurl, $file)
+    private function processGitFile($baseurl, $file, $onlyMeta = false)
     {
-        $client_id = $this->container->getParameter('github_app_client_id');
-        $client_secret = $this->container->getParameter('github_app_client_secret');
-        $url = ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret;
-
-        $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw'));
-        $json_contents = json_decode($contents,true);
-
-        if($json_contents === NULL)
+        if(!$onlyMeta)
         {
-            if(! mb_check_encoding($contents, 'UTF-8'))
-                return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+            $client_id = $this->container->getParameter('github_app_client_id');
+            $client_secret = $this->container->getParameter('github_app_client_secret');
+            $url = ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret;
 
-            return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
+            $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw'));
+            $json_contents = json_decode($contents,true);
+
+            if($json_contents === NULL)
+            {
+                if(! mb_check_encoding($contents, 'UTF-8'))
+                    return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+
+                return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
+            }
+            else
+            {
+                return json_encode(array("success" => false, "message" => $json_contents['message']));
+            }
         }
         else
         {
-            return json_encode(array("success" => false, "message" => $json_contents['message']));
+            return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file")));
         }
     }
-
     private function curlRequest($url, $post_request_data = NULL, $http_header = NULL)
     {
         $curl_req = curl_init();
