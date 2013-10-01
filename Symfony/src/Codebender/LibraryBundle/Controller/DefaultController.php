@@ -516,7 +516,7 @@ class DefaultController extends Controller
     }
 
 
-	private function fetchLibraryFiles($finder, $directory)
+	private function fetchLibraryFiles($finder, $directory, $getContent = true)
 	{
 		if (is_dir($directory))
 		{
@@ -526,7 +526,10 @@ class DefaultController extends Controller
 			$response = array();
 			foreach ($finder as $file)
 			{
-				$response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+                if($getContent)
+				    $response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+                else
+                    $response[] = array("filename" => $file->getRelativePathname());
 			}
 			return $response;
 		}
