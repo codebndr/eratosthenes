@@ -536,6 +536,24 @@ class DefaultController extends Controller
 
 	}
 
+    private function fetchLibraryExamples($finder, $directory)
+    {
+        if (is_dir($directory))
+        {
+            $finder->in($directory."/examples")->in($directory."/Examples");
+            $finder->name('*.pde')->name('*.ino');
+
+            $response = array();
+            foreach ($finder as $file)
+            {
+                    $response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+            }
+
+                return $response;
+        }
+
+    }
+
     private function getExternalInfo($libsmeta, $version)
     {
         $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
