@@ -146,7 +146,7 @@ class DefaultController extends Controller
 		}
 	}
 
-	public function getLibraryCodeAction($auth_key, $version)
+	public function getLibraryCodeAction($auth_key, $version, $renderView = false)
 	{
 		if ($auth_key !== $this->container->getParameter('auth_key'))
 		{
@@ -158,6 +158,7 @@ class DefaultController extends Controller
 			$arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
 
 			$finder = new Finder();
+            $exampleFinder = new Finder();
 
 			$request = $this->getRequest();
 
@@ -175,6 +176,10 @@ class DefaultController extends Controller
 			}
 
 			$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+            if($renderView)
+            {
+                $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/libraries/".$filename);
+            }
 			if(empty($response))
             {
                 $response = json_decode($this->checkIfExternalExists($library),true);
@@ -187,10 +192,23 @@ class DefaultController extends Controller
                     $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
                     if(empty($response))
                         return new Response(json_encode(array("success" => false, "message" => "No files for Library named ".$library." found.")));
+                    if($renderView)
+                    {
+                        $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/external-libraries/".$filename);
+                    }
                 }
             }
-			return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
+            if(!$renderView)
+			    return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
+            else
+            {
 
+                return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
+                    "library" => $library,
+                    "files" => $response,
+                    "examples" => $examples
+                ));
+            }
 		}
 		else
 		{
