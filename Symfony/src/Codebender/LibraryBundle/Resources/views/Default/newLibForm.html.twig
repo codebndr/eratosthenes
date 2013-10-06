@@ -1,5 +1,9 @@
 {# src/Codebender/LibraryBundle/Resources/views/Default/newLibForm.html.twig #}
 
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-responsive.min.css" rel="stylesheet">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+
 {% for flashMessage in app.session.flashbag.get('notice') %}
     <div class="flash-notice">
         <i>{{ flashMessage }}</i>
@@ -8,12 +12,46 @@
 {% endfor %}
 
 
-{{ form(form) }}
+<h3 id = "newLibMessage"></h3>
 
-<select id="machineNames">Machine Names</select>
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div>
+        <p>
+            Git Owner:
+            {{ form_widget(form.GitOwner) }}
+        </p>
+    </div>
+    <div>
+        <p>
+            Git Repo:
+            {{ form_widget(form.GitRepo) }}
+        </p>
+    </div>
+    <div>
+        <p>
+            Human Name:
+            {{ form_widget(form.HumanName) }}
+        </p>
+    </div>
+    <div id="namesDiv">
+        <p>
+            Machine Name:
+            <select id="machineNames">Machine Names</select>
+        </p>
+    </div>
+    <div>
+        <p>
+            Description:
+            {{ form_widget(form.Description) }}
+        </p>
+    </div>
+    <div> <button class="btn btn-primary" {{ form_widget(form.Go) }}</button>
+    </div>
+
+{{ form_end(form) }}
 
 
-<p id = "newLibMessage"></p>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript">
@@ -24,13 +62,14 @@
 
             if($("#newLibrary_GitOwner").val().length > 0 && $("#newLibrary_GitRepo").val().length > 0)
             {
-                $("#newLibMessage").text("Loading Machine names.....");
+                $("#newLibMessage").text("Loading Library.....");
                 $.post( "http://localhost/libraries/Symfony/web/app_dev.php/getlibgitmeta", { gitOwner: $("#newLibrary_GitOwner").val(), gitRepo: $("#newLibrary_GitRepo").val() })
                         .done(function( data ) {
                             if(data.success)
                             {
                                 $("#newLibMessage").text("Library Found!");
                                 var $el = $("#machineNames");
+                                $("#namesDiv").show()
                                 $el.empty();
                                 $.each(data.names, function(k,v){
                                     $el.append($("<option></option>")
@@ -41,6 +80,7 @@
                             else
                             {
                                 $("#newLibMessage").text("There is no such library.");
+                                $("#namesDiv").hide();
                             }
                         });
             }
@@ -53,10 +93,11 @@
 
     $(document).ready(function()
     {
-        $("#newLibMessage").text("New library!");
+        $("#newLibMessage").text("Add a New Library:");
         $("#newLibrary_GitOwner").change(function(){get_lib_from_github()});
         $("#newLibrary_GitRepo").change(function(){get_lib_from_github()});
         $("#machineNames").change(function(){update_machine_name()});
+        $("#namesDiv").hide();
     });
 
 
