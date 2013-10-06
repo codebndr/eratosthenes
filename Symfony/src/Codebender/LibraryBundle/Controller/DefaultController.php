@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Codebender\LibraryBundle\Form\NewLibraryForm;
+use ZipArchive;
 
 class DefaultController extends Controller
 {
@@ -455,6 +456,92 @@ class DefaultController extends Controller
         }
 
     }
+
+    public function downloadAction()
+    {
+        $htmlcode = 200;
+        $value = "";
+
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $finder = new Finder();
+        $exampleFinder = new Finder();
+
+
+        $request = $this->getRequest();
+
+        $library = $request->query->get('library');
+
+        $filename = $library;
+
+        $directory = "";
+
+        $last_slash = strrpos($library, "/");
+        if($last_slash !== false )
+        {
+            $filename = substr($library, $last_slash + 1);
+            $vendor = substr($library, 0, $last_slash);
+        }
+
+        $isBuiltIn = json_decode($this->checkIfBuiltInExists($filename), true);
+        if($isBuiltIn["success"])
+            $path = $arduino_library_files."/libraries/".$filename;
+        else
+        {
+            $isExternal = json_decode($this->checkIfExternalExists($filename), true);
+            if($isExternal["success"])
+            {
+                $path = $arduino_library_files."/external-libraries/".$filename;
+            }
+            else
+            {
+                $value = "";
+                $htmlcode = 404;
+                return new Response($value, $htmlcode);
+            }
+        }
+
+        $files = $this->fetchLibraryFiles($finder, $path);
+        $examples = $this->fetchLibraryExamples($exampleFinder, $path);
+
+        $zipname = "/tmp/asd.zip";
+
+        $zip = new ZipArchive();
+
+        if ($zip->open($zipname, ZIPARCHIVE::CREATE)===false)
+        {
+            $value = "";
+            $htmlcode = 404;
+        }
+        else
+        {
+            if($zip->addEmptyDir($filename)!==true)
+            {
+                $value = "";
+                $htmlcode = 404;
+            }
+            else
+            {
+                foreach($files as $file)
+                {
+                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                }
+                foreach($examples as $file)
+                {
+                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                }
+                $zip->close();
+                $value = file_get_contents($zipname);
+            }
+            unlink($zipname);
+        }
+
+$headers = array('Content-Type'		=> 'application/octet-stream',
+    'Content-Disposition' => 'attachment;filename="'.$filename.'.zip"');
+
+return new Response($value, $htmlcode, $headers);
+
+    }
+
 
     private function read_headers($code)
 {

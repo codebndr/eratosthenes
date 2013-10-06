@@ -29,7 +29,8 @@
 </head>
 <body>
 <h1>{{ library }}</h1>
-
+<a id="download" class="btn btn-primary"
+    href="{{ path('codebender_library_download', { 'library' : library }) }}">Download</a>
 <h3>Files:</h3>
 
 <div class="accordion" id="files_accordion">
