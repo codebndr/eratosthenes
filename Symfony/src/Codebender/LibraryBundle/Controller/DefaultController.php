@@ -518,6 +518,15 @@ class DefaultController extends Controller
         return $libraries;
     }
 
+    private function checkIfBuiltInExists($library)
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        if(is_dir($arduino_library_files."/libraries/".$library))
+            return json_encode(array("success" => true, "message" => "Library found"));
+        else
+            return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
+    }
+
     private function checkIfExternalExists($library)
     {
         $em = $this->getDoctrine()->getManager();
