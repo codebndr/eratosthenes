@@ -567,7 +567,7 @@ class DefaultController extends Controller
     {
         if (is_dir($directory))
         {
-            $finder->in($directory."/examples")->in($directory."/Examples");
+            $finder->in($directory);
             $finder->name('*.pde')->name('*.ino');
 
             $response = array();
