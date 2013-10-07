@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href=\"//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css\" rel=\"stylesheet\">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -58,9 +58,11 @@
         {% for file in files %}
         <div class="accordion-group">
             <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
-                    {{ file.filename }}
+                <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
+                    {{ file.filename }} <label class = 'icon-chevron-down'></label>
                 </a>
+                <a href = "{{ path('codebender_library_get_example_code', {'auth_key': 'authKey', 'version': 'v1'}) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
+
             </div>
             <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
                 <div class="accordion-inner">
@@ -76,9 +78,10 @@
         {% for file in examples %}
             <div class="accordion-group">
                 <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
-                        {{ file.filename }}
+                    <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
+                        {{ file.filename }} <label class = 'icon-chevron-down'></label>
                     </a>
+                    <a href = "{{ path('codebender_library_get_example_code', {'auth_key': 'authKey', 'version': 'v1'}) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
                 </div>
                 <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
                     <div class="accordion-inner">

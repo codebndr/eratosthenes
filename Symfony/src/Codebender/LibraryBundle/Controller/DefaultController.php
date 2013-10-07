@@ -206,6 +206,7 @@ class DefaultController extends Controller
                         $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/external-libraries/".$filename);
                         $em = $this->getDoctrine()->getManager();
                         $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
+                        $filename = $libmeta[0]->getMachineName();
                         $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo());
 
                     }
@@ -217,7 +218,7 @@ class DefaultController extends Controller
             {
 
                 return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
-                    "library" => $library,
+                    "library" => $filename,
                     "files" => $response,
                     "examples" => $examples,
                     "meta" => $meta
