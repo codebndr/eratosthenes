@@ -176,14 +176,22 @@ class DefaultController extends Controller
 				$vendor = substr($library, 0, $last_slash);
 			}
 
-			$response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
-            if($renderView)
+            $exists = json_decode($this->checkIfBuiltInExists($filename),true);
+
+            if($exists["success"])
             {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/libraries/".$filename);
+                $response = $this->diraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+
+                if($renderView)
+                {
+                    $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/libraries/".$filename);
+                    $meta = array();
+                }
             }
-			if(empty($response))
+
+            else
             {
-                $response = json_decode($this->checkIfExternalExists($library),true);
+                $response = json_decode($this->checkIfExternalExists($filename),true);
                 if(!$response['success'])
                 {
                     return new Response(json_encode($response));
@@ -196,6 +204,10 @@ class DefaultController extends Controller
                     if($renderView)
                     {
                         $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/external-libraries/".$filename);
+                        $em = $this->getDoctrine()->getManager();
+                        $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
+                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo());
+
                     }
                 }
             }
@@ -207,7 +219,8 @@ class DefaultController extends Controller
                 return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
                     "library" => $library,
                     "files" => $response,
-                    "examples" => $examples
+                    "examples" => $examples,
+                    "meta" => $meta
                 ));
             }
 		}

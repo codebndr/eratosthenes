@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href=\"//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css\" rel=\"stylesheet\">
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -28,45 +29,65 @@
     </script>
 </head>
 <body>
-<h1>{{ library }}</h1>
-<a id="download" class="btn btn-primary"
+<div>
+    <h1>{{ library }} </h1>
+        {% if meta %}
+            <label
+                    {% if meta.verified %}
+                        class="icon-ok" title="This is a Verified Library."
+                    {% else %}
+                        class="icon-warning-sign" title="Not Verified. Use at your own risk."
+                    {% endif %}
+                    >
+            </label>
+        <h3>{{ meta.humanName }}</h3>
+        <p>{{ meta.description }}</p>
+        {% if meta.gitOwner and meta.gitRepo %}
+            <a class="btn btn-primary" href = "http://www.github.com/{{ meta.gitOwner }}/{{ meta.gitRepo }}">Github Repository</a>
+        {% endif %}
+    {% endif %}
+
+
+<a id="download" class="btn btn-success"
     href="{{ path('codebender_library_download', { 'library' : library }) }}">Download</a>
-<h3>Files:</h3>
-
-<div class="accordion" id="files_accordion">
-    {% for file in files %}
-    <div class="accordion-group">
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
-                {{ file.filename }}
-            </a>
-        </div>
-        <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
-            <div class="accordion-inner">
-                <pre>{{ file.content }}</pre>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
 </div>
+<div>
+    <h3>Files:</h3>
 
-<h3>Examples:</h3>
-<div class="accordion" id="examples_accordion">
-    {% for file in examples %}
+    <div class="accordion" id="files_accordion">
+        {% for file in files %}
         <div class="accordion-group">
             <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
                     {{ file.filename }}
                 </a>
             </div>
-            <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
+            <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
                 <div class="accordion-inner">
                     <pre>{{ file.content }}</pre>
                 </div>
             </div>
         </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
 
+    <h3>Examples:</h3>
+    <div class="accordion" id="examples_accordion">
+        {% for file in examples %}
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
+                        {{ file.filename }}
+                    </a>
+                </div>
+                <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <pre>{{ file.content }}</pre>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 </body>
 </html>
