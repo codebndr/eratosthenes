@@ -47,3 +47,7 @@ codebender_library_get_library_git_meta:
     pattern: /getlibgitmeta
     defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
     methods:  [POST]
+
+codebender_library_search:
+    pattern: /search
+    defaults: {_controller:CodebenderLibraryBundle:Default:search}

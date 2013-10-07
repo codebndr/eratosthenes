@@ -542,6 +542,32 @@ return new Response($value, $htmlcode, $headers);
 
     }
 
+    public function searchAction()
+    {
+        $request = $this->getRequest();
+        $query = $request->query->get('q');
+        $json = $request->query->get('json');
+        $names = array();
+
+        if($query!== NULL && $query!="")
+        {
+            $em = $this->getDoctrine()->getManager();
+            $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
+            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')->setParameter('token', "%".$query."%")->getQuery()->getResult();
+
+
+            foreach($libraries as $lib)
+            {
+                $names[] = $lib->getMachineName();
+            }
+        }
+        if($json!==NULL && $json = true)
+            return new Response(json_encode(array("success" => true, "libs" => $names)));
+        else
+            return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("libs" => $names));
+    }
+
+
 
     private function read_headers($code)
 {
