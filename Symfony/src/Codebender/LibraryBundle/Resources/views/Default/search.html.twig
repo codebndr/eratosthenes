@@ -13,7 +13,7 @@
             if($("#query").val().length>0)
             {
                 window.history.replaceState(null, "Search",  "?q=" + $("#query").val());
-                $.getJSON( "http://localhost/libraries/Symfony/web/app_dev.php/search?json=true&q=" + $("#query").val())
+                $.getJSON( "{{ path('codebender_library_search') }}" + "?json=true&q="+ $("#query").val())
                         .done(function( data ) {
                             if(data.success)
                             {
@@ -21,7 +21,7 @@
                                 var resultsHTML = "";
                                 $.each(data.libs, function(k,v){
                                     console.log(v );
-                                    resultsHTML += '<p><a href = "http://localhost/libraries/Symfony/web/app_dev.php/authKey/v1/view?library='+v+'">'+v+'</a></p>'
+                                    resultsHTML += '<p><a href = "{{ path('codebender_library_view_library', {'auth_key': 'authKey', 'version': 'v1'}) }}?library='+v+'">'+v+'</a></p>'
                                 });
                                 $( "#resultsDiv" ).html(resultsHTML);
                             }
@@ -48,7 +48,7 @@
 
 <div id="resultsDiv">
     {%  for lib in libs %}
-        <p><a href = "http://localhost/libraries/Symfony/web/app_dev.php/authKey/v1/view?library={{ lib }}">{{ lib }}</a></p>
+        <p><a href = "{{ path('codebender_library_view_library', {'auth_key': 'authKey', 'version': 'v1'}) }}?library={{ lib }}">{{ lib }}</a></p>
     {% endfor %}
 </div>
 

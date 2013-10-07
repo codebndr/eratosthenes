@@ -63,7 +63,7 @@
             if($("#newLibrary_GitOwner").val().length > 0 && $("#newLibrary_GitRepo").val().length > 0)
             {
                 $("#newLibMessage").text("Loading Library.....");
-                $.post( "http://localhost/libraries/Symfony/web/app_dev.php/getlibgitmeta", { gitOwner: $("#newLibrary_GitOwner").val(), gitRepo: $("#newLibrary_GitRepo").val() })
+                $.post( "{{ path('codebender_library_get_library_git_meta') }}", { gitOwner: $("#newLibrary_GitOwner").val(), gitRepo: $("#newLibrary_GitRepo").val() })
                         .done(function( data ) {
                             if(data.success)
                             {
