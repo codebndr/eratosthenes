@@ -1,8 +1,6 @@
 {# src/Codebender/LibraryBundle/Resources/views/Default/newLibForm.html.twig #}
 
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-responsive.min.css" rel="stylesheet">
-<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+{% include 'CodebenderLibraryBundle:Default:includes.html.twig' %}
 
 {% for flashMessage in app.session.flashbag.get('notice') %}
     <div class="flash-notice">
