@@ -1,63 +1,12 @@
-{# src/Codebender/LibraryBundle/Resources/views/Default/newLibForm.html.twig #}
 
+<head>
 {% include 'CodebenderLibraryBundle:Default:includes.html.twig' %}
+<script src={{ asset("js/zip.js") }}></script>
 
-{% for flashMessage in app.session.flashbag.get('notice') %}
-    <div class="flash-notice">
-        <i>{{ flashMessage }}</i>
-    </div>
-
-{% endfor %}
-
-
-<h3 id = "newLibMessage"></h3>
-
-{{ form_start(form) }}
-    {{ form_errors(form) }}
-    <div>
-        <p>
-            Git Owner:
-            {{ form_widget(form.GitOwner) }}
-        </p>
-    </div>
-    <div>
-        <p>
-            Git Repo:
-            {{ form_widget(form.GitRepo) }}
-        </p>
-    </div>
-    <div>
-        <p>
-            Human Name:
-            {{ form_widget(form.HumanName) }}
-        </p>
-    </div>
-    <div id="namesDiv">
-        <p>
-            Machine Name:
-            <select id="machineNames">Machine Names</select>
-        </p>
-    </div>
-    <div>
-        <p>
-            Description:
-            {{ form_widget(form.Description) }}
-        </p>
-    </div>
-    <div> <button class="btn btn-primary" {{ form_widget(form.Go) }}</button>
-    </div>
-
-{{ form_end(form) }}
-
-
-
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script type="text/javascript">
-
+    <script type="text/javascript">
 
         function get_lib_from_github()
         {
-
             if($("#newLibrary_GitOwner").val().length > 0 && $("#newLibrary_GitRepo").val().length > 0)
             {
                 $("#newLibMessage").text("Loading Library.....");
@@ -67,13 +16,14 @@
                             {
                                 $("#newLibMessage").text("Library Found!");
                                 var $el = $("#machineNames");
-                                $("#namesDiv").show()
+                                select_github();
                                 $el.empty();
                                 $.each(data.names, function(k,v){
                                     $el.append($("<option></option>")
                                             .attr("value", v).text(v));
                                 });
                                 $el.prop("selected", false);
+                                update_machineName();
                             }
                             else
                             {
@@ -89,20 +39,146 @@
             $("#newLibrary_MachineName").val($("#machineNames").val());
         }
 
-    $(document).ready(function()
-    {
-        $("#newLibMessage").text("Add a New Library:");
-        $("#newLibrary_GitOwner").change(function(){get_lib_from_github()});
-        $("#newLibrary_GitRepo").change(function(){get_lib_from_github()});
-        $("#machineNames").change(function(){update_machine_name()});
-        $("#namesDiv").hide();
-    });
+        function endsWith(str, suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        }
+
+        function startsWith (str, suffix){
+            return str.indexOf(suffix) == 0;
+        }
+
+        function onerror(message) {
+            alert(message);
+        }
+
+        function getZipFiles(file, onend) {
+            zip.createReader(new zip.BlobReader(file), function(zipReader) {
+                return zipReader.getEntries(onend);
+            }, onerror);
+        }
+
+        function get_lib_from_zip()
+        {
+            select_zip();
+            getZipFiles($("#newLibrary_Zip")[0].files[0], function(entries) {
+                var $el = $("#machineNames");
+                $el.empty();
+                entries.forEach(function(entry) {
+
+                    if(endsWith(entry.filename, ".h") && !startsWith(entry.filename, ".")  && !startsWith(entry.filename, "_") )
+                    {
+                        var $lastSlash = entry.filename.lastIndexOf("/");
+                        var $header = entry.filename.substr($lastSlash+1);
+                        var $name = $header.substr(0,$header.length -2);
+                        $el.append($("<option></option>")
+                                .attr("value", $name).text($name));
+
+                    }
+                });
+                $el.prop("selected", false);
+                update_machineName();
+            });
+        }
+
+        function select_zip()
+        {
+            $("#newLibrary_GitOwner").attr("disabled", "disabled");
+            $("#newLibrary_GitRepo").attr("disabled", "disabled");
+            $("#newLibrary_Zip").removeAttr("disabled");
+            $("#gitHubDiv").hide();
+            $("#orDiv").hide();
+            $("#metaDiv").show();
+        }
+
+        function select_github()
+        {
+            $("#newLibrary_GitOwner").removeAttr("disabled");
+            $("#newLibrary_GitRepo").removeAttr("disabled");
+            $("#newLibrary_Zip").attr("disabled", "disabled");
+            $("#zipDiv").hide();
+            $("#orDiv").hide();
+            $("#metaDiv").show();
+        }
+
+        $(document).ready(function()
+        {
+            $("#newLibMessage").text("Add a New Library:");
+            $("#newLibrary_GitOwner").change(function(){get_lib_from_github()});
+            $("#newLibrary_GitRepo").change(function(){get_lib_from_github()});
+            $("#newLibrary_Zip").change(function(){get_lib_from_zip()});
+            $("#machineNames").change(function(){update_machineName()});
+            $("#metaDiv").hide();
+
+        });
+
+    </script>
+</head>
+<body>
+{% for flashMessage in app.session.flashbag.get('notice') %}
+    <div class="flash-notice">
+        <i>{{ flashMessage }}</i>
+    </div>
+
+{% endfor %}
+
+
+<h3 id = "newLibMessage"></h3>
 
 
 
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div id="gitHubDiv">
+        <div id="gitOwnerDiv">
+            <h2>
+                Enter Github URL:
+            </h2>
+            <p>
+                Git Owner:
+                {{ form_widget(form.GitOwner) }}
+            </p>
+        </div>
+        <div id="gitRepoDiv">
+            <p>
+                Git Repo:
+                {{ form_widget(form.GitRepo) }}
+            </p>
+        </div>
+    </div>
+    <div id='orDiv'>
+        <h3>or</h3>
+    </div>
+    <div id="zipDiv">
+        <h2>
+            Upload Zip File:
+            {{ form_widget(form.Zip) }}
+        </h2>
+    </div>
+    <div id="metaDiv">
+        <div>
+            <p>
+                Human Name:
+                {{ form_widget(form.HumanName) }}
+            </p>
+        </div>
+        <div id="namesDiv">
+            <p>
+                Machine Name:
+                <select id="machineNames">Machine Names</select>
+            </p>
+        </div>
+        <div>
+            <p>
+                Description:
+                {{ form_widget(form.Description) }}
+            </p>
+        </div>
+        <div> <button class="btn btn-primary" {{ form_widget(form.Go) }}</button>
+        </div>
+    </div>
 
-</script>
-
+{{ form_end(form) }}
+</body>
 
 
 

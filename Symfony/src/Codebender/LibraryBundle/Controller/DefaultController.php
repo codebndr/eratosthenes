@@ -282,13 +282,22 @@ class DefaultController extends Controller
 
                 $formData = $form->getData();
 
-                $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
+                if($formData["GitOwner"] === NULL && $formData["GitRepo"]===NULL && $formData["Zip"]!==NULL)
+                    $lib = json_decode($this->getLibFromZipFile($formData["Zip"]) ,true);
+                else
+                    $lib = json_decode($this->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
                 if (!$lib['success'])
                     return new Response(json_encode($lib));
                 else
                     $lib = $lib['library'];
+                if($formData["GitOwner"] === NULL && $formData["GitRepo"]===NULL && $formData["Zip"]!==NULL)
+                    $lastCommit=NULL;
+                else
+                    $lastCommit=$this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']);
 
-                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']), $lib), true);
+                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit , $lib), true);
+                if($saved['success'])
+                    return $this->redirect($this->generateUrl('codebender_library_view_library', array("auth_key" => "authKey", "version"=>"v1","library" => $formData["MachineName"])));
                 return new Response(json_encode($saved));
 
             }
@@ -991,6 +1000,89 @@ return new Response($value, $htmlcode, $headers);
             return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file")));
         }
     }
+
+    private function getLibFromZipFile($file)
+    {
+        if(is_dir('/tmp/lib'))
+            $this->destroy_dir('/tmp/lib');
+        $zip = new \ZipArchive;
+        if($zip->open($file) === TRUE)
+        {
+            $zip->extractTo('/tmp/lib/');
+            $zip->close();
+            $dir = json_decode($this->processZipDir('/tmp/lib'), true);
+
+            if(!$dir['success'])
+                return json_encode($dir);
+            else
+                $dir = $dir['directory'];
+            $baseDir = json_decode($this->findBaseDir($dir),true);
+            if(!$baseDir['success'])
+                return json_encode($baseDir);
+            else
+                $baseDir = $baseDir['directory'];
+
+            return json_encode(array("success" => true, "library" => $baseDir));
+        }
+
+        else
+        {
+            return json_encode(array("success" => false, "message" => "Could not unzip Archive."));
+        }
+    }
+    private function processZipDir($path)
+    {
+        $files = array();
+        $dir = preg_grep('/^([^.])/', scandir($path));
+        foreach($dir as $file)
+        {
+            if($file === "__MACOSX")
+                continue;
+
+            if(is_dir($path.'/'.$file))
+            {
+                $subdir = json_decode($this->processZipDir($path.'/'.$file), true);
+                if($subdir['success'])
+                    array_push($files, $subdir['directory']);
+                else
+                    return json_encode($subdir);
+            }
+            else
+            {
+                $file = json_decode( $this->processZipFile($path.'/'.$file), true);
+                if($file['success'])
+                    array_push($files, $file['file']);
+                else if($file['message']!="Bad Encoding")
+                    return json_encode($file);
+            }
+        }
+        return json_encode(array("success" => true, "directory" =>array("name" => substr($path, 9), "type" => "dir", "contents"=>$files)));
+    }
+
+    private function processZipFile($path)
+    {
+        $contents = file_get_contents($path);
+        if(! mb_check_encoding($contents, 'UTF-8')){
+            return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+        }
+        if($contents === NULL)
+            return json_encode(array("success" => false, "message"=>"Could not read file ".basename($path)));
+
+        return json_encode(array("success" => true, "file" => array("name" => basename($path),"type" => "file", "contents" => $contents)));
+    }
+
+    private function destroy_dir($dir) {
+        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+        foreach (scandir($dir) as $file) {
+            if ($file == '.' || $file == '..') continue;
+            if (!$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) {
+                chmod($dir . DIRECTORY_SEPARATOR . $file, 0777);
+                if (!$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) return false;
+            };
+        }
+        return rmdir($dir);
+    }
+
     private function curlRequest($url, $post_request_data = NULL, $http_header = NULL)
     {
         $curl_req = curl_init();
