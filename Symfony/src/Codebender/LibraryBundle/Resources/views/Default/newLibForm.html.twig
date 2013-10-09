@@ -7,36 +7,58 @@
 
         function get_lib_from_github()
         {
-            if($("#newLibrary_GitOwner").val().length > 0 && $("#newLibrary_GitRepo").val().length > 0)
+            var $url = $("#githubUrl").val();
+            var $github_url_pattern = /^(http:\/\/)?(www.)?github.com\/[a-zA-Z0-9.-]+\/[a-zA-Z0-9.-]+\/?$/;
+            if (!$github_url_pattern.test($url))
+                $("#newLibMessage").text("Invalid Github URL");
+            else
             {
+                if(endsWith($url, "/"))
+                {
+                    $url = $url.substr(0, $url.length-1);
+                }
+                var $lastSlash = $url.lastIndexOf("/");
+                var $repo = $url.substr($lastSlash+1);
+                $url = $url.substr(0, $url.length - $repo.length - 1);
+                $lastSlash = $url.lastIndexOf("/");
+                var $owner = $url.substr($lastSlash+1);
+
+
                 $("#newLibMessage").text("Loading Library.....");
-                $.post( "{{ path('codebender_library_get_library_git_meta') }}", { gitOwner: $("#newLibrary_GitOwner").val(), gitRepo: $("#newLibrary_GitRepo").val() })
-                        .done(function( data ) {
-                            if(data.success)
-                            {
-                                $("#newLibMessage").text("Library Found!");
-                                var $el = $("#machineNames");
-                                select_github();
-                                $el.empty();
-                                $.each(data.names, function(k,v){
-                                    $el.append($("<option></option>")
-                                            .attr("value", v).text(v));
-                                });
-                                $el.prop("selected", false);
-                                update_machineName();
-                            }
-                            else
-                            {
-                                $("#newLibMessage").text("There is no such library.");
-                                $("#namesDiv").hide();
-                            }
+                $.post( "{{ path('codebender_library_get_library_git_meta') }}", { gitOwner: $owner, gitRepo: $repo })
+                    .done(function( data ) {
+                    if(data.success)
+                    {
+                        $("#newLibMessage").text("Library Found!");
+                        update_git($owner, $repo)
+                        var $el = $("#machineNames");
+                        select_github();
+                        $el.empty();
+                        $.each(data.names, function(k,v){
+                            $el.append($("<option></option>")
+                                    .attr("value", v).text(v));
                         });
+                        $el.prop("selected", false);
+                        update_machineName();
+                    }
+                    else
+                    {
+                        $("#newLibMessage").text("There is no such library.");
+                    }
+                });
             }
+
         }
 
         function update_machineName()
         {
             $("#newLibrary_MachineName").val($("#machineNames").val());
+        }
+
+        function update_git(owner, repo)
+        {
+            $("#newLibrary_GitOwner").val(owner);
+            $("#newLibrary_GitRepo").val(repo);
         }
 
         function endsWith(str, suffix) {
@@ -103,8 +125,7 @@
         $(document).ready(function()
         {
             $("#newLibMessage").text("Add a New Library:");
-            $("#newLibrary_GitOwner").change(function(){get_lib_from_github()});
-            $("#newLibrary_GitRepo").change(function(){get_lib_from_github()});
+            $("#githubUrl").change(function(){get_lib_from_github()});
             $("#newLibrary_Zip").change(function(){get_lib_from_zip()});
             $("#machineNames").change(function(){update_machineName()});
             $("#metaDiv").hide();
@@ -129,30 +150,16 @@
 {{ form_start(form) }}
     {{ form_errors(form) }}
     <div id="gitHubDiv">
-        <div id="gitOwnerDiv">
-            <h2>
-                Enter Github URL:
-            </h2>
-            <p>
-                Git Owner:
-                {{ form_widget(form.GitOwner) }}
-            </p>
-        </div>
-        <div id="gitRepoDiv">
-            <p>
-                Git Repo:
-                {{ form_widget(form.GitRepo) }}
-            </p>
-        </div>
+       <input type="text" id="githubUrl" autocomplete="off" placeholder="Enter Github Url"/></div>
     </div>
     <div id='orDiv'>
         <h3>or</h3>
     </div>
     <div id="zipDiv">
-        <h2>
+        <h3>
             Upload Zip File:
             {{ form_widget(form.Zip) }}
-        </h2>
+        </h3>
     </div>
     <div id="metaDiv">
         <div>
@@ -161,7 +168,7 @@
                 {{ form_widget(form.HumanName) }}
             </p>
         </div>
-        <div id="namesDiv">
+        <div>
             <p>
                 Machine Name:
                 <select id="machineNames">Machine Names</select>

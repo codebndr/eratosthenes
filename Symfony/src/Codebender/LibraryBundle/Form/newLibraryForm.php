@@ -10,8 +10,8 @@ class newLibraryForm extends AbstractType{
     {
 
         $builder
-            ->add('GitOwner', 'text', array('label' => 'Git Owner: '))
-            ->add('GitRepo', 'text', array('label' => 'Git Repository: '))
+            ->add('GitOwner', 'hidden')
+            ->add('GitRepo', 'hidden')
             ->add('Zip', 'file')
             ->add('HumanName', 'text', array('label' => 'Human Name: '))
             ->add('MachineName', 'hidden')
