@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
+use Codebender\LibraryBundle\Entity\Example;
 use Codebender\LibraryBundle\Entity\ExternalLibrary;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
@@ -807,8 +808,29 @@ return new Response($value, $htmlcode, $headers);
         $em->persist($lib);
         $em->flush();
 
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory');
+        $examples = $this->fetchLibraryExamples(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+        foreach($examples as $example)
+        {
+            $path_parts = pathinfo($example['filename']);
+            $this->saveExampleMeta($path_parts['filename'], $lib, $example['filename'], NULL);
+        }
+
         return json_encode(array("success" => true));
 
+    }
+
+    private function saveExampleMeta($name, $lib, $path, $boards)
+    {
+        //TODO make it better. You know, return things and shit
+        $example = new Example();
+        $example->setName($name);
+        $example->setLibrary($lib);
+        $example->setPath($path);
+        $example->setBoards($boards);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($example);
+        $em->flush();
     }
 
     private function getLastCommitFromGithub($gitOwner, $gitRepo)
