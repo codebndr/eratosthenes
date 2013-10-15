@@ -392,7 +392,7 @@ class DefaultController extends Controller
                 $externalLibs = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
             }
 
-            $version = "105";
+            $v = "105";
             $format = "binary";
             $build = array("mcu"=>"atmega328p", "f_cpu"=>"16000000L", "core"=>"arduino", "variant"=>"standard");
             $response = array();
@@ -427,7 +427,7 @@ class DefaultController extends Controller
                     }
                     $libraries = $this->constructLibraryFiles($libsToInclude);
 
-                    $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $version, 'build' => $build));
+                    $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $v, 'build' => $build));
                     $libResponse[$file->getRelativePathName()] = json_decode($this->curlRequest($compiler_url = $this->container->getParameter('compiler_url'), $post_request_data = $request_data),true);
 
                 }
