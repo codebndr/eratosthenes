@@ -582,7 +582,8 @@ return new Response($value, $htmlcode, $headers);
 
             foreach($libraries as $lib)
             {
-                $names[] = $lib->getMachineName();
+                if($lib->getActive())
+                    $names[] = $lib->getMachineName();
             }
         }
         if($json!==NULL && $json = true)
