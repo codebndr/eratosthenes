@@ -181,7 +181,7 @@ class DefaultController extends Controller
 
             if($exists["success"])
             {
-                $response = $this->diraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+                $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
 
                 if($renderView)
                 {
