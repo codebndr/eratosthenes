@@ -620,38 +620,19 @@ return new Response($value, $htmlcode, $headers);
 
         foreach($libnames as $lib)
         {
-           if(is_dir($arduino_library_files."/libraries/".$lib))
-           {
-
-               $finder = new Finder;
-               $finder->files()->name('*.h')->name('*.cpp');
-               $finder->in($arduino_library_files."/libraries/".$lib);
-               $libfiles = array();
-
-               foreach($finder as $file)
-               {
-                   $libfiles[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
-               }
-               $libraries[$lib] =  $libfiles;
-
-           }
+           $finder = new Finder;
+           $builtIn = json_decode($this->checkIfBuiltInExists($lib), true);
+           if($builtIn['success'])
+               $path = $arduino_library_files."/libraries/".$lib;
            else
            {
                $exists = json_decode($this->checkIfExternalExists($lib), true);
                if($exists['success'])
-               {
-                   $finder = new Finder;
-                   $finder->files()->name('*.h')->name('*.cpp');
-                   $finder->in($arduino_library_files."/external-libraries/".$lib);
-                   $libfiles = array();
-
-                   foreach($finder as $file)
-                   {
-                       $libfiles[] = array("filename"=>$file->getBaseName(), "content" => $file->getContents());
-                   }
-                   $libraries[$lib] =  $libfiles;
-               }
+                   $path = $arduino_library_files."/external-libraries/".$lib;
+               else continue;
            }
+           $files = $this->fetchLibraryFiles($finder, $path);
+           $libraries[$lib] = $files;
         }
         return $libraries;
     }
