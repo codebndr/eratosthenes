@@ -739,7 +739,7 @@ return new Response($value, $htmlcode, $headers);
                 foreach($finder as $file)
                 {
                     $url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$libname."/".$file->getRelativePathname();
-                    $libraries[$libname]["examples"][] = array("name" => strtok($file->getRelativePathname(), "/"), "filename" => $file->getFilename(), "url" => $url);
+                    $libraries[$libname]["examples"][] = array("name" => strtok($file->getFilename(), "."), "filename" => $file->getFilename(), "url" => $url);
                 }
 
             }
