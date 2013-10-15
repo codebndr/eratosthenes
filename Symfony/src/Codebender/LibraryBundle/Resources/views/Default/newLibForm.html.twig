@@ -8,7 +8,7 @@
         function get_lib_from_github()
         {
             var $url = $("#githubUrl").val();
-            var $github_url_pattern = /^(http:\/\/)?(www.)?github.com\/[a-zA-Z0-9.-]+\/[a-zA-Z0-9.-]+\/?$/;
+            var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+\/?$/;
             if (!$github_url_pattern.test($url))
                 $("#newLibMessage").text("Invalid Github URL");
             else
