@@ -668,7 +668,7 @@ return new Response($value, $htmlcode, $headers);
     {
         $em = $this->getDoctrine()->getManager();
         $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
-        if(empty($lib))
+        if(empty($lib) || !$lib[0]->getActive())
         {
             return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
         }
