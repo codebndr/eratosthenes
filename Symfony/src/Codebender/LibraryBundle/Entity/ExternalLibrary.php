@@ -64,6 +64,13 @@ class ExternalLibrary
     private $verified;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="lastCommit", type="string", length=255, nullable = true)
@@ -216,6 +223,29 @@ class ExternalLibrary
     public function getVerified()
     {
         return $this->verified;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return ExternalLibrary
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 
     /**

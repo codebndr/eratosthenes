@@ -802,6 +802,7 @@ return new Response($value, $htmlcode, $headers);
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
         $lib->setVerified(false);
+        $lib->setActive(false);
         $lib->setLastCommit($lastCommit);
 
         $em = $this->getDoctrine()->getManager();
