@@ -406,12 +406,12 @@ class DefaultController extends Controller
                 $libResponse = array();
                 foreach ($finder as $file)
                 {
-
                     $files = array();
                     $libsToInclude = array();
 
                     $content = $file->getContents();
-                    $files[] = array("filename"=>$file->getBaseName(), "content" => $content);
+                    $path_info = pathinfo($file->getBaseName());
+                    $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => $content);
 
                     $h_finder = new Finder();
                     $h_finder->files()->name('*.h')->name('*.cpp');
