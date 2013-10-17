@@ -24,6 +24,8 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
+    globals:
+        auth_key: %auth_key%
 
 # Assetic Configuration
 assetic:
