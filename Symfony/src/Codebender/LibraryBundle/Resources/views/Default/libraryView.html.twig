@@ -48,13 +48,14 @@
     <h3>Files:</h3>
 
     <div class="accordion" id="files_accordion">
+        {% set get_example_hash = { 'auth_key':   (auth_key)  , 'version': 'v1' } %}
         {% for file in files %}
         <div class="accordion-group">
             <div class="accordion-heading">
                 <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
                     {{ file.filename }} <label class = 'icon-chevron-down'></label>
                 </a>
-                <a href = "{{ path('codebender_library_get_example_code', {'auth_key': 'authKey', 'version': 'v1'}) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
+                <a href = "{{ path('codebender_library_get_example_code', get_example_hash) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
 
             </div>
             <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
@@ -74,7 +75,7 @@
                     <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
                         {{ file.filename }} <label class = 'icon-chevron-down'></label>
                     </a>
-                    <a href = "{{ path('codebender_library_get_example_code', {'auth_key': 'authKey', 'version': 'v1'}) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
+                    <a href = "{{ path('codebender_library_get_example_code',  get_example_hash) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
                 </div>
                 <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
                     <div class="accordion-inner">
