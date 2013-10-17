@@ -481,89 +481,101 @@ class DefaultController extends Controller
 
     }
 
-    public function downloadAction()
+    public function downloadAction($auth_key, $version)
     {
-        $htmlcode = 200;
-        $value = "";
-
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
-        $finder = new Finder();
-        $exampleFinder = new Finder();
-
-
-        $request = $this->getRequest();
-
-        $library = $request->query->get('library');
-
-        $filename = $library;
-
-        $directory = "";
-
-        $last_slash = strrpos($library, "/");
-        if($last_slash !== false )
+        if ($auth_key !== $this->container->getParameter('auth_key'))
         {
-            $filename = substr($library, $last_slash + 1);
-            $vendor = substr($library, 0, $last_slash);
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
-        $isBuiltIn = json_decode($this->checkIfBuiltInExists($filename), true);
-        if($isBuiltIn["success"])
-            $path = $arduino_library_files."/libraries/".$filename;
-        else
+        if ($version == "v1")
         {
-            $isExternal = json_decode($this->checkIfExternalExists($filename), true);
-            if($isExternal["success"])
-            {
-                $path = $arduino_library_files."/external-libraries/".$filename;
-            }
-            else
-            {
-                $value = "";
-                $htmlcode = 404;
-                return new Response($value, $htmlcode);
-            }
-        }
-
-        $files = $this->fetchLibraryFiles($finder, $path);
-        $examples = $this->fetchLibraryExamples($exampleFinder, $path);
-
-        $zipname = "/tmp/asd.zip";
-
-        $zip = new ZipArchive();
-
-        if ($zip->open($zipname, ZIPARCHIVE::CREATE)===false)
-        {
+            $htmlcode = 200;
             $value = "";
-            $htmlcode = 404;
-        }
-        else
-        {
-            if($zip->addEmptyDir($filename)!==true)
+
+            $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+            $finder = new Finder();
+            $exampleFinder = new Finder();
+
+
+            $request = $this->getRequest();
+
+            $library = $request->query->get('library');
+
+            $filename = $library;
+
+            $directory = "";
+
+            $last_slash = strrpos($library, "/");
+            if($last_slash !== false )
+            {
+                $filename = substr($library, $last_slash + 1);
+                $vendor = substr($library, 0, $last_slash);
+            }
+
+            $isBuiltIn = json_decode($this->checkIfBuiltInExists($filename), true);
+            if($isBuiltIn["success"])
+                $path = $arduino_library_files."/libraries/".$filename;
+            else
+            {
+                $isExternal = json_decode($this->checkIfExternalExists($filename), true);
+                if($isExternal["success"])
+                {
+                    $path = $arduino_library_files."/external-libraries/".$filename;
+                }
+                else
+                {
+                    $value = "";
+                    $htmlcode = 404;
+                    return new Response($value, $htmlcode);
+                }
+            }
+
+            $files = $this->fetchLibraryFiles($finder, $path);
+            $examples = $this->fetchLibraryExamples($exampleFinder, $path);
+
+            $zipname = "/tmp/asd.zip";
+
+            $zip = new ZipArchive();
+
+            if ($zip->open($zipname, ZIPARCHIVE::CREATE)===false)
             {
                 $value = "";
                 $htmlcode = 404;
             }
             else
             {
-                foreach($files as $file)
+                if($zip->addEmptyDir($filename)!==true)
                 {
-                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                    $value = "";
+                    $htmlcode = 404;
                 }
-                foreach($examples as $file)
+                else
                 {
-                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                    foreach($files as $file)
+                    {
+                        $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                    }
+                    foreach($examples as $file)
+                    {
+                        $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                    }
+                    $zip->close();
+                    $value = file_get_contents($zipname);
                 }
-                $zip->close();
-                $value = file_get_contents($zipname);
+                unlink($zipname);
             }
-            unlink($zipname);
+
+            $headers = array('Content-Type'		=> 'application/octet-stream',
+            'Content-Disposition' => 'attachment;filename="'.$filename.'.zip"');
+
+            return new Response($value, $htmlcode, $headers);
+
         }
-
-$headers = array('Content-Type'		=> 'application/octet-stream',
-    'Content-Disposition' => 'attachment;filename="'.$filename.'.zip"');
-
-return new Response($value, $htmlcode, $headers);
-
+        else
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
     }
 
     public function searchAction()

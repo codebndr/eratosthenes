@@ -40,9 +40,9 @@
         {% endif %}
     {% endif %}
 
-
+    {% set download_hash = { 'library' : library,  'auth_key':   (auth_key)  , 'version': 'v1' } %}
 <a id="download" class="btn btn-success"
-    href="{{ path('codebender_library_download', { 'library' : library }) }}">Download</a>
+    href="{{ path('codebender_library_download', download_hash) }}">Download</a>
 </div>
 <div>
     <h3>Files:</h3>

@@ -19,7 +19,7 @@ codebender_library_fetch_library_code:
     defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }
 
 codebender_library_download:
-    pattern: /download
+    pattern: /{auth_key}/{version}/download
     defaults: { _controller: CodebenderLibraryBundle:Default:download }
 
 codebender_library_view_library:
