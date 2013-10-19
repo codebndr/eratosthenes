@@ -473,6 +473,55 @@ class DefaultController extends Controller
             return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("libs" => $names));
     }
 
+
+    private function getLibraryExamples($library)
+    {
+        $exists = json_decode($this->getLibraryType($library), true);
+        if ($exists['success'])
+        {
+            $examples = array();
+            $path = "";
+            if($exists['type'] == 'external')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+            }
+            else if($exists['type'] = 'builtin')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+            }
+            $inoFinder = new Finder();
+            $inoFinder->in($path);
+            $inoFinder->name('*.ino')->name('*.pde');
+
+            foreach ($inoFinder as $example)
+            {
+                $files = array();
+
+                $content = $example->getContents();
+                $path_info = pathinfo($example->getBaseName());
+                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => $content);
+
+                $h_finder = new Finder();
+                $h_finder->files()->name('*.h')->name('*.cpp');
+                $h_finder->in($path."/".$example->getRelativePath());
+
+                foreach($h_finder as $header)
+                {
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
+                }
+
+                $examples[$path_info['filename']]=$files;
+            }
+
+            return json_encode(array('success' => true, 'examples' => $examples));
+
+        }
+        else
+        {
+            return json_encode($exists);
+        }
+    }
+    
     private function getLibraryType($library)
     {
         $isExternal = json_decode($this->checkIfExternalExists($library), true);
