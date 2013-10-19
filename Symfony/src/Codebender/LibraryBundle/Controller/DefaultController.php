@@ -473,7 +473,24 @@ class DefaultController extends Controller
             return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("libs" => $names));
     }
 
+    private function getLibraryType($library)
+    {
+        $isExternal = json_decode($this->checkIfExternalExists($library), true);
+        if($isExternal['success'])
+        {
+            return json_encode(array('success' => true, 'type' => 'external'));
+        }
+        else
+        {
+            $isBuiltIn = json_encode($this->checkIfBuiltInExists($library), true);
+            if ($isBuiltIn['success'])
+            {
+                return json_encode(array('success' => true, 'type' => 'builtin'));
+            }
+        }
 
+        return json_encode(array('success' => false, 'message' => 'Library named '.$library.' not found.'));
+    }
 
     private function read_headers($code)
 {
