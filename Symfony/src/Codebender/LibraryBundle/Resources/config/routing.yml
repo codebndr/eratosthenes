@@ -31,6 +31,10 @@ codebender_library_new_external:
     defaults: {_controller:CodebenderLibraryBundle:Default:newLibrary}
     methods:  [GET, POST]
 
+codebender_library_compile_examples:
+    pattern:  /{auth_key}/{version}/compile
+    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
+
 codebender_library_check_for_external_updates:
     pattern: /{auth_key}/{version}/checkforexternalupdates
     defaults: {_controller:CodebenderLibraryBundle:Default:checkForExternalUpdates}

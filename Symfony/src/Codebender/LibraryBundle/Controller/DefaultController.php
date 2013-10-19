@@ -473,6 +473,29 @@ class DefaultController extends Controller
             return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("libs" => $names));
     }
 
+    public function compileLibraryExamplesAction($auth_key, $version)
+    {
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+        }
+
+        if ($version == "v1")
+        {
+            $request = $this->getRequest();
+            $library = $request->query->get('library');
+            if($library === NULL)
+                return new Response(json_encode(array('success' => false, 'message' => 'Library name not givern.')));
+            $response = $this->compileLibraryExamples($library);
+
+            return new Response($response);
+        }
+        else
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
+    }
+
     private function compileLibraryExamples($library)
     {
         $examples = json_decode($this->getLibraryExamples($library), true);
