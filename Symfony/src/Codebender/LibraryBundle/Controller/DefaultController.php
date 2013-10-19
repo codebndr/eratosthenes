@@ -473,7 +473,60 @@ class DefaultController extends Controller
             return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("libs" => $names));
     }
 
+    private function compileLibraryExamples($library)
+    {
+        $examples = json_decode($this->getLibraryExamples($library), true);
+        if($examples['success'])
+        {
+            $response = array();
+            foreach($examples['examples'] as $example => $files)
+            {
+                $response[$example] = json_decode($this->getBoardsForExample($files), true);
+            }
 
+            return json_encode($response);
+        }
+        else
+        {
+            return json_encode($examples);
+        }
+
+    }
+
+    private function getBoardsForExample($files)
+    {
+        $boards = array();
+        $builds = array();
+        $codebender_boards = json_decode($this->curlRequest($this->container->getParameter('boards_url')), true);
+        foreach($codebender_boards as $cb_b)
+        {
+            $builds[$cb_b['name']] =$cb_b['build'];
+        }
+        foreach ($builds as $board => $build) {
+            $compiles = json_decode($this->compileExampleForBoard($files, $build), true);
+            if($compiles['success'])
+            {
+                $boards[] = $board;
+            }
+        }
+        return json_encode(array("success" => true, "boards" => $boards));
+    }
+
+    private function compileExampleForBoard($files, $build)
+    {
+        $v = "105";
+        $format = "binary";
+        $libsToInclude = array();
+        foreach ($files as $file) {
+            $libsToInclude = array_merge($libsToInclude, $this->read_headers($file['content']));
+        }
+        $libraries = $this->constructLibraryFiles($libsToInclude);
+        $request_data = json_encode(array('files' => $files, 'libraries' => $libraries, 'format' => $format, 'version' => $v, 'build' => $build));
+        $compilation = $this->curlRequest($compiler_url = $this->container->getParameter('compiler_url'), $post_request_data = $request_data);
+
+        return $compilation;
+    }
+    
     private function getLibraryExamples($library)
     {
         $exists = json_decode($this->getLibraryType($library), true);
@@ -521,7 +574,7 @@ class DefaultController extends Controller
             return json_encode($exists);
         }
     }
-    
+
     private function getLibraryType($library)
     {
         $isExternal = json_decode($this->checkIfExternalExists($library), true);
