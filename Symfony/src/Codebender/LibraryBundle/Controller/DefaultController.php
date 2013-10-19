@@ -584,7 +584,7 @@ class DefaultController extends Controller
         }
         else
         {
-            $isBuiltIn = json_encode($this->checkIfBuiltInExists($library), true);
+            $isBuiltIn = json_decode($this->checkIfBuiltInExists($library), true);
             if ($isBuiltIn['success'])
             {
                 return json_encode(array('success' => true, 'type' => 'builtin'));
