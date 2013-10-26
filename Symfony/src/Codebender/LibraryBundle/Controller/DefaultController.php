@@ -485,7 +485,7 @@ class DefaultController extends Controller
             $request = $this->getRequest();
             $library = $request->query->get('library');
             if($library === NULL)
-                return new Response(json_encode(array('success' => false, 'message' => 'Library name not givern.')));
+                return new Response(json_encode(array('success' => false, 'message' => 'Library name not given.')));
             $response = $this->compileLibraryExamples($library);
 
             return new Response($response);
