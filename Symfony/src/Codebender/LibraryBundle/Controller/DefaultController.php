@@ -826,7 +826,7 @@ class DefaultController extends Controller
             $path_parts = pathinfo($example['filename']);
             $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
             $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $example['filename'],json_encode($boards['boards']));
+            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'],json_encode($boards['boards']));
         }
 
 
