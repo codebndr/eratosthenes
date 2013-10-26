@@ -816,11 +816,19 @@ class DefaultController extends Controller
 
         $arduino_library_files = $this->container->getParameter('arduino_library_directory');
         $examples = $this->fetchLibraryExamples(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+
+        $libfilesForCompilation = $this->fetchLibraryFiles(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+
         foreach($examples as $example)
         {
+
+            $filesForCompilation = $libfilesForCompilation;
             $path_parts = pathinfo($example['filename']);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $example['filename'], NULL);
+            $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
+            $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
+            $this->saveExampleMeta($path_parts['filename'], $lib, $example['filename'],json_encode($boards['boards']));
         }
+
 
         return json_encode(array("success" => true));
 
