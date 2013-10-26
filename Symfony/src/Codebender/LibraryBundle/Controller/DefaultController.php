@@ -505,6 +505,7 @@ class DefaultController extends Controller
             foreach($examples['examples'] as $example => $files)
             {
                 $response[$example] = json_decode($this->getBoardsForExample($files), true);
+                $this->updateBoardsForExample($library, $example, $response[$example]['boards']);
             }
 
             return json_encode($response);
@@ -516,6 +517,23 @@ class DefaultController extends Controller
 
     }
 
+    private function updateBoardsForExample($library, $exampleName, $boards)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+
+        if(!empty($lib))
+        {
+            $ex = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $lib[0], 'name' => $exampleName));
+            if(!empty($ex))
+            {
+                $ex[0]->setBoards(json_encode($boards));
+
+                $em->persist($ex[0]);
+                $em->flush();
+            }
+        }
+    }
     private function getBoardsForExample($files)
     {
         $boards = array();
