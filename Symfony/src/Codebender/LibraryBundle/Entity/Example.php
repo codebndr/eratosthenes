@@ -43,7 +43,7 @@ class Example
     /**
      * @var string
      *
-     * @ORM\Column(name="boards", type="string", length=255, nullable = true)
+     * @ORM\Column(name="boards", type="string", length=2048, nullable = true)
      */
     private $boards;
 
