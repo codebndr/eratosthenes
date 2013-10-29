@@ -1,10 +1,10 @@
 parameters:
-#    database_driver:   pdo_mysql
-#    database_host:     127.0.0.1
-#    database_port:     ~
-#    database_name:     symfony
-#    database_user:     root
-#    database_password: ~
+    database_driver:   pdo_mysql
+    database_host:     127.0.0.1
+    database_port:     ~
+    database_name:     symfony
+    database_user:     root
+    database_password: ~
 #
 #    mailer_transport:  smtp
 #    mailer_host:       127.0.0.1
@@ -14,12 +14,6 @@ parameters:
     locale:            en
     secret:            CSRF-Token-Not-Really-Used
 
-        database_driver:
-        database_host:
-        database_port:
-        database_name:
-        database_user:
-        database_password:
 
     # Path to libraries.
     arduino_library_directory: /opt/codebender/codebender-arduino-library-files
