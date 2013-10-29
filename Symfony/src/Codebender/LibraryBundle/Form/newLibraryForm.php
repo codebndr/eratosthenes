@@ -4,7 +4,7 @@ namespace Codebender\LibraryBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class newLibraryForm extends AbstractType{
+class NewLibraryForm extends AbstractType{
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
