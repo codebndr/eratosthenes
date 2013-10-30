@@ -752,7 +752,7 @@ class DefaultController extends Controller
             {
                 $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
             }
-            if(is_dir($arduino_library_files."EXTERNAL-libraries/".$libname))
+            if(is_dir($arduino_library_files."external-libraries/".$libname))
             {
                 $finder = new Finder();
                 $finder->files()->name('*.ino')->name('*.pde');
