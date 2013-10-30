@@ -298,7 +298,7 @@ class DefaultController extends Controller
 
                 $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit , $lib), true);
                 if($saved['success'])
-                    return $this->redirect($this->generateUrl('codebender_library_view_library', array("auth_key" => "authKey", "version"=>"v1","library" => $formData["MachineName"])));
+                    return $this->redirect($this->generateUrl('codebender_library_view_library', array("auth_key" => $this->container->getParameter('auth_key'), "version"=>"v1","library" => $formData["MachineName"])));
                 return new Response(json_encode($saved));
 
             }
