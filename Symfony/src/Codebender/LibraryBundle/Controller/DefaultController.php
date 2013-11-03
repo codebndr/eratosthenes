@@ -69,7 +69,7 @@ class DefaultController extends Controller
 
 		    $external_libraries = array();
             $em = $this->getDoctrine()->getManager();
-            $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+            $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
             $external_libraries = $this->getExternalInfo($externalMeta, $version);
 
 		    ksort($built_examples);
