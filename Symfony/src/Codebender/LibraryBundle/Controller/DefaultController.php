@@ -835,16 +835,17 @@ class DefaultController extends Controller
         $arduino_library_files = $this->container->getParameter('arduino_library_directory');
         $examples = $this->fetchLibraryExamples(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
 
-        $libfilesForCompilation = $this->fetchLibraryFiles(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+//        $libfilesForCompilation = $this->fetchLibraryFiles(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
 
         foreach($examples as $example)
         {
 
-            $filesForCompilation = $libfilesForCompilation;
+//            $filesForCompilation = $libfilesForCompilation;
             $path_parts = pathinfo($example['filename']);
-            $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
-            $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'],json_encode($boards['boards']));
+//            $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
+//            $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
+//            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'],json_encode($boards['boards']));
+            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'], NULL);
         }
 
 
