@@ -1061,7 +1061,8 @@ class DefaultController extends Controller
         if(is_dir('/tmp/lib'))
             $this->destroy_dir('/tmp/lib');
         $zip = new \ZipArchive;
-        if($zip->open($file) === TRUE)
+        $opened = $zip->open($file);
+        if($opened === TRUE)
         {
             $zip->extractTo('/tmp/lib/');
             $zip->close();
@@ -1082,7 +1083,7 @@ class DefaultController extends Controller
 
         else
         {
-            return json_encode(array("success" => false, "message" => "Could not unzip Archive."));
+            return json_encode(array("success" => false, "message" => "Could not unzip Archive. Code: ".$opened));
         }
     }
     private function processZipDir($path)
