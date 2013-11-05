@@ -1119,7 +1119,7 @@ class DefaultController extends Controller
     {
         $contents = file_get_contents($path);
         if(! mb_check_encoding($contents, 'UTF-8')){
-            return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+            $contents = utf8_encode($contents);
         }
         if($contents === NULL)
             return json_encode(array("success" => false, "message"=>"Could not read file ".basename($path)));
