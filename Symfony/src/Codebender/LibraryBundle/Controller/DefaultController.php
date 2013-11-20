@@ -275,6 +275,35 @@ class DefaultController extends Controller
         }
     }
 
+    public function changeLibraryStatusAction()
+    {
+        if ($this->getRequest()->getMethod() == 'POST')
+        {
+            $library = $this->get('request')->request->get('library');
+
+            $exists = json_decode($this->checkIfExternalExists($library, true), true);
+
+            if($exists['success'])
+            {
+                $em = $this->getDoctrine()->getManager();
+                $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+                if($lib[0]->getActive())
+                    $lib[0]->setActive(0);
+                else
+                    $lib[0]->setActive(1);
+                $em->persist($lib[0]);
+                $em->flush();
+
+                return new Response(json_encode(array("success" => true)));
+            }
+            else
+            {
+                return new Response(json_encode(array("success" => false, "message" => "Library not found.")));
+            }
+        }
+        return new Response(json_encode(array("success" => false, "message" => "POST should be used.")));
+    }
+
     public function newLibraryAction($auth_key, $version)
     {
 
@@ -574,7 +603,7 @@ class DefaultController extends Controller
 
         return $compilation;
     }
-    
+
     private function getLibraryExamples($library)
     {
         $exists = json_decode($this->getLibraryType($library), true);

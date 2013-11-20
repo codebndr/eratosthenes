@@ -33,6 +33,13 @@
                     {% endif %}
                     >
             </label>
+            <label>
+                {% if meta.active %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger">Disable Library</button>
+                {% else %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library</button>
+                {% endif %}
+            </label>
         <h3>{{ meta.humanName }}</h3>
         <p>{{ meta.description }}</p>
         {% if meta.gitOwner and meta.gitRepo %}
@@ -86,5 +93,33 @@
         {% endfor %}
     </div>
 </div>
+
+<script type="text/javascript">
+
+    function changeLibraryStatus(library, newstatus)
+    {
+        $.post( "{{ path('codebender_library_status_change') }}", { library: library, newstatus: newstatus })
+            .done(function( data ) {
+                var response = jQuery.parseJSON(data);
+                if(response.success)
+                {
+                    $("#statusbutton").toggleClass("btn-success");
+                    $("#statusbutton").toggleClass("btn-danger");
+                    if ($("#statusbutton").html() == "Disable Library")
+                    {
+                        $("#statusbutton").html("Enable Library");
+                    }
+                    else
+                    {
+                        $("#statusbutton").html("Disable Library");
+                    }
+
+                }
+                console.log(data);
+            });
+    }
+
+</script>
+
 </body>
 </html>

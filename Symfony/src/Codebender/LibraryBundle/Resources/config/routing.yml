@@ -47,3 +47,8 @@ codebender_library_get_library_git_meta:
 codebender_library_search:
     pattern: /search
     defaults: {_controller:CodebenderLibraryBundle:Default:search}
+
+codebender_library_status_change:
+    pattern: /statuschange
+    defaults: {_controller:CodebenderLibraryBundle:Default:changeLibraryStatus}
+    methods:  [POST]
