@@ -166,6 +166,13 @@ class DefaultController extends Controller
 
 			// retrieve GET and POST variables respectively
 			$library = $request->query->get('library');
+            $disabled = $request->query->get('disabled');
+            if($disabled != 1)
+                $getDisabled = false;
+            else
+                $getDisabled = true;
+
+
 
 			$filename = $library;
 			$directory = "";
@@ -192,7 +199,7 @@ class DefaultController extends Controller
 
             else
             {
-                $response = json_decode($this->checkIfExternalExists($filename),true);
+                $response = json_decode($this->checkIfExternalExists($filename,$getDisabled),true);
                 if(!$response['success'])
                 {
                     return new Response(json_encode($response));
@@ -208,7 +215,7 @@ class DefaultController extends Controller
                         $em = $this->getDoctrine()->getManager();
                         $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
                         $filename = $libmeta[0]->getMachineName();
-                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo());
+                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "active" => $libmeta[0]->getActive());
 
                     }
                 }
