@@ -906,8 +906,9 @@ class DefaultController extends Controller
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
+        $github_app_name = $this->container->getParameter('github_app_name');
         $url =  "https://api.github.com/repos/".$gitOwner."/".$gitRepo."/commits"."?client_id=".$client_id."&client_secret=".$client_secret;
-        $json_contents = json_decode($this->curlRequest($url), true);
+        $json_contents = json_decode($this->curlRequest($url, NULL, array('User-Agent: '.$github_app_name)), true);
 
         return $json_contents[0]['sha'];
     }
@@ -1029,9 +1030,10 @@ class DefaultController extends Controller
 
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
+        $github_app_name = $this->container->getParameter('github_app_name');
         $url = ($path == "" ?  $baseurl : $baseurl."/".$path)."?client_id=".$client_id."&client_secret=".$client_secret;
 
-        $json_contents = json_decode($this->curlRequest($url), true);
+        $json_contents = json_decode($this->curlRequest($url, NULL, array('User-Agent: '.$github_app_name)), true);
 
         if(array_key_exists('message', $json_contents))
         {
@@ -1069,9 +1071,10 @@ class DefaultController extends Controller
         {
             $client_id = $this->container->getParameter('github_app_client_id');
             $client_secret = $this->container->getParameter('github_app_client_secret');
+            $github_app_name = $this->container->getParameter('github_app_name');
             $url = ($baseurl."/".$file['path'])."?client_id=".$client_id."&client_secret=".$client_secret;
 
-            $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw'));
+            $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw', 'User-Agent: '.$github_app_name));
             $json_contents = json_decode($contents,true);
 
             if($json_contents === NULL)
@@ -1189,7 +1192,7 @@ class DefaultController extends Controller
             curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
 
         if($http_header!==NULL)
-            curl_setopt($curl_req, CURLOPT_HTTPHEADER, array('Accept: application/vnd.github.v3.raw'));
+            curl_setopt($curl_req, CURLOPT_HTTPHEADER, $http_header);
 
         $contents = curl_exec($curl_req);
 

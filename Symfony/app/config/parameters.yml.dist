@@ -16,6 +16,7 @@ parameters:
     auth_key: "youMustChangeThis"
 
     #Generated from github
+    github_app_name: appName
     github_app_client_id: thisIsYourClientID
     github_app_client_secret: thisIsYourClientSecret
 
