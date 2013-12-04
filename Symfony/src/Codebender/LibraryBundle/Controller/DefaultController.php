@@ -786,7 +786,10 @@ class DefaultController extends Controller
             $libname = $lib->getMachineName();
             if(!isset($libraries[$libname]))
             {
-                $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
+                if($lib->getOwner() !== NULL && $lib->getRepo() !== NULL)
+                    $libraries[$libname] = array("description" => $lib->getDescription(), "url" => "http://github.com/".$lib->getOwner()."/".$lib->getRepo(), "examples" => array());
+                else
+                    $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
             }
             if(is_dir($arduino_library_files."external-libraries/".$libname))
             {
