@@ -800,7 +800,15 @@ class DefaultController extends Controller
                 foreach($finder as $file)
                 {
                     $url = $this->get('router')->generate('codebender_library_get_example_code', array("auth_key" => $this->container->getParameter('auth_key'),"version" => $version),true).'?file='.$libname."/".$file->getRelativePathname();
-                    $libraries[$libname]["examples"][] = array("name" => strtok($file->getFilename(), "."), "filename" => $file->getFilename(), "url" => $url);
+                    $path = str_ireplace("/examples/", "/", $file->getRelativePath());
+                    $library_name = strtok($path, "/");
+                    $type_name = strtok("/");
+                    $example_name = strtok("/");
+                    if($example_name == "")
+                        $example_name = $type_name;
+                    else
+                        $example_name = $type_name.":".$example_name;
+                    $libraries[$libname]["examples"][] = array("name" => $example_name, "filename" => $file->getFilename(), "url" => $url);
                 }
 
             }
