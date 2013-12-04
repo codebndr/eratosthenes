@@ -78,9 +78,16 @@ class ExternalLibrary
     private $lastCommit;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=512, nullable = true)
+     */
+    private $url;
+
+    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -269,6 +276,29 @@ class ExternalLibrary
     public function getLastCommit()
     {
         return $this->lastCommit;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     * @return ExternalLibrary
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
     }
 
 }

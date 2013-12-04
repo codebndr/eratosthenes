@@ -43,7 +43,7 @@
         <h3>{{ meta.humanName }}</h3>
         <p>{{ meta.description }}</p>
         {% if meta.gitOwner and meta.gitRepo %}
-            <a class="btn btn-primary" href = "http://www.github.com/{{ meta.gitOwner }}/{{ meta.gitRepo }}">Github Repository</a>
+            <a class="btn btn-primary" href = "{{ meta.url }}">Github Repository</a>
         {% endif %}
     {% endif %}
 

@@ -107,9 +107,11 @@
             $("#newLibrary_GitOwner").attr("disabled", "disabled");
             $("#newLibrary_GitRepo").attr("disabled", "disabled");
             $("#newLibrary_Zip").removeAttr("disabled");
+            $("#newLibrary_Url").removeAttr("disabled");
             $("#gitHubDiv").hide();
             $("#orDiv").hide();
             $("#metaDiv").show();
+            $("#urlDiv").show();
         }
 
         function select_github()
@@ -117,9 +119,11 @@
             $("#newLibrary_GitOwner").removeAttr("disabled");
             $("#newLibrary_GitRepo").removeAttr("disabled");
             $("#newLibrary_Zip").attr("disabled", "disabled");
+            $("#newLibrary_Url").val("http://github.com/"+$("#newLibrary_GitOwner").val()+"/"+ $("#newLibrary_GitRepo").val());
             $("#zipDiv").hide();
             $("#orDiv").hide();
             $("#metaDiv").show();
+            $("#urlDiv").hide();
         }
 
         $(document).ready(function()
@@ -178,6 +182,12 @@
             <p>
                 Description:
                 {{ form_widget(form.Description) }}
+            </p>
+        </div>
+        <div id="urlDiv">
+            <p>
+                Info Url:
+                {{ form_widget(form.Url) }}
             </p>
         </div>
         <div> <button class="btn btn-primary" {{ form_widget(form.Go) }}</button>

@@ -215,7 +215,7 @@ class DefaultController extends Controller
                         $em = $this->getDoctrine()->getManager();
                         $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
                         $filename = $libmeta[0]->getMachineName();
-                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "active" => $libmeta[0]->getActive());
+                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "url" => $libmeta[0]->getUrl(), "active" => $libmeta[0]->getActive());
 
                     }
                 }
@@ -332,7 +332,7 @@ class DefaultController extends Controller
                 else
                     $lastCommit=$this->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']);
 
-                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit , $lib), true);
+                $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit, $formData['Url'], $lib), true);
                 if($saved['success'])
                     return $this->redirect($this->generateUrl('codebender_library_view_library', array("auth_key" => $this->container->getParameter('auth_key'), "version"=>"v1","library" => $formData["MachineName"], "disabled"=>1)));
                 return new Response(json_encode($saved));
@@ -860,7 +860,7 @@ class DefaultController extends Controller
 	}
 
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $libfiles)
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $libfiles)
     {
         $exists = json_decode($this->checkIfExternalExists($machineName), true);
         if($exists['success'])
@@ -879,6 +879,7 @@ class DefaultController extends Controller
         $lib->setVerified(false);
         $lib->setActive(false);
         $lib->setLastCommit($lastCommit);
+        $lib->setUrl($url);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($lib);
