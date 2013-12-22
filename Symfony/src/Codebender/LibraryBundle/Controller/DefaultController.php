@@ -753,13 +753,17 @@ class DefaultController extends Controller
             else if(iterator_count($finder) == 0)
                 return json_encode(array('success' => false));
             else
-                $filesPath = iterator_to_array($finder, false)[0]->getPath();
+            {
+                $filesPathIterator = iterator_to_array($finder, false);
+                $filesPath = $filesPathIterator[0]->getPath();
+            }
         }
 
         else
         {
 
-            $filesPath = iterator_to_array($finder, false)[0]->getPath();
+            $filesPathIterator = iterator_to_array($finder, false);
+            $filesPath = $filesPathIterator[0]->getPath();
         }
         $files = $this->getExampleFilesFromDir($filesPath);
         return $files;
