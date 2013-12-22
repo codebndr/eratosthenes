@@ -47,30 +47,9 @@ class DefaultController extends Controller
 	    {
 		    $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
 
-		    $finder = new Finder();
-		    $finder2 = new Finder();
-
-		    $finder->files()->name('*.ino')->name('*.pde');
-		    $finder2->files()->name('*.ino')->name('*.pde');
-
-		    $built_examples = array();
-		    if (is_dir($arduino_library_files."examples"))
-		    {
-			    $finder->in($arduino_library_files."examples");
-			    $built_examples = $this->iterateDir($finder, "v1");
-		    }
-
-		    $included_libraries = array();
-		    if (is_dir($arduino_library_files."libraries"))
-		    {
-			    $finder2->in($arduino_library_files."libraries");
-			    $included_libraries = $this->iterateDir($finder2, "v1");
-		    }
-
-		    $external_libraries = array();
-            $em = $this->getDoctrine()->getManager();
-            $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
-            $external_libraries = $this->getExternalInfo($externalMeta, $version);
+            $built_examples = $this->getLibariesListFromDir($arduino_library_files."examples");
+            $included_libraries = $this->getLibariesListFromDir($arduino_library_files."libraries");
+            $external_libraries = $this->getExternalLibrariesList();
 
 		    ksort($built_examples);
 		    ksort($included_libraries);
@@ -88,7 +67,7 @@ class DefaultController extends Controller
 	    }
     }
 
-	public function getExampleCodeAction($auth_key, $version)
+	public function getExampleCodeAction($auth_key, $version, $library, $example)
 	{
 		if ($auth_key !== $this->container->getParameter('auth_key'))
 		{
@@ -97,50 +76,26 @@ class DefaultController extends Controller
 
 		if ($version == "v1")
 		{
-			$arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+            $type = json_decode($this->getLibraryType($library), true);
+            if(!$type['success'])
+                return new Response(json_encode($type));
 
-			$finder = new Finder();
+            switch($type['type'])
+            {
+                case 'builtin':
+                    $dir = $this->container->getParameter('arduino_library_directory')."/libraries/";
+                    $example = $this->getExampleCodeFromDir($dir, $library, $example);
+                    break;
+                case 'external':
+                    $example = $this->getExternalExampleCode($library, $example);
+                    break;
+                case 'example':
+                    $dir = $this->container->getParameter('arduino_library_directory')."/examples/";
+                    $example = $this->getExampleCodeFromDir($dir, $library, $example);
+                    break;
+            }
 
-			$request = $this->getRequest();
-
-			// retrieve GET and POST variables respectively
-			$file = $request->query->get('file');
-
-			$last_slash = strrpos($file, "/");
-			$filename = substr($file, $last_slash + 1);
-			$directory = substr($file, 0, $last_slash);
-            $first_slash = strpos($file, "/");
-            $libname = substr($file, 0, $first_slash);
-
-
-			$finder->files()->name($filename);
-			if (is_dir($arduino_library_files."examples"))
-			{
-				$finder->in($arduino_library_files."examples");
-			}
-
-			if (is_dir($arduino_library_files."libraries"))
-			{
-				$finder->in($arduino_library_files."libraries");
-			}
-
-			if (is_dir($arduino_library_files."external-libraries"))
-			{
-                $exists = json_decode($this->checkIfExternalExists($libname),true);
-                if($exists['success'])
-                {
-                    $finder->in($arduino_library_files."external-libraries");
-                }
-			}
-
-			$finder->path($directory);
-
-			$response = "";
-			foreach ($finder as $file)
-			{
-				$response = $file->getContents();
-			}
-			return new Response($response);
+            return new Response($example);
 		}
 		else
 		{
@@ -604,53 +559,53 @@ class DefaultController extends Controller
 //        return $compilation;
 //    }
 //
-//    private function getLibraryExamples($library)
-//    {
-//        $exists = json_decode($this->getLibraryType($library), true);
-//        if ($exists['success'])
-//        {
-//            $examples = array();
-//            $path = "";
-//            if($exists['type'] == 'external')
-//            {
-//                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
-//            }
-//            else if($exists['type'] = 'builtin')
-//            {
-//                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
-//            }
-//            $inoFinder = new Finder();
-//            $inoFinder->in($path);
-//            $inoFinder->name('*.ino')->name('*.pde');
-//
-//            foreach ($inoFinder as $example)
-//            {
-//                $files = array();
-//
-//                $content = $example->getContents();
-//                $path_info = pathinfo($example->getBaseName());
-//                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => $content);
-//
-//                $h_finder = new Finder();
-//                $h_finder->files()->name('*.h')->name('*.cpp');
-//                $h_finder->in($path."/".$example->getRelativePath());
-//
-//                foreach($h_finder as $header)
-//                {
-//                    $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
-//                }
-//
-//                $examples[$path_info['filename']]=$files;
-//            }
-//
-//            return json_encode(array('success' => true, 'examples' => $examples));
-//
-//        }
-//        else
-//        {
-//            return json_encode($exists);
-//        }
-//    }
+    private function getLibraryExamples($library)
+    {
+        $exists = json_decode($this->getLibraryType($library), true);
+        if ($exists['success'])
+        {
+            $examples = array();
+            $path = "";
+            if($exists['type'] == 'external')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+            }
+            else if($exists['type'] = 'builtin')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+            }
+            $inoFinder = new Finder();
+            $inoFinder->in($path);
+            $inoFinder->name('*.ino')->name('*.pde');
+
+            foreach ($inoFinder as $example)
+            {
+                $files = array();
+
+                $content = $example->getContents();
+                $path_info = pathinfo($example->getBaseName());
+                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => $content);
+
+                $h_finder = new Finder();
+                $h_finder->files()->name('*.h')->name('*.cpp');
+                $h_finder->in($path."/".$example->getRelativePath());
+
+                foreach($h_finder as $header)
+                {
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
+                }
+
+                $examples[$path_info['filename']]=$files;
+            }
+
+            return json_encode(array('success' => true, 'examples' => $examples));
+
+        }
+        else
+        {
+            return json_encode($exists);
+        }
+    }
 
     private function getLibraryType($library)
     {
@@ -665,6 +620,14 @@ class DefaultController extends Controller
             if ($isBuiltIn['success'])
             {
                 return json_encode(array('success' => true, 'type' => 'builtin'));
+            }
+            else
+            {
+                $isExample = json_decode($this->checkIfBuiltInExampleFolderExists($library), true);
+                if ($isExample['success'])
+                {
+                    return json_encode(array('success' => true, 'type' => 'example'));
+                }
             }
         }
 
@@ -714,10 +677,127 @@ class DefaultController extends Controller
 //        return $libraries;
 //    }
 
+    private function getExternalExampleCode($library, $example)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $libMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+
+        $exampleMeta = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $example));
+        if(count($exampleMeta) == 0)
+        {
+            $example =  str_replace(":", "/", $example);
+            $filename = pathinfo($example, PATHINFO_FILENAME);
+            $exampleMeta = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $filename));
+            if(count($exampleMeta) > 1)
+            {
+                $meta = NULL;
+                foreach($exampleMeta as $e)
+                {
+                    $path = $e -> getPath();
+                    if(!(strpos($path, $example)===false))
+                    {
+                        $meta = $e;
+                        break;
+                    }
+                }
+                if(!$meta)
+                {
+                    return json_encode(array('success' => false));
+                }
+            }
+            else if(count($exampleMeta) == 0)
+                return json_encode(array('success' => false));
+            else
+                $meta = $exampleMeta[0];
+        }
+        else
+        {
+            $meta = $exampleMeta[0];
+        }
+        $fullPath = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$meta->getPath();
+
+        $path = pathinfo($fullPath, PATHINFO_DIRNAME);
+        $files = $this->getExampleFilesFromDir($path);
+        return $files;
+
+    }
+
+    private function getExampleCodeFromDir($dir, $library, $example)
+    {
+        $finder = new Finder();
+        $finder->in($dir.$library);
+        $finder->name($example.".ino", $example.".pde");
+
+        if(iterator_count($finder) == 0)
+        {
+            $example =  str_replace(":", "/", $example);
+            $filename = pathinfo($example, PATHINFO_FILENAME);
+            $finder->name($filename.".ino", $filename.".pde");
+            if(iterator_count($finder) > 1)
+            {
+                $filesPath = NULL;
+                foreach($finder as $e)
+                {
+                    $path = $e -> getPath();
+                    if(!(strpos($path, $example)===false))
+                    {
+                        $filesPath = $e;
+                        break;
+                    }
+                }
+                if(!$filesPath)
+                {
+                    return json_encode(array('success' => false));
+                }
+            }
+            else if(iterator_count($finder) == 0)
+                return json_encode(array('success' => false));
+            else
+                $filesPath = iterator_to_array($finder, false)[0]->getPath();
+        }
+
+        else
+        {
+
+            $filesPath = iterator_to_array($finder, false)[0]->getPath();
+        }
+        $files = $this->getExampleFilesFromDir($filesPath);
+        return $files;
+    }
+
+    private function getExampleFilesFromDir($dir)
+    {
+        $filesFinder = new Finder();
+        $filesFinder->in($dir);
+        $filesFinder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.pde')->name('*.ino');
+
+        $files = array();
+        foreach($filesFinder as $file)
+        {
+            if($file->getExtension() == "pde")
+                $name = $file->getBasename("pde")."ino";
+            else
+                $name = $file->getFilename();
+
+            $files[]=array("filename" => $name, "code" => $file->getContents());
+
+        }
+
+        return json_encode(array('success' => true, "files" => $files));
+    }
     private function checkIfBuiltInExists($library)
     {
         $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
         if(is_dir($arduino_library_files."/libraries/".$library))
+            return json_encode(array("success" => true, "message" => "Library found"));
+        else
+            return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
+    }
+
+    private function checkIfBuiltInExampleFolderExists($library)
+    {
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        if(is_dir($arduino_library_files."/examples/".$library))
             return json_encode(array("success" => true, "message" => "Library found"));
         else
             return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
@@ -777,11 +857,13 @@ class DefaultController extends Controller
 
     }
 
-    private function getExternalInfo($libsmeta, $version)
+    private function getExternalLibrariesList()
     {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $em = $this->getDoctrine()->getManager();
+        $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
+
         $libraries = array();
-        foreach($libsmeta as $lib)
+        foreach($externalMeta as $lib)
         {
             $libname = $lib->getMachineName();
             if(!isset($libraries[$libname]))
@@ -791,73 +873,65 @@ class DefaultController extends Controller
                 else
                     $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
             }
-            if(is_dir($arduino_library_files."external-libraries/".$libname))
+            $examples = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $lib));
+            foreach($examples as $example)
             {
-                $finder = new Finder();
-                $finder->files()->name('*.ino')->name('*.pde');
-                $finder->in($arduino_library_files."external-libraries/".$libname);
+                $names = $this->getExampleAndLibNameFromRelativePath(pathinfo($example->getPath(), PATHINFO_DIRNAME), $example->getName());
 
-                foreach($finder as $file)
-                {
-                    $url = '/get?file='.$libname."/".$file->getRelativePathname();
-                    $path = str_ireplace("/examples/", "/", $file->getRelativePath());
-                    $library_name = strtok($path, "/");
-                    $type_name = strtok("/");
-                    $example_name = strtok("/");
-                    if($example_name == "")
-                        $example_name = $type_name;
-                    else
-                        $example_name = $type_name.":".$example_name;
-                    $libraries[$libname]["examples"][] = array("name" => $example_name, "filename" => $file->getFilename(), "url" => $url);
-                }
-
+                $libraries[$libname]['examples'][] = array('name' => $names['example_name']);
             }
+
+
         }
+
         return $libraries;
     }
-
-	private function iterateDir($finder, $version)
+	private function getLibariesListFromDir($path)
 	{
+
+        $finder = new Finder();
+        $finder->files()->name('*.ino')->name('*.pde');
+        $finder->in($path);
+
 		$libraries = array();
 
 		foreach ($finder as $file)
 		{
-//			if (strpos($file->getRelativePath(), "/examples/") === false)
-//				continue;
+            $names = $this->getExampleAndLibNameFromRelativePath($file->getRelativePath(), $file->getBasename(".".$file->getExtension()));
 
-			// Print the absolute path
-//		    print $file->getRealpath()."<br />\n";
-
-			// Print the relative path to the file, omitting the filename
-//			print $file->getRelativePath()."<br />\n";
-
-			// Print the relative path to the file
-//			print $file->getRelativePathname()."<br />\n";
-
-			$path = str_ireplace("/examples/", "/", $file->getRelativePath());
-			$library_name = strtok($path, "/");
-			$type_name = strtok("/");
-            $example_name = strtok("/");
-            if($example_name == "")
-                $example_name = $type_name;
-            else
-                $example_name = $type_name.":".$example_name;
-			$url = '/get?file='.$file->getRelativePathname();
-
-			if(!isset($libraries[$library_name]))
+			if(!isset($libraries[$names['library_name']]))
 			{
-				$libraries[$library_name] = array("description"=> "", "examples" => array());
+				$libraries[$names['library_name']] = array("description"=> "", "examples" => array());
 			}
-			$libraries[$library_name]["examples"][] = array("name" => $example_name, "filename" => $file->getFilename(), "url" => $url);
+            $libraries[$names['library_name']]['examples'][] = array('name' => $names['example_name']);
 
-//			print $library_name."<br />\n";
-//			print $example_name."<br />\n";
-
-			// Print the relative path to the file
-//			print $file->getFilename()."<br />\n";
 		}
 		return $libraries;
 	}
+
+    private function getExampleAndLibNameFromRelativePath($path, $filename)
+    {
+        $type = "";
+        $library_name = strtok($path, "/");
+
+        $tmp = strtok("/");
+
+        while($tmp!= "" && !($tmp === false))
+        {
+            if($tmp != 'examples' && $tmp != 'Examples' && $tmp != $filename)
+            {
+                if($type == "")
+                    $type = $tmp;
+                else
+                    $type = $type.":".$tmp;
+            }
+            $tmp = strtok("/");
+
+
+        }
+        $example_name= ($type == "" ?$filename : $type.":".$filename);
+        return(array('library_name' => $library_name, 'example_name' => $example_name));
+    }
 
 
     private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $libfiles)
