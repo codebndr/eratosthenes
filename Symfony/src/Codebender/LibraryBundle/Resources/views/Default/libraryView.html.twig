@@ -62,8 +62,7 @@
                 <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
                     {{ file.filename }} <label class = 'icon-chevron-down'></label>
                 </a>
-                <a href = "{{ path('codebender_library_get_example_code', get_example_hash) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
-
+                {#TODO make it work for multifiled examples#}
             </div>
             <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
                 <div class="accordion-inner">
@@ -82,8 +81,8 @@
                     <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
                         {{ file.filename }} <label class = 'icon-chevron-down'></label>
                     </a>
-                    <a href = "{{ path('codebender_library_get_example_code',  get_example_hash) }}?file={{ library }}/{{ file.filename }}"> <label class = "icon-file" title="Raw data"></label></a>
                 </div>
+                {#TODO make it work for multifiled examples#}
                 <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
                     <div class="accordion-inner">
                         <pre>{{ file.content }}</pre>
