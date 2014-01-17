@@ -21,3 +21,4 @@ parameters:
     github_app_client_secret: thisIsYourClientSecret
 
     compiler_url: http://url/to/compiler
+    boards_url: http://url/to/boards/list
