@@ -1294,6 +1294,55 @@ class DefaultController extends Controller
         curl_close($curl_req);
         return $contents;
     }
+	
+	
+    public function getKeywordsAction()
+    {
+		
+		
+        $request = $this->getRequest();
+        $library= $request->query->get('library');
+		
+        $exists = json_decode($this->getLibraryType($library), true);
+		
+        if ($exists['success'])
+        {
+            $filesFound= array();
+			
+            $path = "";
+            if($exists['type'] == 'external')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+            }
+            else if($exists['type'] = 'builtin')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+            }
+			
+            $finder = new Finder();
+            $finder->in($path);
+            $finder->name('keywords.txt');
+
+            foreach ($finder as $file)
+            {
+
+                $content = $file->getContents();
+                $path_info = pathinfo($file->getBaseName());
+
+                $filesFound[$path_info['filename'].'.txt']=array("content" => $content);
+            }
+
+            return new Response(json_encode(array('success' => true, 'filesFound' => $filesFound)));
+
+        }
+        else
+        {
+            return new Response(json_encode($exists));
+        }
+		
+	}	
+		
+	
 
 
 }
