@@ -1298,8 +1298,6 @@ class DefaultController extends Controller
 	
     public function getKeywordsAction()
     {
-		
-		
         $request = $this->getRequest();
         $library= $request->query->get('library');
 		
@@ -1319,17 +1317,31 @@ class DefaultController extends Controller
                 $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
             }
 			
+			$keywordsFile="keywords.txt";
+			
             $finder = new Finder();
             $finder->in($path);
-            $finder->name('keywords.txt');
+            $finder->name($keywordsFile);
 
+			
+			$keywords=array();
+			
             foreach ($finder as $file)
             {
-
                 $content = $file->getContents();
-                $path_info = pathinfo($file->getBaseName());
-
-                $filesFound[$path_info['filename'].'.txt']=array("content" => $content);
+				
+				$lines = preg_split('/\r\n|\r|\n/', $content);
+				
+				foreach($lines as $rawline){
+					$line=trim($rawline);
+					$parts = preg_split('/\s+/', $line);
+					if(count($parts)==2 && substr($parts[1],0,7)=="KEYWORD"){
+						$this->get('logger')->info(".[".$parts[0]."] --> [".$parts[1]."].");
+						$keywords[]=$parts;
+					}
+				}
+				
+                $filesFound[$keywordsFile]=array("keywords" => $keywords);
             }
 
             return new Response(json_encode(array('success' => true, 'filesFound' => $filesFound)));
