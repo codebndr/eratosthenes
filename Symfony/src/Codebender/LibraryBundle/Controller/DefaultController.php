@@ -1305,7 +1305,6 @@ class DefaultController extends Controller
 		
         if ($exists['success'])
         {
-            $filesFound= array();
 			
             $path = "";
             if($exists['type'] == 'external')
@@ -1317,11 +1316,10 @@ class DefaultController extends Controller
                 $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
             }
 			
-			$keywordsFile="keywords.txt";
 			
             $finder = new Finder();
             $finder->in($path);
-            $finder->name($keywordsFile);
+            $finder->name("keywords.txt");
 
 			
 			$keywords=array();
@@ -1336,15 +1334,15 @@ class DefaultController extends Controller
 					$line=trim($rawline);
 					$parts = preg_split('/\s+/', $line);
 					if(count($parts)==2 && substr($parts[1],0,7)=="KEYWORD"){
-						$this->get('logger')->info(".[".$parts[0]."] --> [".$parts[1]."].");
-						$keywords[]=$parts;
+						//$this->get('logger')->info(".[".$parts[0]."] --> [".$parts[1]."].");
+						$keywords[$parts[1]][]=$parts[0];
 					}
 				}
 				
-                $filesFound[$keywordsFile]=array("keywords" => $keywords);
+				break;
             }
 
-            return new Response(json_encode(array('success' => true, 'filesFound' => $filesFound)));
+            return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
 
         }
         else
