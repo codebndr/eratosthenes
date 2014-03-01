@@ -95,7 +95,7 @@ class DefaultController extends Controller
                     break;
             }
 
-            return new Response($example);
+            return new Response($example, 200,  array('content-type' => 'application/json'));
 		}
 		else
 		{
