@@ -1331,12 +1331,24 @@ class DefaultController extends Controller
 				$lines = preg_split('/\r\n|\r|\n/', $content);
 				
 				foreach($lines as $rawline){
+					
 					$line=trim($rawline);
 					$parts = preg_split('/\s+/', $line);
-					if(count($parts)==2 && substr($parts[1],0,7)=="KEYWORD"){
-						//$this->get('logger')->info(".[".$parts[0]."] --> [".$parts[1]."].");
-						$keywords[$parts[1]][]=$parts[0];
+					
+					$totalParts=count($parts);
+					
+					if( ($totalParts == 2) || ($totalParts == 3) ) {
+						
+						if( (substr($parts[1],0,7) == "KEYWORD") ) {
+							$keywords[$parts[1]][] = $parts[0];
+						}
+						
+						if( (substr($parts[1],0,7) == "LITERAL") ) {
+							$keywords["KEYWORD2"][] = $parts[0];
+						}
+						
 					}
+					
 				}
 				
 				break;
