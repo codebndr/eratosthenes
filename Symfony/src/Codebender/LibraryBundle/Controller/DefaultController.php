@@ -1316,16 +1316,14 @@ class DefaultController extends Controller
                 $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
             }
 			
+			$keywords=array();
 			
             $finder = new Finder();
             $finder->in($path);
-            $finder->name("keywords.txt");
-
+            $finder->name( '/keywords\.txt/i' );
 			
-			$keywords=array();
-			
-            foreach ($finder as $file)
-            {
+            foreach ($finder as $file) {
+				
                 $content = $file->getContents();
 				
 				$lines = preg_split('/\r\n|\r|\n/', $content);
