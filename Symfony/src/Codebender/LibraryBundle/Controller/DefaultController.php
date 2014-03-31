@@ -1342,7 +1342,7 @@ class DefaultController extends Controller
 						}
 						
 						if( (substr($parts[1],0,7) == "LITERAL") ) {
-							$keywords["KEYWORD2"][] = $parts[0];
+							$keywords["KEYWORD3"][] = $parts[0];
 						}
 						
 					}
