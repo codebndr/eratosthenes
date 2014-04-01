@@ -1301,6 +1301,12 @@ class DefaultController extends Controller
         $request = $this->getRequest();
         $library= $request->query->get('library');
 		
+		if( $library == null ) {
+			
+            return new Response(json_encode(array("success"=>false)));
+			
+		}
+
         $exists = json_decode($this->getLibraryType($library), true);
 		
         if ($exists['success'])
