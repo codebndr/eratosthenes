@@ -139,6 +139,12 @@ class DefaultController extends Controller
 				$vendor = substr($library, 0, $last_slash);
 			}
 
+            //TODO handle the case of different .h filenames and folder names
+            if($filename == "ArduinoRobot")
+                $filename = "Robot_Control";
+            else if($filename == "ArduinoRobotMotorBoard")
+                $filename = "Robot_Motor";
+
             $exists = json_decode($this->checkIfBuiltInExists($filename),true);
 
             if($exists["success"])
