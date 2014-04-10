@@ -1327,6 +1327,7 @@ class DefaultController extends Controller
             {
                 $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
             }
+            else return new Response(json_encode(array("success"=>false)));
 			
 			$keywords=array();
 			
