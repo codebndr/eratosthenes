@@ -1300,6 +1300,92 @@ class DefaultController extends Controller
         curl_close($curl_req);
         return $contents;
     }
+	
+	
+    public function getKeywordsAction($auth_key, $version)
+    {
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+        }
+
+        if ($version !== "v1")
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
+
+        $request = $this->getRequest();
+        $library= $request->query->get('library');
+		
+		if( $library == null ) {
+			
+            return new Response(json_encode(array("success"=>false)));
+			
+		}
+
+        $exists = json_decode($this->getLibraryType($library), true);
+		
+        if ($exists['success'])
+        {
+			
+            $path = "";
+            if($exists['type'] == 'external')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+            }
+            else if($exists['type'] = 'builtin')
+            {
+                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+            }
+            else return new Response(json_encode(array("success"=>false)));
+			
+			$keywords=array();
+			
+            $finder = new Finder();
+            $finder->in($path);
+            $finder->name( '/keywords\.txt/i' );
+			
+            foreach ($finder as $file) {
+				
+                $content = $file->getContents();
+				
+				$lines = preg_split('/\r\n|\r|\n/', $content);
+				
+				foreach($lines as $rawline){
+					
+					$line=trim($rawline);
+					$parts = preg_split('/\s+/', $line);
+					
+					$totalParts=count($parts);
+					
+					if( ($totalParts == 2) || ($totalParts == 3) ) {
+						
+						if( (substr($parts[1],0,7) == "KEYWORD") ) {
+							$keywords[$parts[1]][] = $parts[0];
+						}
+						
+						if( (substr($parts[1],0,7) == "LITERAL") ) {
+							$keywords["KEYWORD3"][] = $parts[0];
+						}
+						
+					}
+					
+				}
+				
+				break;
+            }
+
+            return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
+
+        }
+        else
+        {
+            return new Response(json_encode($exists));
+        }
+		
+	}	
+		
+	
 
 
 }

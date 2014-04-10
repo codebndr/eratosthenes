@@ -52,3 +52,9 @@ codebender_library_status_change:
     pattern: /statuschange
     defaults: {_controller:CodebenderLibraryBundle:Default:changeLibraryStatus}
     methods:  [POST]
+
+codebender_library_get_keywords:
+    pattern:  /{auth_key}/{version}/getkeywords
+    defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
+    
+    
