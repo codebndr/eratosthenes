@@ -1302,8 +1302,18 @@ class DefaultController extends Controller
     }
 	
 	
-    public function getKeywordsAction()
+    public function getKeywordsAction($auth_key, $version)
     {
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+        }
+
+        if ($version !== "v1")
+        {
+            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
+        }
+
         $request = $this->getRequest();
         $library= $request->query->get('library');
 		
