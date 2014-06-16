@@ -588,9 +588,9 @@ class DefaultController extends Controller
             {
                 $files = array();
 
-                $content = $example->getContents();
+                $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
                 $path_info = pathinfo($example->getBaseName());
-                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => mb_convert_encoding($content, "UTF-8"));
+                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content);
 
                 $h_finder = new Finder();
                 $h_finder->files()->name('*.h')->name('*.cpp');
@@ -598,7 +598,7 @@ class DefaultController extends Controller
 
                 foreach($h_finder as $header)
                 {
-                    $files[] = array("filename"=>$header->getBaseName(), "content" => mb_convert_encoding($header->getContents(), "UTF-8"));
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => (!mb_check_encoding($header->getContents(), 'UTF-8')) ? mb_convert_encoding($header->getContents(), "UTF-8") : $header->getContents());
                 }
 
                 $examples[$path_info['filename']]=$files;
@@ -789,7 +789,7 @@ class DefaultController extends Controller
             else
                 $name = $file->getFilename();
 
-            $files[]=array("filename" => $name, "code" => mb_convert_encoding($file->getContents(), "UTF-8"));
+            $files[]=array("filename" => $name, "code" => (!mb_check_encoding($file->getContents(), 'UTF-8'))? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
 
         }
 
@@ -840,7 +840,7 @@ class DefaultController extends Controller
 			foreach ($finder as $file)
 			{
                 if($getContent)
-				    $response[] = array("filename" => $file->getRelativePathname(), "content" => mb_convert_encoding($file->getContents(), "UTF-8"));
+				    $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
                 else
                     $response[] = array("filename" => $file->getRelativePathname());
 			}
@@ -859,7 +859,7 @@ class DefaultController extends Controller
             $response = array();
             foreach ($finder as $file)
             {
-                    $response[] = array("filename" => $file->getRelativePathname(), "content" => mb_convert_encoding($file->getContents(), "UTF-8"));
+                    $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
             }
 
                 return $response;
@@ -1347,7 +1347,7 @@ class DefaultController extends Controller
 
             foreach ($finder as $file) {
 
-                $content = $file->getContents();
+                $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
 
 				$lines = preg_split('/\r\n|\r|\n/', $content);
 
