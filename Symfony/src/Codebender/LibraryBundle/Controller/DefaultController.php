@@ -588,9 +588,9 @@ class DefaultController extends Controller
             {
                 $files = array();
 
-                $content = $example->getContents();
+                $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
                 $path_info = pathinfo($example->getBaseName());
-                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => $content);
+                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content);
 
                 $h_finder = new Finder();
                 $h_finder->files()->name('*.h')->name('*.cpp');
@@ -598,7 +598,7 @@ class DefaultController extends Controller
 
                 foreach($h_finder as $header)
                 {
-                    $files[] = array("filename"=>$header->getBaseName(), "content" => $header->getContents());
+                    $files[] = array("filename"=>$header->getBaseName(), "content" => (!mb_check_encoding($header->getContents(), 'UTF-8')) ? mb_convert_encoding($header->getContents(), "UTF-8") : $header->getContents());
                 }
 
                 $examples[$path_info['filename']]=$files;
@@ -789,7 +789,7 @@ class DefaultController extends Controller
             else
                 $name = $file->getFilename();
 
-            $files[]=array("filename" => $name, "code" => $file->getContents());
+            $files[]=array("filename" => $name, "code" => (!mb_check_encoding($file->getContents(), 'UTF-8'))? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
 
         }
 
@@ -840,7 +840,7 @@ class DefaultController extends Controller
 			foreach ($finder as $file)
 			{
                 if($getContent)
-				    $response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+				    $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
                 else
                     $response[] = array("filename" => $file->getRelativePathname());
 			}
@@ -859,7 +859,7 @@ class DefaultController extends Controller
             $response = array();
             foreach ($finder as $file)
             {
-                    $response[] = array("filename" => $file->getRelativePathname(), "content" => $file->getContents());
+                    $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
             }
 
                 return $response;
@@ -1300,8 +1300,8 @@ class DefaultController extends Controller
         curl_close($curl_req);
         return $contents;
     }
-	
-	
+
+
     public function getKeywordsAction($auth_key, $version)
     {
         if ($auth_key !== $this->container->getParameter('auth_key'))
@@ -1316,18 +1316,18 @@ class DefaultController extends Controller
 
         $request = $this->getRequest();
         $library= $request->query->get('library');
-		
+
 		if( $library == null ) {
-			
+
             return new Response(json_encode(array("success"=>false)));
-			
+
 		}
 
         $exists = json_decode($this->getLibraryType($library), true);
-		
+
         if ($exists['success'])
         {
-			
+
             $path = "";
             if($exists['type'] == 'external')
             {
@@ -1338,40 +1338,40 @@ class DefaultController extends Controller
                 $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
             }
             else return new Response(json_encode(array("success"=>false)));
-			
+
 			$keywords=array();
-			
+
             $finder = new Finder();
             $finder->in($path);
             $finder->name( '/keywords\.txt/i' );
-			
+
             foreach ($finder as $file) {
-				
-                $content = $file->getContents();
-				
+
+                $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
+
 				$lines = preg_split('/\r\n|\r|\n/', $content);
-				
+
 				foreach($lines as $rawline){
-					
+
 					$line=trim($rawline);
 					$parts = preg_split('/\s+/', $line);
-					
+
 					$totalParts=count($parts);
-					
+
 					if( ($totalParts == 2) || ($totalParts == 3) ) {
-						
+
 						if( (substr($parts[1],0,7) == "KEYWORD") ) {
 							$keywords[$parts[1]][] = $parts[0];
 						}
-						
+
 						if( (substr($parts[1],0,7) == "LITERAL") ) {
 							$keywords["KEYWORD3"][] = $parts[0];
 						}
-						
+
 					}
-					
+
 				}
-				
+
 				break;
             }
 
@@ -1382,10 +1382,10 @@ class DefaultController extends Controller
         {
             return new Response(json_encode($exists));
         }
-		
-	}	
-		
-	
+
+	}
+
+
 
 
 }
