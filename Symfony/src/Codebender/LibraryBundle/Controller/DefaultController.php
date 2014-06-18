@@ -1181,7 +1181,7 @@ class DefaultController extends Controller
             if($json_contents === NULL)
             {
                 if(! mb_check_encoding($contents, 'UTF-8'))
-                    return json_encode(array('success'=>false, 'message' => "Bad Encoding"));
+                    $contents = mb_convert_encoding($contents, 'UTF-8');
 
                 return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
             }
