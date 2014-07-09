@@ -879,9 +879,9 @@ class DefaultController extends Controller
             if(!isset($libraries[$libname]))
             {
                 if($lib->getOwner() !== NULL && $lib->getRepo() !== NULL)
-                    $libraries[$libname] = array("description" => $lib->getDescription(), "url" => "http://github.com/".$lib->getOwner()."/".$lib->getRepo(), "examples" => array());
+                    $libraries[$libname] = array("description" => $lib->getDescription(), "humanName" => $lib->getHumanName(), "url" => "http://github.com/".$lib->getOwner()."/".$lib->getRepo(), "examples" => array());
                 else
-                    $libraries[$libname] = array("description" => $lib->getDescription(), "examples" => array());
+                    $libraries[$libname] = array("description" => $lib->getDescription(), "humanName" => $lib->getHumanName(), "examples" => array());
             }
             $examples = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $lib));
             foreach($examples as $example)
