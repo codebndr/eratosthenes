@@ -14,6 +14,10 @@ codebender_library_get_example_code:
     pattern:  /{auth_key}/{version}/get/{library}/{example}
     defaults: { _controller: CodebenderLibraryBundle:Default:getExampleCode }
 
+codebender_get_library_examples:
+    pattern:  /{auth_key}/{version}/getlibexamples/{library}
+    defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryAllExamples }
+
 codebender_library_fetch_library_code:
     pattern:  /{auth_key}/{version}/fetch
     defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }
@@ -56,5 +60,4 @@ codebender_library_status_change:
 codebender_library_get_keywords:
     pattern:  /{auth_key}/{version}/getkeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
-    
-    
+
