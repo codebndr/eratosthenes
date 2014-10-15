@@ -565,7 +565,7 @@ class DefaultController extends Controller
 //        return $compilation;
 //    }
 //
-    public function getLibraryAllExamplesAction($library) {
+    public function getExamplesAction($library) {
         return new Response($this->getLibraryExamples($library));
     }
 
