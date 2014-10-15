@@ -605,7 +605,11 @@ class DefaultController extends Controller
                     $files[] = array("filename"=>$header->getBaseName(), "content" => (!mb_check_encoding($header->getContents(), 'UTF-8')) ? mb_convert_encoding($header->getContents(), "UTF-8") : $header->getContents());
                 }
 
-                $examples[$path_info['filename']]=$files;
+                $dir = preg_replace( '/[E|e]xamples\//', '', $example->getRelativePath());
+                $dir = str_replace( $path_info['filename'], '', $dir);
+                $dir = str_replace('/', ':', $dir);
+
+                $examples[$dir . $path_info['filename']] = $files;
             }
 
             return json_encode(array('success' => true, 'examples' => $examples));
