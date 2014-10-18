@@ -608,6 +608,9 @@ class DefaultController extends Controller
                 $dir = preg_replace( '/[E|e]xamples\//', '', $example->getRelativePath());
                 $dir = str_replace( $path_info['filename'], '', $dir);
                 $dir = str_replace('/', ':', $dir);
+                if ($dir != '' && substr($dir, -1) != ':')
+                    $dir .= ':';
+
 
                 $examples[$dir . $path_info['filename']] = $files;
             }
