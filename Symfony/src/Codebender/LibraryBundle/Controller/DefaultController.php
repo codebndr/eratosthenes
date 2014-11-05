@@ -845,7 +845,7 @@ class DefaultController extends Controller
 		if (is_dir($directory))
 		{
 			$finder->in($directory)->exclude('examples')->exclude('Examples');
-			$finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S');
+			$finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.inc')->name('*.txt');
 
 			$response = array();
 			foreach ($finder as $file)
