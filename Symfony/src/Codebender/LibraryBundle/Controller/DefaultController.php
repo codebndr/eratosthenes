@@ -845,13 +845,23 @@ class DefaultController extends Controller
 		if (is_dir($directory))
 		{
 			$finder->in($directory)->exclude('examples')->exclude('Examples');
-			$finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.inc')->name('*.txt');
+            // Left this here, just in case we need it again.
+			// $finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.inc')->name('*.txt');
+            $finder->name('*.*');
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 			$response = array();
 			foreach ($finder as $file)
 			{
-                if($getContent)
-				    $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
+                if($getContent) {
+                    $mimeType = finfo_file($finfo, $file);
+                    if (strpos($mimeType, "text/") === false)
+                        $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
+                    else
+                        $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
+				    $response[] = array("filename" => $file->getRelativePathname(), "content" => $content);
+                }
                 else
                     $response[] = array("filename" => $file->getRelativePathname());
 			}
