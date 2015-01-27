@@ -18,24 +18,6 @@ class DefaultController extends Controller
 		return new Response(json_encode(array("success" => true, "status" => "OK")));
 	}
 
-	public function testAction($auth_key)
-	{
-		if ($auth_key !== $this->container->getParameter('auth_key'))
-		{
-			return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
-		}
-
-		set_time_limit(0); // make the script execution time unlimited (otherwise the request may time out)
-
-		// change the current Symfony root dir
-		chdir($this->get('kernel')->getRootDir()."/../");
-
-		//TODO: replace this with a less horrible way to handle phpunit
-		exec("phpunit -c app --stderr 2>&1", $output, $return_val);
-
-		return new Response(json_encode(array("success" => (bool) !$return_val, "message" => implode("\n", $output))));
-	}
-
 	public function listAction($auth_key, $version)
     {
 	    if ($auth_key !== $this->container->getParameter('auth_key'))
