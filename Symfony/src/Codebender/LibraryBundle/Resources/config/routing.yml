@@ -3,7 +3,7 @@ codebender_library_status_check:
     defaults: { _controller: CodebenderLibraryBundle:Default:status }
 
 codebender_compiler_test:
-    pattern:  /{auth_key}/test/
+    pattern:  /{auth_key}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
 codebender_library_list:

@@ -8,6 +8,7 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 class TestController extends Controller
@@ -26,9 +27,9 @@ class TestController extends Controller
         chdir($this->get('kernel')->getRootDir()."/../");
 
         //TODO: replace this with a less horrible way to handle phpunit
-        exec("phpunit -c app --stderr 2>&1", $output, $return_val);
+        exec("bin/phpunit -c app --stderr 2>&1", $output, $return_val);
 
-        return new Response(json_encode(array("success" => (bool) !$return_val, "message" => implode("\n", $output))));
+        return new Response(json_encode(array("success" => (bool) !$return_val, "message" => implode("<br>", $output))));
     }
 
 }
