@@ -2,25 +2,18 @@ codebender_library_status_check:
     pattern:  /status
     defaults: { _controller: CodebenderLibraryBundle:Default:status }
 
-codebender_compiler_test:
+codebender_unit_test:
     pattern:  /{auth_key}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
-codebender_library_list:
+codebender_api_handler:
     pattern:  /{auth_key}/{version}
-    defaults: { _controller: CodebenderLibraryBundle:Default:list }
+    defaults: { _controller: CodebenderLibraryBundle:Default:apiHandler }
+    methods:  [POST]
 
-codebender_library_get_example_code:
-    pattern:  /{auth_key}/{version}/get/{library}/{example}
-    defaults: { _controller: CodebenderLibraryBundle:Default:getExampleCode }
-
-codebender_get_library_examples:
-    pattern:  /{auth_key}/{version}/examples/{library}
-    defaults: { _controller: CodebenderLibraryBundle:Default:getExamples }
-
-codebender_library_fetch_library_code:
-    pattern:  /{auth_key}/{version}/fetch
-    defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }
+codebender_library_check_github_updates:
+    pattern: /{auth_key}/{version}/checkGithubUpdates
+    defaults: {_controller:CodebenderLibraryBundle:Default:checkGithubUpdates}
 
 codebender_library_download:
     pattern: /{auth_key}/{version}/download
@@ -35,13 +28,9 @@ codebender_library_new_external:
     defaults: {_controller:CodebenderLibraryBundle:Default:newLibrary}
     methods:  [GET, POST]
 
-codebender_library_compile_examples:
-    pattern:  /{auth_key}/{version}/compile
-    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
-
-codebender_library_check_for_external_updates:
-    pattern: /{auth_key}/{version}/checkforexternalupdates
-    defaults: {_controller:CodebenderLibraryBundle:Default:checkForExternalUpdates}
+#codebender_library_compile_examples:
+#    pattern:  /{auth_key}/{version}/compile
+#    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
 
 codebender_library_get_library_git_meta:
     pattern: /getlibgitmeta
@@ -58,6 +47,6 @@ codebender_library_status_change:
     methods:  [POST]
 
 codebender_library_get_keywords:
-    pattern:  /{auth_key}/{version}/getkeywords
+    pattern:  /{auth_key}/{version}/getKeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
 

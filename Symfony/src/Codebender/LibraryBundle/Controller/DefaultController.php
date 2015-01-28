@@ -18,168 +18,172 @@ class DefaultController extends Controller
 		return new Response(json_encode(array("success" => true, "status" => "OK")));
 	}
 
-	public function listAction($auth_key, $version)
+    public function apiHandlerAction($auth_key, $version)
     {
-	    if ($auth_key !== $this->container->getParameter('auth_key'))
-	    {
-		    return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-	    }
+        if ($auth_key !== $this->container->getParameter('auth_key'))
+        {
+            return new Response(json_encode(array("success" => false, "message" => "Invalid library manager authorization key.")));
+        }
 
-	    if ($version == "v1")
-	    {
-		    $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        if ($version != "v1")
+        {
+            return new Response(json_encode(array("success" => false, "message" => "Invalid library manager API version.")));
+        }
 
-            $built_examples = $this->getLibariesListFromDir($arduino_library_files."examples");
-            $included_libraries = $this->getLibariesListFromDir($arduino_library_files."libraries");
-            $external_libraries = $this->getExternalLibrariesList();
+        $request = $this->getRequest();
+        $content = $request->getContent();
 
-		    ksort($built_examples);
-		    ksort($included_libraries);
-		    ksort($external_libraries);
+        $content = json_decode($content, true);
+        if ($content === NULL )
+        {
+            return new Response(json_encode(array("success" => false, "message" => "Wrong data")));
+        }
 
-		    return new Response(json_encode(array("success" => true,
-			    "text" => "Successful Request!",
-			    "categories" => array("Examples" => $built_examples,
-				    "Builtin Libraries" => $included_libraries,
-				    "External Libraries" => $external_libraries))));
-	    }
-	    else
-	    {
-		    return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
-	    }
+        // TODO: add a "testIsValid" for the request contents
+        switch ($content["type"])
+        {
+            case "list":
+                return $this->listAll();
+            case "getExampleCode":
+                return $this->getExampleCode($content["library"], $content["example"]);
+            case "getExamples":
+                return $this->getLibraryExamples($content["library"]);
+            case "fetch":
+                return $this->getLibraryCode($content["library"], 0);
+            case "checkGithubUpdates":
+                return $this->checkGithubUpdates();
+            case "getKeywords":
+                return $this->getKeywords($content["library"]);
+            default:
+                return new Response(json_encode(array("success" => false, "message" => "No action defined")));
+        }
     }
 
-	public function getExampleCodeAction($auth_key, $version, $library, $example)
+	public function listAll()
+    {
+
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+
+        $built_examples = $this->getLibariesListFromDir($arduino_library_files."examples");
+        $included_libraries = $this->getLibariesListFromDir($arduino_library_files."libraries");
+        $external_libraries = $this->getExternalLibrariesList();
+
+        ksort($built_examples);
+        ksort($included_libraries);
+        ksort($external_libraries);
+
+        return new Response(json_encode(array("success" => true,
+            "text" => "Successful Request!",
+            "categories" => array("Examples" => $built_examples,
+                "Builtin Libraries" => $included_libraries,
+                "External Libraries" => $external_libraries))));
+    }
+
+	public function getExampleCode($library, $example)
 	{
-		if ($auth_key !== $this->container->getParameter('auth_key'))
-		{
-			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-		}
 
-		if ($version == "v1")
-		{
-            $type = json_decode($this->getLibraryType($library), true);
-            if(!$type['success'])
-                return new Response(json_encode($type));
+        $type = json_decode($this->getLibraryType($library), true);
+        if(!$type['success'])
+            return new Response(json_encode($type));
 
-            switch($type['type'])
-            {
-                case 'builtin':
-                    $dir = $this->container->getParameter('arduino_library_directory')."/libraries/";
-                    $example = $this->getExampleCodeFromDir($dir, $library, $example);
-                    break;
-                case 'external':
-                    $example = $this->getExternalExampleCode($library, $example);
-                    break;
-                case 'example':
-                    $dir = $this->container->getParameter('arduino_library_directory')."/examples/";
-                    $example = $this->getExampleCodeFromDir($dir, $library, $example);
-                    break;
-            }
+        switch($type['type'])
+        {
+            case 'builtin':
+                $dir = $this->container->getParameter('arduino_library_directory')."/libraries/";
+                $example = $this->getExampleCodeFromDir($dir, $library, $example);
+                break;
+            case 'external':
+                $example = $this->getExternalExampleCode($library, $example);
+                break;
+            case 'example':
+                $dir = $this->container->getParameter('arduino_library_directory')."/examples/";
+                $example = $this->getExampleCodeFromDir($dir, $library, $example);
+                break;
+        }
 
-            return new Response($example, 200,  array('content-type' => 'application/json'));
-		}
-		else
-		{
-			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
-		}
+        return new Response($example, 200,  array('content-type' => 'application/json'));
 	}
 
-	public function getLibraryCodeAction($auth_key, $version, $renderView = false)
+	public function getLibraryCode($library, $disabled, $renderView = false)
 	{
-		if ($auth_key !== $this->container->getParameter('auth_key'))
-		{
-			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-		}
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
 
-		if ($version == "v1")
-		{
-			$arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $finder = new Finder();
+        $exampleFinder = new Finder();
 
-			$finder = new Finder();
-            $exampleFinder = new Finder();
+        $request = $this->getRequest();
 
-			$request = $this->getRequest();
-
-			// retrieve GET and POST variables respectively
-			$library = $request->query->get('library');
-            $disabled = $request->query->get('disabled');
-            if($disabled != 1)
-                $getDisabled = false;
-            else
-                $getDisabled = true;
+        if($disabled != 1)
+            $getDisabled = false;
+        else
+            $getDisabled = true;
 
 
 
-			$filename = $library;
-			$directory = "";
+        $filename = $library;
+        $directory = "";
 
-			$last_slash = strrpos($library, "/");
-			if($last_slash !== false )
-			{
-				$filename = substr($library, $last_slash + 1);
-				$vendor = substr($library, 0, $last_slash);
-			}
+        $last_slash = strrpos($library, "/");
+        if($last_slash !== false )
+        {
+            $filename = substr($library, $last_slash + 1);
+            $vendor = substr($library, 0, $last_slash);
+        }
 
-            //TODO handle the case of different .h filenames and folder names
-            if($filename == "ArduinoRobot")
-                $filename = "Robot_Control";
-            else if($filename == "ArduinoRobotMotorBoard")
-                $filename = "Robot_Motor";
+        //TODO handle the case of different .h filenames and folder names
+        if($filename == "ArduinoRobot")
+            $filename = "Robot_Control";
+        else if($filename == "ArduinoRobotMotorBoard")
+            $filename = "Robot_Motor";
 
-            $exists = json_decode($this->checkIfBuiltInExists($filename),true);
+        $exists = json_decode($this->checkIfBuiltInExists($filename),true);
 
-            if($exists["success"])
+        if($exists["success"])
+        {
+            $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+
+            if($renderView)
             {
-                $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/libraries/".$filename);
+                $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/libraries/".$filename);
+                $meta = array();
+            }
+        }
 
+        else
+        {
+            $response = json_decode($this->checkIfExternalExists($filename,$getDisabled),true);
+            if(!$response['success'])
+            {
+                return new Response(json_encode($response));
+            }
+            else
+            {
+                $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
+                if(empty($response))
+                    return new Response(json_encode(array("success" => false, "message" => "No files for Library named ".$library." found.")));
                 if($renderView)
                 {
-                    $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/libraries/".$filename);
-                    $meta = array();
+                    $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/external-libraries/".$filename);
+                    $em = $this->getDoctrine()->getManager();
+                    $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
+                    $filename = $libmeta[0]->getMachineName();
+                    $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "url" => $libmeta[0]->getUrl(), "active" => $libmeta[0]->getActive());
+
                 }
             }
+        }
+        if(!$renderView)
+            return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
+        else
+        {
 
-            else
-            {
-                $response = json_decode($this->checkIfExternalExists($filename,$getDisabled),true);
-                if(!$response['success'])
-                {
-                    return new Response(json_encode($response));
-                }
-                else
-                {
-                    $response = $this->fetchLibraryFiles($finder, $arduino_library_files."/external-libraries/".$filename);
-                    if(empty($response))
-                        return new Response(json_encode(array("success" => false, "message" => "No files for Library named ".$library." found.")));
-                    if($renderView)
-                    {
-                        $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files."/external-libraries/".$filename);
-                        $em = $this->getDoctrine()->getManager();
-                        $libmeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
-                        $filename = $libmeta[0]->getMachineName();
-                        $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "url" => $libmeta[0]->getUrl(), "active" => $libmeta[0]->getActive());
-
-                    }
-                }
-            }
-            if(!$renderView)
-			    return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
-            else
-            {
-
-                return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
-                    "library" => $filename,
-                    "files" => $response,
-                    "examples" => $examples,
-                    "meta" => $meta
-                ));
-            }
-		}
-		else
-		{
-			return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
-		}
+            return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
+                "library" => $filename,
+                "files" => $response,
+                "examples" => $examples,
+                "meta" => $meta
+            ));
+        }
 	}
 
     public function getLibraryGitMetaAction()
@@ -211,8 +215,6 @@ class DefaultController extends Controller
             $response->headers->set('Content-Type', 'application/json');
             return $response;
 
-
-            return $response;
         } else {
             return new Response(json_encode(array("success" => false)));
         }
@@ -291,42 +293,30 @@ class DefaultController extends Controller
 
     }
 
-    public function checkForExternalUpdatesAction($auth_key, $version)
+    public function checkGithubUpdates()
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
-        {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-        }
-        if ($version == "v1")
-        {
-            $needToUpdate = array();
-            $em = $this->getDoctrine()->getManager();
-            $libraries = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
+        $needToUpdate = array();
+        $em = $this->getDoctrine()->getManager();
+        $libraries = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
 
-            foreach($libraries as $lib)
+        foreach($libraries as $lib)
+        {
+            $gitOwner = $lib->getOwner();
+            $gitRepo = $lib->getRepo();
+
+            if($gitOwner!==null and $gitRepo!==null)
             {
-                $gitOwner = $lib->getOwner();
-                $gitRepo = $lib->getRepo();
-
-                if($gitOwner!==null and $gitRepo!==null)
-                {
-                    $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
-                    if($lastCommitFromGithub !== $lib->getLastCommit())
-                        $needToUpdate[]=array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
-                }
+                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
+                if($lastCommitFromGithub !== $lib->getLastCommit())
+                    $needToUpdate[]=array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
             }
-            if(empty($needToUpdate))
-                $response = array("success" => true, "message" => "No Libraries need to update");
-            else
-                $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
-
-            return new Response(json_encode($response));
         }
+        if(empty($needToUpdate))
+            $response = array("success" => true, "message" => "No Libraries need to update");
         else
-        {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
-        }
+            $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
 
+        return new Response(json_encode($response));
     }
 
     public function downloadAction($auth_key, $version)
@@ -547,9 +537,6 @@ class DefaultController extends Controller
 //        return $compilation;
 //    }
 //
-    public function getExamplesAction($library) {
-        return new Response($this->getLibraryExamples($library));
-    }
 
     private function getLibraryExamples($library)
     {
@@ -1305,22 +1292,9 @@ class DefaultController extends Controller
     }
 
 
-    public function getKeywordsAction($auth_key, $version)
+    public function getKeywords($library)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
-        {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-        }
-
-        if ($version !== "v1")
-        {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid API version.")));
-        }
-
-        $request = $this->getRequest();
-        $library= $request->query->get('library');
-
-		if( $library == null ) {
+		if( $library === NULL ) {
 
             return new Response(json_encode(array("success"=>false)));
 
@@ -1328,63 +1302,59 @@ class DefaultController extends Controller
 
         $exists = json_decode($this->getLibraryType($library), true);
 
-        if ($exists['success'])
-        {
-
-            $path = "";
-            if($exists['type'] == 'external')
-            {
-                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
-            }
-            else if($exists['type'] = 'builtin')
-            {
-                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
-            }
-            else return new Response(json_encode(array("success"=>false)));
-
-			$keywords=array();
-
-            $finder = new Finder();
-            $finder->in($path);
-            $finder->name( '/keywords\.txt/i' );
-
-            foreach ($finder as $file) {
-
-                $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
-
-				$lines = preg_split('/\r\n|\r|\n/', $content);
-
-				foreach($lines as $rawline){
-
-					$line=trim($rawline);
-					$parts = preg_split('/\s+/', $line);
-
-					$totalParts=count($parts);
-
-					if( ($totalParts == 2) || ($totalParts == 3) ) {
-
-						if( (substr($parts[1],0,7) == "KEYWORD") ) {
-							$keywords[$parts[1]][] = $parts[0];
-						}
-
-						if( (substr($parts[1],0,7) == "LITERAL") ) {
-							$keywords["KEYWORD3"][] = $parts[0];
-						}
-
-					}
-
-				}
-
-				break;
-            }
-
-            return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
-
-        }
-        else
+        if ($exists['success'] === false)
         {
             return new Response(json_encode($exists));
         }
+
+        $path = "";
+        if($exists['type'] == 'external')
+        {
+            $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+        }
+        else if($exists['type'] = 'builtin')
+        {
+            $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+        }
+        else return new Response(json_encode(array("success"=>false)));
+
+        $keywords=array();
+
+        $finder = new Finder();
+        $finder->in($path);
+        $finder->name( '/keywords\.txt/i' );
+
+        foreach ($finder as $file) {
+
+            $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
+
+            $lines = preg_split('/\r\n|\r|\n/', $content);
+
+            foreach($lines as $rawline){
+
+                $line=trim($rawline);
+                $parts = preg_split('/\s+/', $line);
+
+                $totalParts=count($parts);
+
+                if( ($totalParts == 2) || ($totalParts == 3) ) {
+
+                    if( (substr($parts[1],0,7) == "KEYWORD") ) {
+                        $keywords[$parts[1]][] = $parts[0];
+                    }
+
+                    if( (substr($parts[1],0,7) == "LITERAL") ) {
+                        $keywords["KEYWORD3"][] = $parts[0];
+                    }
+
+                }
+
+            }
+
+            break;
+        }
+
+        return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
 
 	}
 
