@@ -329,6 +329,21 @@ class DefaultHandler {
         }
     }
 
+    private function fixDirName($dir)
+    {
+        foreach ($dir['contents'] as &$f)
+        {
+            if($f['type'] == 'dir')
+            {
+                $first_slash = strpos($f['name'],"/");
+                $f['name'] = substr($f['name'], $first_slash + 1);
+                $f = $this->fixDirName($f);
+            }
+        }
+        return $dir;
+    }
+
+
     public function curlRequest($url, $post_request_data = NULL, $http_header = NULL)
     {
         $curl_req = curl_init();

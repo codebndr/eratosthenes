@@ -572,20 +572,6 @@ class DefaultController extends Controller
         return $names;
     }
 
-    private function fixDirName($dir)
-    {
-        foreach ($dir['contents'] as &$f)
-        {
-            if($f['type'] == 'dir')
-            {
-                $first_slash = strpos($f['name'],"/");
-                $f['name'] = substr($f['name'], $first_slash + 1);
-                $f = $this->fixDirName($f);
-            }
-        }
-        return $dir;
-    }
-
     private function findHeadersFromLibFiles($libFiles)
     {
         $headers = array();
