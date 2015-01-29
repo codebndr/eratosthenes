@@ -37,7 +37,11 @@ class DefaultController extends Controller
             return new Response(json_encode(array("success" => false, "message" => "Wrong data")));
         }
 
-        // TODO: add a "testIsValid" for the request contents
+        if ($this->isValid($content) === false)
+        {
+            return new Response(json_encode(array("success" => false, "message" => "Incorrect request fields")));
+        }
+
         switch ($content["type"])
         {
             case "list":
@@ -55,11 +59,31 @@ class DefaultController extends Controller
             case "getKeywords":
                 return $this->getKeywords($content["library"]);
             default:
-                return new Response(json_encode(array("success" => false, "message" => "No action defined")));
+                return new Response(json_encode(array("success" => false, "message" => "No valid action requested")));
         }
     }
 
+    private function isValid($requestContent)
+    {
+        if (!array_key_exists("type", $requestContent))
+        {
+            return false;
+        }
 
+        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords"))
+            && !array_key_exists("library", $requestContent))
+        {
+            return false;
+        }
+
+        if ($requestContent["type"] == "getExampleCode"
+            && !array_key_exists("example", $requestContent))
+        {
+            return false;
+        }
+
+        return true;
+    }
 
 	private function listAll()
     {
