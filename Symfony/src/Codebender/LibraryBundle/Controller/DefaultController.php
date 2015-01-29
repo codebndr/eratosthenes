@@ -32,7 +32,7 @@ class DefaultController extends Controller
         $content = $request->getContent();
 
         $content = json_decode($content, true);
-        if ($content === NULL )
+        if ($content === NULL)
         {
             return new Response(json_encode(array("success" => false, "message" => "Wrong data")));
         }
@@ -59,7 +59,9 @@ class DefaultController extends Controller
         }
     }
 
-	public function listAll()
+
+
+	private function listAll()
     {
 
         $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
@@ -79,7 +81,7 @@ class DefaultController extends Controller
                 "External Libraries" => $external_libraries))));
     }
 
-	public function getExampleCode($library, $example)
+	private function getExampleCode($library, $example)
 	{
 
         $type = json_decode($this->getLibraryType($library), true);
