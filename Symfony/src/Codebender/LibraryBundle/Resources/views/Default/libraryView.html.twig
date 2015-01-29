@@ -47,7 +47,7 @@
         {% endif %}
     {% endif %}
 
-    {% set download_hash = { 'library' : library,  'auth_key':   (auth_key)  , 'version': 'v1' } %}
+    {% set download_hash = { 'library' : (library),  'auth_key': (auth_key) } %}
 <a id="download" class="btn btn-success"
     href="{{ path('codebender_library_download', download_hash) }}">Download</a>
 </div>
@@ -95,9 +95,10 @@
 
 <script type="text/javascript">
 
-    function changeLibraryStatus(library, newstatus)
+    function changeLibraryStatus(library)
     {
-        $.post( "{{ path('codebender_library_status_change') }}", { library: library, newstatus: newstatus })
+        var route = "{{ path('codebender_library_status_change', {'auth_key': auth_key, 'library': "LIBRARYNAME"}) }}";
+        $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
                 var response = jQuery.parseJSON(data);
                 if(response.success)
