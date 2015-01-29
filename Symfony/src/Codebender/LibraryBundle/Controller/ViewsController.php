@@ -367,7 +367,7 @@ class ViewsController extends Controller
         $opened = $zip->open($file);
         if($opened === TRUE)
         {
-            $hanlder = $this->get('codebender_library.hanlder');
+            $handler = $this->get('codebender_library.handler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
@@ -376,7 +376,7 @@ class ViewsController extends Controller
                 return json_encode($dir);
             else
                 $dir = $dir['directory'];
-            $baseDir = json_decode($hanlder->findBaseDir($dir),true);
+            $baseDir = json_decode($handler->findBaseDir($dir),true);
             if(!$baseDir['success'])
                 return json_encode($baseDir);
             else

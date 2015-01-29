@@ -47,10 +47,10 @@ class DefaultController extends Controller
             case "getExamples":
                 return $this->getLibraryExamples($content["library"]);
             case "fetch":
-                $handler = $this->get('codebender_library.hanlder');
+                $handler = $this->get('codebender_library.handler');
                 return $handler->getLibraryCode($content["library"], 0);
             case "checkGithubUpdates":
-                $handler = $this->get('codebender_library.hanlder');
+                $handler = $this->get('codebender_library.handler');
                 return $handler->checkGithubUpdates();
             case "getKeywords":
                 return $this->getKeywords($content["library"]);
@@ -112,7 +112,7 @@ class DefaultController extends Controller
         }
 
         if ($this->getRequest()->getMethod() == 'POST') {
-            $handler = $this->get('codebender_library.hanlder');
+            $handler = $this->get('codebender_library.handler');
 
             $owner = $this->get('request')->request->get('gitOwner');
             $repo = $this->get('request')->request->get('gitRepo');
