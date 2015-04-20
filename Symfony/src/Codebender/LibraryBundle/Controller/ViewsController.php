@@ -57,6 +57,7 @@ class ViewsController extends Controller
 
         }
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+            'auth_key' => $auth_key,
             'form' => $form->createView()
         ));
     }
