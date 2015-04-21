@@ -11,14 +11,26 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
-	public function statusAction()
-	{
+    /**
+     * Dummy function, returns status
+     *
+     * @return Response
+     */
+	public function statusAction() {
 		return new Response(json_encode(array("success" => true, "status" => "OK")));
 	}
 
-    public function apiHandlerAction($auth_key, $version)
-    {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+    /**
+     * The main library manager API handler action.
+     * Checks the autorization credentials and the validity of the request.
+     * Can handle several types of requests, like code fetching, examples fetching, etc.
+     *
+     * @param $authorizationKey
+     * @param $version
+     * @return Response
+     */
+    public function apiHandlerAction($authorizationKey, $version) {
+        if ($authorizationKey !== $this->container->getParameter('auth_key'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid library manager authorization key.")));
         }
@@ -42,6 +54,11 @@ class DefaultController extends Controller
             return new Response(json_encode(array("success" => false, "message" => "Incorrect request fields")));
         }
 
+        return $this->selectAction($content);
+    }
+
+    private function selectAction($content) {
+
         switch ($content["type"])
         {
             case "list":
@@ -49,7 +66,7 @@ class DefaultController extends Controller
             case "getExampleCode":
                 return $this->getExampleCode($content["library"], $content["example"]);
             case "getExamples":
-                return $this->getLibraryExamples($content["library"]);
+                return new Response($this->getLibraryExamples($content["library"]));
             case "fetch":
                 $handler = $this->get('codebender_library.handler');
                 return $handler->getLibraryCode($content["library"], 0);
@@ -63,8 +80,7 @@ class DefaultController extends Controller
         }
     }
 
-    private function isValid($requestContent)
-    {
+    private function isValid($requestContent) {
         if (!array_key_exists("type", $requestContent))
         {
             return false;
@@ -85,28 +101,26 @@ class DefaultController extends Controller
         return true;
     }
 
-	private function listAll()
-    {
+	private function listAll() {
 
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $arduinoLibraryFiles = $this->container->getParameter('arduino_library_directory')."/";
 
-        $built_examples = $this->getLibariesListFromDir($arduino_library_files."examples");
-        $included_libraries = $this->getLibariesListFromDir($arduino_library_files."libraries");
-        $external_libraries = $this->getExternalLibrariesList();
+        $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles."examples");
+        $includedLibraries = $this->getLibariesListFromDir($arduinoLibraryFiles."libraries");
+        $externalLibraries = $this->getExternalLibrariesList();
 
-        ksort($built_examples);
-        ksort($included_libraries);
-        ksort($external_libraries);
+        ksort($builtinExamples);
+        ksort($includedLibraries);
+        ksort($externalLibraries);
 
         return new Response(json_encode(array("success" => true,
             "text" => "Successful Request!",
-            "categories" => array("Examples" => $built_examples,
-                "Builtin Libraries" => $included_libraries,
-                "External Libraries" => $external_libraries))));
+            "categories" => array("Examples" => $builtinExamples,
+                "Builtin Libraries" => $includedLibraries,
+                "External Libraries" => $externalLibraries))));
     }
 
-	private function getExampleCode($library, $example)
-	{
+	private function getExampleCode($library, $example) {
 
         $type = json_decode($this->getLibraryType($library), true);
         if(!$type['success'])
@@ -130,134 +144,134 @@ class DefaultController extends Controller
         return new Response($example, 200,  array('content-type' => 'application/json'));
 	}
 
-    public function getLibraryGitMetaAction($auth_key)
-    {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+    public function getLibraryGitMetaAction($authorizationKey) {
+        if ($authorizationKey !== $this->container->getParameter('auth_key'))
         {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
-        if ($this->getRequest()->getMethod() == 'POST') {
-            $handler = $this->get('codebender_library.handler');
-
-            $owner = $this->get('request')->request->get('gitOwner');
-            $repo = $this->get('request')->request->get('gitRepo');
-            $lib = json_decode($handler->getLibFromGithub($owner, $repo, true), true);
-            if (!$lib['success'])
-            {
-                $response =  new Response(json_encode($lib));
-                $response->headers->set('Content-Type', 'application/json');
-                return $response;
-            }
-
-            else
-                $lib = $lib['library'];
-
-            $headers = $this->findHeadersFromLibFiles($lib['contents']);
-            $names = $this->getLibNamesFromHeaders($headers);
-            $response =  new Response(json_encode(array("success" => true, "names" => $names )));
-            $response->headers->set('Content-Type', 'application/json');
-            return $response;
-
-        } else {
+        if ($this->getRequest()->getMethod() != 'POST') {
             return new Response(json_encode(array("success" => false)));
         }
+
+        $handler = $this->get('codebender_library.handler');
+
+        $owner = $this->get('request')->request->get('gitOwner');
+        $repo = $this->get('request')->request->get('gitRepo');
+        $githubLibrary = json_decode($handler->getLibFromGithub($owner, $repo, true), true);
+        if (!$githubLibrary['success'])
+        {
+            $response =  new Response(json_encode($githubLibrary));
+            $response->headers->set('Content-Type', 'application/json');
+            return $response;
+        }
+
+        /*
+         * Library found in Github. The `library` field of the assoc array
+         * returned is the actual code of the library.
+         */
+        $libraryCode = $githubLibrary['library'];
+
+        $headers = $this->findHeadersFromLibFiles($libraryCode['contents']);
+        $names = $this->getLibNamesFromHeaders($headers);
+        $response =  new Response(json_encode(array("success" => true, "names" => $names )));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 
-    private function getLibraryExamples($library)
-    {
+    private function getLibraryExamples($library) {
         $exists = json_decode($this->getLibraryType($library), true);
-        if ($exists['success'])
-        {
-            $examples = array();
-            $path = "";
-            if($exists['type'] == 'external')
-            {
-                $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
-            }
-            else if($exists['type'] = 'builtin')
-            {
-                $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
-            }
-            $inoFinder = new Finder();
-            $inoFinder->in($path);
-            $inoFinder->name('*.ino')->name('*.pde');
-
-            foreach ($inoFinder as $example)
-            {
-                $files = array();
-
-                $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
-                $path_info = pathinfo($example->getBaseName());
-                $files[] = array("filename"=>$path_info['filename'].'.ino', "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content);
-
-                $h_finder = new Finder();
-                $h_finder->files()->name('*.h')->name('*.cpp');
-                $h_finder->in($path."/".$example->getRelativePath());
-
-                foreach($h_finder as $header)
-                {
-                    $files[] = array("filename"=>$header->getBaseName(), "content" => (!mb_check_encoding($header->getContents(), 'UTF-8')) ? mb_convert_encoding($header->getContents(), "UTF-8") : $header->getContents());
-                }
-
-                $dir = preg_replace( '/[E|e]xamples\//', '', $example->getRelativePath());
-                $dir = str_replace( $path_info['filename'], '', $dir);
-                $dir = str_replace('/', ':', $dir);
-                if ($dir != '' && substr($dir, -1) != ':')
-                    $dir .= ':';
-
-
-                $examples[$dir . $path_info['filename']] = $files;
-            }
-
-            return json_encode(array('success' => true, 'examples' => $examples));
-
-        }
-        else
-        {
+        if ($exists['success'] === false) {
             return json_encode($exists);
         }
+        $examples = array();
+        $path = "";
+        // TODO: WHAT ABOUT `EXAMPLES`??????
+        if($exists['type'] == 'external') {
+            $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
+        }
+        else if($exists['type'] == 'builtin') {
+            $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
+        }
+        $inoFinder = new Finder();
+        $inoFinder->in($path);
+        $inoFinder->name('*.ino')->name('*.pde');
+
+        foreach ($inoFinder as $example)
+        {
+            $files = array();
+
+            $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
+            $pathInfo = pathinfo($example->getBaseName());
+            $files[] = array("filename"=>$pathInfo['filename'].'.ino', "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content);
+
+            // TODO: Not only .h and .cpp files in Arduino examples
+            $notInoFilesFinder = new Finder();
+            $notInoFilesFinder->files()->name('*.h')->name('*.cpp');
+            $notInoFilesFinder->in($path."/".$example->getRelativePath());
+
+            foreach($notInoFilesFinder as $nonInoFile)
+            {
+                $files[] = array(
+                    "filename"=>$nonInoFile->getBaseName(),
+                    "content" =>
+                        (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), "UTF-8") : $nonInoFile->getContents()
+                );
+            }
+
+            $dir = preg_replace( '/[E|e]xamples\//', '', $example->getRelativePath());
+            $dir = str_replace( $pathInfo['filename'], '', $dir);
+            $dir = str_replace('/', ':', $dir);
+            if ($dir != '' && substr($dir, -1) != ':')
+                $dir .= ':';
+
+
+            $examples[$dir . $pathInfo['filename']] = $files;
+        }
+        return json_encode(array('success' => true, 'examples' => $examples));
     }
 
-    private function getLibraryType($library)
-    {
+    private function getLibraryType($library) {
         $handler = $this->get('codebender_library.handler');
+
+        /*
+         * Each library's type can be either external () ..
+         */
         $isExternal = json_decode($handler->checkIfExternalExists($library), true);
-        if($isExternal['success'])
-        {
+        if($isExternal['success']) {
             return json_encode(array('success' => true, 'type' => 'external'));
         }
-        else
-        {
-            $isBuiltIn = json_decode($handler->checkIfBuiltInExists($library), true);
-            if ($isBuiltIn['success'])
-            {
-                return json_encode(array('success' => true, 'type' => 'builtin'));
-            }
-            else
-            {
-                $isExample = json_decode($this->checkIfBuiltInExampleFolderExists($library), true);
-                if ($isExample['success'])
-                {
-                    return json_encode(array('success' => true, 'type' => 'example'));
-                }
-            }
+
+        /*
+         * .. or builtin (SD, Ethernet, etc) ...
+         */
+        $isBuiltIn = json_decode($handler->checkIfBuiltInExists($library), true);
+        if ($isBuiltIn['success']) {
+            return json_encode(array('success' => true, 'type' => 'builtin'));
         }
 
+        /*
+         * .. or example (01.Basics, etc)
+         */
+        $isExample = json_decode($this->checkIfBuiltInExampleFolderExists($library), true);
+        if ($isExample['success']) {
+            return json_encode(array('success' => true, 'type' => 'example'));
+        }
+
+        // Library was not found, return proper message
         return json_encode(array('success' => false, 'message' => 'Library named '.$library.' not found.'));
     }
 
-    private function getExternalExampleCode($library, $example)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $libMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+    private function getExternalExampleCode($library, $example) {
+        $entityManager = $this->getDoctrine()->getManager();
+        $libMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
 
-        $exampleMeta = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $example));
+        $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $example));
         if(count($exampleMeta) == 0)
         {
             $example =  str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-            $exampleMeta = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $filename));
+            $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $filename));
             if(count($exampleMeta) > 1)
             {
                 $meta = NULL;
@@ -292,8 +306,7 @@ class DefaultController extends Controller
 
     }
 
-    private function getExampleCodeFromDir($dir, $library, $example)
-    {
+    private function getExampleCodeFromDir($dir, $library, $example) {
         $finder = new Finder();
         $finder->in($dir.$library);
         $finder->name($example.".ino", $example.".pde");
@@ -339,8 +352,7 @@ class DefaultController extends Controller
         return $files;
     }
 
-    private function getExampleFilesFromDir($dir)
-    {
+    private function getExampleFilesFromDir($dir) {
         $filesFinder = new Finder();
         $filesFinder->in($dir);
         $filesFinder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.pde')->name('*.ino');
@@ -360,37 +372,37 @@ class DefaultController extends Controller
         return json_encode(array('success' => true, "files" => $files));
     }
 
-    private function checkIfBuiltInExampleFolderExists($library)
-    {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
-        if(is_dir($arduino_library_files."/examples/".$library))
+    private function checkIfBuiltInExampleFolderExists($library) {
+        $arduinoLibraryFiles = $this->container->getParameter('arduino_library_directory')."/";
+        if(is_dir($arduinoLibraryFiles."/examples/".$library)) {
             return json_encode(array("success" => true, "message" => "Library found"));
-        else
-            return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
+        }
+
+        return json_encode(array("success" => false, "message" => "No Library named ".$library." found."));
     }
 
-    private function getExternalLibrariesList()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $externalMeta = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
+    private function getExternalLibrariesList() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $externalMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
 
         $libraries = array();
-        foreach($externalMeta as $lib)
+        foreach($externalMeta as $library)
         {
-            $libname = $lib->getMachineName();
-            if(!isset($libraries[$libname]))
-            {
-                if($lib->getOwner() !== NULL && $lib->getRepo() !== NULL)
-                    $libraries[$libname] = array("description" => $lib->getDescription(), "humanName" => $lib->getHumanName(), "url" => "http://github.com/".$lib->getOwner()."/".$lib->getRepo(), "examples" => array());
-                else
-                    $libraries[$libname] = array("description" => $lib->getDescription(), "humanName" => $lib->getHumanName(), "examples" => array());
+            $libraryMachineName = $library->getMachineName();
+            if(!isset($libraries[$libraryMachineName])) {
+                $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "examples" => array());
+
+                if($library->getOwner() !== NULL && $library->getRepo() !== NULL) {
+                    $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(), "examples" => array());
+                }
             }
-            $examples = $em->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $lib));
-            foreach($examples as $example)
-            {
+
+            $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $library));
+
+            foreach($examples as $example) {
                 $names = $this->getExampleAndLibNameFromRelativePath(pathinfo($example->getPath(), PATHINFO_DIRNAME), $example->getName());
 
-                $libraries[$libname]['examples'][] = array('name' => $names['example_name']);
+                $libraries[$libraryMachineName]['examples'][] = array('name' => $names['example_name']);
             }
 
 
@@ -398,8 +410,8 @@ class DefaultController extends Controller
 
         return $libraries;
     }
-	private function getLibariesListFromDir($path)
-	{
+
+	private function getLibariesListFromDir($path) {
 
         $finder = new Finder();
         $finder->files()->name('*.ino')->name('*.pde');
@@ -421,10 +433,9 @@ class DefaultController extends Controller
 		return $libraries;
 	}
 
-    private function getExampleAndLibNameFromRelativePath($path, $filename)
-    {
+    private function getExampleAndLibNameFromRelativePath($path, $filename) {
         $type = "";
-        $library_name = strtok($path, "/");
+        $libraryName = strtok($path, "/");
 
         $tmp = strtok("/");
 
@@ -441,12 +452,11 @@ class DefaultController extends Controller
 
 
         }
-        $example_name= ($type == "" ?$filename : $type.":".$filename);
-        return(array('library_name' => $library_name, 'example_name' => $example_name));
+        $exampleName= ($type == "" ?$filename : $type.":".$filename);
+        return(array('library_name' => $libraryName, 'example_name' => $exampleName));
     }
 
-    private function getLibNamesFromHeaders($headers)
-    {
+    private function getLibNamesFromHeaders($headers) {
         $names = array();
         foreach($headers as $header)
         {
@@ -458,8 +468,7 @@ class DefaultController extends Controller
         return $names;
     }
 
-    private function findHeadersFromLibFiles($libFiles)
-    {
+    private function findHeadersFromLibFiles($libFiles) {
         $headers = array();
         foreach($libFiles as $file)
         {
@@ -471,8 +480,7 @@ class DefaultController extends Controller
         return $headers;
     }
 
-    public function getKeywords($library)
-    {
+    private function getKeywords($library) {
 		if( $library === NULL ) {
 
             return new Response(json_encode(array("success"=>false)));
@@ -481,18 +489,15 @@ class DefaultController extends Controller
 
         $exists = json_decode($this->getLibraryType($library), true);
 
-        if ($exists['success'] === false)
-        {
+        if ($exists['success'] === false) {
             return new Response(json_encode($exists));
         }
 
         $path = "";
-        if($exists['type'] == 'external')
-        {
+        if($exists['type'] == 'external') {
             $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
         }
-        else if($exists['type'] = 'builtin')
-        {
+        else if($exists['type'] = 'builtin') {
             $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
         }
         else return new Response(json_encode(array("success"=>false)));
@@ -504,7 +509,6 @@ class DefaultController extends Controller
         $finder->name( '/keywords\.txt/i' );
 
         foreach ($finder as $file) {
-
             $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
 
             $lines = preg_split('/\r\n|\r|\n/', $content);
@@ -536,8 +540,5 @@ class DefaultController extends Controller
         return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
 
 	}
-
-
-
 
 }
