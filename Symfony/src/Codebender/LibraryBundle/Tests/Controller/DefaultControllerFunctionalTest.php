@@ -4,7 +4,7 @@ namespace Codebender\LibraryBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class DefaultControllerTest extends WebTestCase
+class DefaultControllerFunctionalTest extends WebTestCase
 {
 	public function testStatus()
 	{
@@ -16,25 +16,15 @@ class DefaultControllerTest extends WebTestCase
 
 	}
 
-	public function testInvalidKey()
+	public function testInvalidMethod()
 	{
 		$client = static::createClient();
 
-		$client->request('GET', '/inValidKey/v1');
+        $auth_key = $client->getContainer()->getParameter("auth_key");
 
-		$this->assertEquals($client->getResponse()->getContent(), '{"success":false,"step":0,"message":"Invalid authorization key."}');
+		$client->request('GET', "/$auth_key/v1");
 
-	}
-
-	public function testInvalidAPI()
-	{
-		$client = static::createClient();
-
-		$auth_key = $client->getContainer()->getParameter("auth_key");
-
-		$client->request('GET', '/'.$auth_key.'/v666');
-
-		$this->assertEquals($client->getResponse()->getContent(), '{"success":false,"step":0,"message":"Invalid API version."}');
+		$this->assertEquals($client->getResponse()->getStatusCode(), 405);
 
 	}
 
@@ -44,7 +34,7 @@ class DefaultControllerTest extends WebTestCase
 
 		$auth_key = $client->getContainer()->getParameter("auth_key");
 
-		$client->request('GET', '/'.$auth_key.'/v1');
+		$client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"list"}', true);
 
 		$response = $client->getResponse()->getContent();
 		$response = json_decode($response, true);
@@ -69,13 +59,9 @@ class DefaultControllerTest extends WebTestCase
 
 		//Check for a specific, known example
 		$example_found = false;
-		foreach($basic_examples as $example)
-		{
-			if($example["name"] == "AnalogReadSerial")
-			{
+		foreach($basic_examples as $example) {
+			if($example["name"] == "AnalogReadSerial") {
 				$this->assertEquals($example["name"], "AnalogReadSerial");
-				$this->assertEquals($example["filename"], "AnalogReadSerial.ino");
-				$this->assertContains("get?file=01.Basics/AnalogReadSerial/AnalogReadSerial.ino", $example["url"]);
 				$example_found = true;
 			}
 		}
@@ -84,22 +70,67 @@ class DefaultControllerTest extends WebTestCase
 		$this->assertTrue($example_found);
 	}
 
-	public function testGetFile()
-	{
-		$client = static::createClient();
+    public function testGetExampleCode() {
+        $client = static::createClient();
 
-		$auth_key = $client->getContainer()->getParameter("auth_key");
+        $auth_key = $client->getContainer()->getParameter("auth_key");
 
-		$client->request('GET', '/'.$auth_key.'/v1/get', array('file' => '01.Basics/AnalogReadSerial/AnalogReadSerial.ino'));
+        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}', true);
 
-//		$response = $client->getResponse();
-//		var_dump($response);
+        $response = json_decode($client->getResponse()->getContent(), true);
 
-		$this->markTestIncomplete("This test is not ready, for some reason response has no output");
-	}
+        $this->assertTrue($response['success']);
+        $this->assertEquals($response['files'][0]['filename'], 'eeprom_read.ino');
+        $this->assertContains('void setup()', $response['files'][0]['code']);
+    }
 
-	public function testIncorrectInputs()
-	{
-		$this->markTestIncomplete("No tests for invalid inputs yet");
-	}
+    public function testGetExamples() {
+        $client = static::createClient();
+
+        $auth_key = $client->getContainer()->getParameter("auth_key");
+
+        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getExamples","library":"EEPROM"}', true);
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('eeprom_clear', $response['examples']);
+        $this->assertArrayHasKey('eeprom_read', $response['examples']);
+        $this->assertArrayHasKey('eeprom_write', $response['examples']);
+    }
+
+    public function testFetchLibrary() {
+        $client = static::createClient();
+
+        $auth_key = $client->getContainer()->getParameter("auth_key");
+
+        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"fetch","library":"EEPROM"}', true);
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+        $this->assertEquals('EEPROM.cpp', $response['files'][0]['filename']);
+        $this->assertEquals('EEPROM.h', $response['files'][1]['filename']);
+        $this->assertEquals('keywords.txt', $response['files'][2]['filename']);
+    }
+
+    public function testCheckGithubUpdates() {
+        $this->markTestIncomplete("Need to setup testing with Github credentials");
+    }
+
+    public function testGetKeywords() {
+        $client = static::createClient();
+
+        $auth_key = $client->getContainer()->getParameter("auth_key");
+
+        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getKeywords","library":"EEPROM"}', true);
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+        $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
+        $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
+    }
+
 }
