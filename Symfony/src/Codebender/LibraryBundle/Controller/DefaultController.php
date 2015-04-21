@@ -186,11 +186,14 @@ class DefaultController extends Controller
         }
         $examples = array();
         $path = "";
-        // TODO: WHAT ABOUT `EXAMPLES`??????
+        /*
+         * Assume the requested library is an example
+         */
+        $path = $this->container->getParameter('arduino_library_directory')."/examples/".$library;
         if($exists['type'] == 'external') {
             $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
         }
-        else if($exists['type'] == 'builtin') {
+        if($exists['type'] == 'builtin') {
             $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
         }
         $inoFinder = new Finder();
