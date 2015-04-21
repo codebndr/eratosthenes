@@ -3,16 +3,16 @@ codebender_library_status_check:
     defaults: { _controller: CodebenderLibraryBundle:Default:status }
 
 codebender_unit_test:
-    pattern:  /{auth_key}/test
+    pattern:  /{authorizationKey}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
 codebender_api_handler:
-    pattern:  /{auth_key}/{version}
+    pattern:  /{authorizationKey}/{version}
     defaults: { _controller: CodebenderLibraryBundle:Default:apiHandler }
     methods:  [POST]
 
 codebender_library_view_library:
-    pattern:  /{auth_key}/view
+    pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
 
 #codebender_library_compile_examples:
@@ -20,33 +20,33 @@ codebender_library_view_library:
 #    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
 
 codebender_library_get_library_git_meta:
-    pattern: /{auth_key}/getlibgitmeta
+    pattern: /{authorizationKey}/getlibgitmeta
     defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
     methods:  [POST]
 
 codebender_library_download:
-    pattern: /{auth_key}/download/{library}
+    pattern: /{authorizationKey}/download/{library}
     defaults: { _controller: CodebenderLibraryBundle:Views:download }
 
 codebender_library_new_external:
-    pattern: /{auth_key}/new
+    pattern: /{authorizationKey}/new
     defaults: {_controller:CodebenderLibraryBundle:Views:newLibrary}
     methods:  [GET, POST]
 
 codebender_library_check_github_updates:
-    pattern: /{auth_key}/gitUpdates
+    pattern: /{authorizationKey}/gitUpdates
     defaults: {_controller:CodebenderLibraryBundle:Views:gitUpdates}
 
 codebender_library_search:
-    pattern: /{auth_key}/search
+    pattern: /{authorizationKey}/search
     defaults: { _controller: CodebenderLibraryBundle:Views:search }
 
 codebender_library_status_change:
-    pattern: /{auth_key}/toggleStatus/{library}
+    pattern: /{authorizationKey}/toggleStatus/{library}
     defaults: {_controller:CodebenderLibraryBundle:Views:changeLibraryStatus}
     methods:  [POST]
 
 codebender_library_get_keywords:
-    pattern:  /{auth_key}/{version}/getKeywords
+    pattern:  /{authorizationKey}/{version}/getKeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
 

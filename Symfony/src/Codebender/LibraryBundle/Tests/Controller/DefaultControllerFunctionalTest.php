@@ -20,9 +20,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
 	{
 		$client = static::createClient();
 
-        $auth_key = $client->getContainer()->getParameter("auth_key");
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-		$client->request('GET', "/$auth_key/v1");
+		$client->request('GET', "/$authorizationKey/v1");
 
 		$this->assertEquals($client->getResponse()->getStatusCode(), 405);
 
@@ -32,9 +32,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
 	{
 		$client = static::createClient();
 
-		$auth_key = $client->getContainer()->getParameter("auth_key");
+		$authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-		$client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"list"}', true);
+		$client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"list"}', true);
 
 		$response = $client->getResponse()->getContent();
 		$response = json_decode($response, true);
@@ -73,9 +73,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
     public function testGetExampleCode() {
         $client = static::createClient();
 
-        $auth_key = $client->getContainer()->getParameter("auth_key");
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}', true);
+        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -87,9 +87,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
     public function testGetExamples() {
         $client = static::createClient();
 
-        $auth_key = $client->getContainer()->getParameter("auth_key");
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getExamples","library":"EEPROM"}', true);
+        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getExamples","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -102,9 +102,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
     public function testFetchLibrary() {
         $client = static::createClient();
 
-        $auth_key = $client->getContainer()->getParameter("auth_key");
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"fetch","library":"EEPROM"}', true);
+        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"fetch","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -122,9 +122,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
     public function testGetKeywords() {
         $client = static::createClient();
 
-        $auth_key = $client->getContainer()->getParameter("auth_key");
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$auth_key.'/v1', array(), array(), array(), '{"type":"getKeywords","library":"EEPROM"}', true);
+        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getKeywords","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);

@@ -15,7 +15,7 @@
                                 var resultsHTML = "";
                                 $.each(data.libs, function(k,v){
                                     console.log(v );
-                                    resultsHTML += '<p><a href = "{{ path('codebender_library_view_library', {'auth_key': auth_key}) }}?library='+v+'">'+v+'</a></p>'
+                                    resultsHTML += '<p><a href = "{{ path('codebender_library_view_library', {'authorizationKey': authorizationKey}) }}?library='+v+'">'+v+'</a></p>'
                                 });
                                 $( "#resultsDiv" ).html(resultsHTML);
                             }
@@ -42,7 +42,7 @@
 
 <div id="resultsDiv">
     {%  for lib in libs %}
-        <p><a href = "{{ path('codebender_library_view_library', {'auth_key': auth_key}) }}?library={{ lib }}">{{ lib }}</a></p>
+        <p><a href = "{{ path('codebender_library_view_library', {'authorizationKey': authorizationKey}) }}?library={{ lib }}">{{ lib }}</a></p>
     {% endfor %}
 </div>
 

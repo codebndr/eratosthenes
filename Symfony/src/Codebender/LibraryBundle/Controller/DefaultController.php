@@ -30,7 +30,7 @@ class DefaultController extends Controller
      * @return Response
      */
     public function apiHandlerAction($authorizationKey, $version) {
-        if ($authorizationKey !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid library manager authorization key.")));
         }
@@ -145,7 +145,7 @@ class DefaultController extends Controller
 	}
 
     public function getLibraryGitMetaAction($authorizationKey) {
-        if ($authorizationKey !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }

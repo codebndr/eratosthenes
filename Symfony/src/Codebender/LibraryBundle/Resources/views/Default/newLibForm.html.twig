@@ -25,7 +25,7 @@
 
 
                 $("#newLibMessage").text("Loading Library.....");
-                $.post( "{{ path('codebender_library_get_library_git_meta', {'auth_key' : auth_key}) }}", { gitOwner: $owner, gitRepo: $repo })
+                $.post( "{{ path('codebender_library_get_library_git_meta', {'authorizationKey' : authorizationKey}) }}", { gitOwner: $owner, gitRepo: $repo })
                     .done(function( data ) {
                     if(data.success)
                     {

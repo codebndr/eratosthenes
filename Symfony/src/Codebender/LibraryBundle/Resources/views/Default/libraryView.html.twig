@@ -47,7 +47,7 @@
         {% endif %}
     {% endif %}
 
-    {% set download_hash = { 'library' : (library),  'auth_key': (auth_key) } %}
+    {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
 <a id="download" class="btn btn-success"
     href="{{ path('codebender_library_download', download_hash) }}">Download</a>
 </div>
@@ -55,7 +55,7 @@
     <h3>Files:</h3>
 
     <div class="accordion" id="files_accordion">
-        {% set get_example_hash = { 'auth_key':   (auth_key)  , 'version': 'v1' } %}
+        {% set get_example_hash = { 'authorizationKey':   (authorizationKey)  , 'version': 'v1' } %}
         {% for file in files %}
         <div class="accordion-group">
             <div class="accordion-heading">
@@ -97,7 +97,7 @@
 
     function changeLibraryStatus(library)
     {
-        var route = "{{ path('codebender_library_status_change', {'auth_key': auth_key, 'library': "LIBRARYNAME"}) }}";
+        var route = "{{ path('codebender_library_status_change', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
         $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
                 var response = jQuery.parseJSON(data);

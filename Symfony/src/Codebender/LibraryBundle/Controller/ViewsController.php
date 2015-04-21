@@ -20,10 +20,10 @@ use ZipArchive;
 class ViewsController extends Controller
 {
 
-    public function newLibraryAction($auth_key)
+    public function newLibraryAction($authorizationKey)
     {
 
-        if ($auth_key !== $this->container->getParameter('auth_key')) {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
@@ -52,19 +52,19 @@ class ViewsController extends Controller
 
             $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit, $formData['Url'], $lib), true);
             if($saved['success'])
-                return $this->redirect($this->generateUrl('codebender_library_view_library', array("auth_key" => $this->container->getParameter('auth_key'), "version"=>"v1","library" => $formData["MachineName"], "disabled"=>1)));
+                return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "version"=>"v1","library" => $formData["MachineName"], "disabled"=>1)));
             return new Response(json_encode($saved));
 
         }
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
-            'auth_key' => $auth_key,
+            'authorizationKey' => $authorizationKey,
             'form' => $form->createView()
         ));
     }
 
-    public function viewLibraryAction($auth_key)
+    public function viewLibraryAction($authorizationKey)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
@@ -93,9 +93,9 @@ class ViewsController extends Controller
         ));
     }
 
-    public function gitUpdatesAction($auth_key)
+    public function gitUpdatesAction($authorizationKey)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
@@ -119,9 +119,9 @@ class ViewsController extends Controller
 //        ));
     }
 
-    public function searchAction($auth_key)
+    public function searchAction($authorizationKey)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
@@ -147,12 +147,12 @@ class ViewsController extends Controller
         if($json!==NULL && $json = true)
             return new Response(json_encode(array("success" => true, "libs" => $names)));
         else
-            return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("auth_key" => $auth_key, "libs" => $names));
+            return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("authorizationKey" => $authorizationKey, "libs" => $names));
     }
 
-    public function changeLibraryStatusAction($auth_key, $library)
+    public function changeLibraryStatusAction($authorizationKey, $library)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
@@ -183,9 +183,9 @@ class ViewsController extends Controller
         return new Response(json_encode(array("success" => true)));
     }
 
-    public function downloadAction($auth_key, $library)
+    public function downloadAction($authorizationKey, $library)
     {
-        if ($auth_key !== $this->container->getParameter('auth_key'))
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
         {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
