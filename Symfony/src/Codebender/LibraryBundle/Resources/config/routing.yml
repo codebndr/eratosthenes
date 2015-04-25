@@ -10,10 +10,6 @@ codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
 
-#codebender_library_compile_examples:
-#    pattern:  /{auth_key}/{version}/compile
-#    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
-
 codebender_library_get_library_git_meta:
     pattern: /{authorizationKey}/getlibgitmeta
     defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
