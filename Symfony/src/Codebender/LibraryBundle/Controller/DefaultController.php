@@ -30,13 +30,11 @@ class DefaultController extends Controller
      * @return Response
      */
     public function apiHandlerAction($authorizationKey, $version) {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid library manager authorization key.")));
         }
 
-        if ($version != "v1")
-        {
+        if ($version != "v1") {
             return new Response(json_encode(array("success" => false, "message" => "Invalid library manager API version.")));
         }
 
@@ -44,13 +42,11 @@ class DefaultController extends Controller
         $content = $request->getContent();
 
         $content = json_decode($content, true);
-        if ($content === NULL)
-        {
+        if ($content === null) {
             return new Response(json_encode(array("success" => false, "message" => "Wrong data")));
         }
 
-        if ($this->isValid($content) === false)
-        {
+        if ($this->isValid($content) === false) {
             return new Response(json_encode(array("success" => false, "message" => "Incorrect request fields")));
         }
 
@@ -59,8 +55,7 @@ class DefaultController extends Controller
 
     private function selectAction($content) {
 
-        switch ($content["type"])
-        {
+        switch ($content["type"]) {
             case "list":
                 return $this->listAll();
             case "getExampleCode":
@@ -81,20 +76,15 @@ class DefaultController extends Controller
     }
 
     private function isValid($requestContent) {
-        if (!array_key_exists("type", $requestContent))
-        {
+        if (!array_key_exists("type", $requestContent)) {
             return false;
         }
 
-        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords"))
-            && !array_key_exists("library", $requestContent))
-        {
+        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords")) && !array_key_exists("library", $requestContent)) {
             return false;
         }
 
-        if ($requestContent["type"] == "getExampleCode"
-            && !array_key_exists("example", $requestContent))
-        {
+        if ($requestContent["type"] == "getExampleCode" && !array_key_exists("example", $requestContent)) {
             return false;
         }
 
@@ -113,18 +103,25 @@ class DefaultController extends Controller
         ksort($includedLibraries);
         ksort($externalLibraries);
 
-        return new Response(json_encode(array("success" => true,
-            "text" => "Successful Request!",
-            "categories" => array("Examples" => $builtinExamples,
-                "Builtin Libraries" => $includedLibraries,
-                "External Libraries" => $externalLibraries))));
+        return new Response(json_encode(
+            array(
+                "success" => true,
+                "text" => "Successful Request!",
+                "categories" => array(
+                    "Examples" => $builtinExamples,
+                    "Builtin Libraries" => $includedLibraries,
+                    "External Libraries" => $externalLibraries)
+                )
+            )
+        );
     }
 
 	private function getExampleCode($library, $example) {
 
         $type = json_decode($this->getLibraryType($library), true);
-        if(!$type['success'])
+        if (!$type['success']) {
             return new Response(json_encode($type));
+        }
 
         switch($type['type'])
         {
@@ -145,8 +142,7 @@ class DefaultController extends Controller
 	}
 
     public function getLibraryGitMetaAction($authorizationKey) {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
@@ -159,8 +155,7 @@ class DefaultController extends Controller
         $owner = $this->get('request')->request->get('gitOwner');
         $repo = $this->get('request')->request->get('gitRepo');
         $githubLibrary = json_decode($handler->getLibFromGithub($owner, $repo, true), true);
-        if (!$githubLibrary['success'])
-        {
+        if (!$githubLibrary['success']) {
             $response =  new Response(json_encode($githubLibrary));
             $response->headers->set('Content-Type', 'application/json');
             return $response;
@@ -190,18 +185,17 @@ class DefaultController extends Controller
          * Assume the requested library is an example
          */
         $path = $this->container->getParameter('arduino_library_directory')."/examples/".$library;
-        if($exists['type'] == 'external') {
+        if ($exists['type'] == 'external') {
             $path = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$library;
         }
-        if($exists['type'] == 'builtin') {
+        if ($exists['type'] == 'builtin') {
             $path = $this->container->getParameter('arduino_library_directory')."/libraries/".$library;
         }
         $inoFinder = new Finder();
         $inoFinder->in($path);
         $inoFinder->name('*.ino')->name('*.pde');
 
-        foreach ($inoFinder as $example)
-        {
+        foreach ($inoFinder as $example) {
             $files = array();
 
             $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
@@ -213,8 +207,7 @@ class DefaultController extends Controller
             $notInoFilesFinder->files()->name('*.h')->name('*.cpp');
             $notInoFilesFinder->in($path."/".$example->getRelativePath());
 
-            foreach($notInoFilesFinder as $nonInoFile)
-            {
+            foreach($notInoFilesFinder as $nonInoFile) {
                 $files[] = array(
                     "filename"=>$nonInoFile->getBaseName(),
                     "content" =>
@@ -225,8 +218,9 @@ class DefaultController extends Controller
             $dir = preg_replace( '/[E|e]xamples\//', '', $example->getRelativePath());
             $dir = str_replace( $pathInfo['filename'], '', $dir);
             $dir = str_replace('/', ':', $dir);
-            if ($dir != '' && substr($dir, -1) != ':')
+            if ($dir != '' && substr($dir, -1) != ':') {
                 $dir .= ':';
+            }
 
 
             $examples[$dir . $pathInfo['filename']] = $files;
@@ -270,35 +264,29 @@ class DefaultController extends Controller
         $libMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
 
         $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $example));
-        if(count($exampleMeta) == 0)
-        {
+        if(count($exampleMeta) == 0) {
             $example =  str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
             $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $filename));
-            if(count($exampleMeta) > 1)
-            {
-                $meta = NULL;
-                foreach($exampleMeta as $e)
-                {
+            if(count($exampleMeta) > 1) {
+                $meta = null;
+                foreach($exampleMeta as $e) {
                     $path = $e -> getPath();
-                    if(!(strpos($path, $example)===false))
-                    {
+                    if (!(strpos($path, $example)===false)) {
                         $meta = $e;
                         break;
                     }
                 }
-                if(!$meta)
-                {
+                if (!$meta) {
                     return json_encode(array('success' => false));
                 }
-            }
-            else if(count($exampleMeta) == 0)
+            } else if (count($exampleMeta) == 0) {
                 return json_encode(array('success' => false));
-            else
+            }
+            else {
                 $meta = $exampleMeta[0];
-        }
-        else
-        {
+            }
+        } else {
             $meta = $exampleMeta[0];
         }
         $fullPath = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$meta->getPath();
@@ -314,39 +302,30 @@ class DefaultController extends Controller
         $finder->in($dir.$library);
         $finder->name($example.".ino", $example.".pde");
 
-        if(iterator_count($finder) == 0)
-        {
+        if(iterator_count($finder) == 0) {
             $example =  str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
             $finder->name($filename.".ino", $filename.".pde");
-            if(iterator_count($finder) > 1)
-            {
-                $filesPath = NULL;
-                foreach($finder as $e)
-                {
+            if(iterator_count($finder) > 1) {
+                $filesPath = null;
+                foreach($finder as $e) {
                     $path = $e -> getPath();
-                    if(!(strpos($path, $example)===false))
-                    {
+                    if (!(strpos($path, $example)===false)) {
                         $filesPath = $e;
                         break;
                     }
                 }
-                if(!$filesPath)
-                {
+                if (!$filesPath) {
                     return json_encode(array('success' => false));
                 }
-            }
-            else if(iterator_count($finder) == 0)
+            } else if (iterator_count($finder) == 0) {
                 return json_encode(array('success' => false));
-            else
-            {
+            }
+            else {
                 $filesPathIterator = iterator_to_array($finder, false);
                 $filesPath = $filesPathIterator[0]->getPath();
             }
-        }
-
-        else
-        {
+        } else {
 
             $filesPathIterator = iterator_to_array($finder, false);
             $filesPath = $filesPathIterator[0]->getPath();
@@ -395,7 +374,7 @@ class DefaultController extends Controller
             if(!isset($libraries[$libraryMachineName])) {
                 $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "examples" => array());
 
-                if($library->getOwner() !== NULL && $library->getRepo() !== NULL) {
+                if($library->getOwner() !== null && $library->getRepo() !== null) {
                     $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(), "examples" => array());
                 }
             }
@@ -422,16 +401,14 @@ class DefaultController extends Controller
 
 		$libraries = array();
 
-		foreach ($finder as $file)
-		{
-            $names = $this->getExampleAndLibNameFromRelativePath($file->getRelativePath(), $file->getBasename(".".$file->getExtension()));
+		foreach ($finder as $file) {
+            		$names = $this->getExampleAndLibNameFromRelativePath($file->getRelativePath(), $file->getBasename(".".$file->getExtension()));
 
 			if(!isset($libraries[$names['library_name']]))
 			{
 				$libraries[$names['library_name']] = array("description"=> "", "examples" => array());
 			}
-            $libraries[$names['library_name']]['examples'][] = array('name' => $names['example_name']);
-
+            		$libraries[$names['library_name']]['examples'][] = array('name' => $names['example_name']);
 		}
 		return $libraries;
 	}
@@ -484,11 +461,11 @@ class DefaultController extends Controller
     }
 
     private function getKeywords($library) {
-		if( $library === NULL ) {
+	if( $library === null ) {
 
             return new Response(json_encode(array("success"=>false)));
 
-		}
+	}
 
         $exists = json_decode($this->getLibraryType($library), true);
 
