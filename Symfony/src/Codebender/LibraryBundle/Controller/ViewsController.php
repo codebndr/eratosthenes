@@ -52,7 +52,7 @@ class ViewsController extends Controller
 
             $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit, $formData['Url'], $lib), true);
             if($saved['success'])
-                return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "version"=>"v1","library" => $formData["MachineName"], "disabled"=>1)));
+                return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'),"library" => $formData["MachineName"], "disabled"=>1)));
             return new Response(json_encode($saved));
 
         }
