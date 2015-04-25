@@ -6,11 +6,6 @@ codebender_unit_test:
     pattern:  /{authorizationKey}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
-codebender_api_handler:
-    pattern:  /{authorizationKey}/{version}
-    defaults: { _controller: CodebenderLibraryBundle:Default:apiHandler }
-    methods:  [POST]
-
 codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
@@ -50,3 +45,7 @@ codebender_library_get_keywords:
     pattern:  /{authorizationKey}/{version}/getKeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
 
+codebender_api_handler:
+    pattern:  /{authorizationKey}/{version}
+    defaults: { _controller: CodebenderLibraryBundle:Default:apiHandler }
+    methods:  [POST]
