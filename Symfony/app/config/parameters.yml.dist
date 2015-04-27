@@ -13,7 +13,7 @@ parameters:
     # Path to libraries.
     arduino_library_directory: /opt/codebender/codebender-arduino-library-files
 
-    auth_key: "youMustChangeThis"
+    authorizationKey: "youMustChangeThis"
 
     #Generated from github
     github_app_name: appName

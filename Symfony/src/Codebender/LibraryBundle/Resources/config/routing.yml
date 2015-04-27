@@ -2,62 +2,46 @@ codebender_library_status_check:
     pattern:  /status
     defaults: { _controller: CodebenderLibraryBundle:Default:status }
 
-codebender_compiler_test:
-    pattern:  /{auth_key}/test/
-    defaults: { _controller: CodebenderLibraryBundle:Default:test }
-
-codebender_library_list:
-    pattern:  /{auth_key}/{version}
-    defaults: { _controller: CodebenderLibraryBundle:Default:list }
-
-codebender_library_get_example_code:
-    pattern:  /{auth_key}/{version}/get/{library}/{example}
-    defaults: { _controller: CodebenderLibraryBundle:Default:getExampleCode }
-
-codebender_get_library_examples:
-    pattern:  /{auth_key}/{version}/examples/{library}
-    defaults: { _controller: CodebenderLibraryBundle:Default:getExamples }
-
-codebender_library_fetch_library_code:
-    pattern:  /{auth_key}/{version}/fetch
-    defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode }
-
-codebender_library_download:
-    pattern: /{auth_key}/{version}/download
-    defaults: { _controller: CodebenderLibraryBundle:Default:download }
+codebender_unit_test:
+    pattern:  /{authorizationKey}/test
+    defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
 codebender_library_view_library:
-    pattern:  /{auth_key}/{version}/view
-    defaults: { _controller: CodebenderLibraryBundle:Default:getLibraryCode, renderView: true }
-
-codebender_library_new_external:
-    pattern: /{auth_key}/{version}/new
-    defaults: {_controller:CodebenderLibraryBundle:Default:newLibrary}
-    methods:  [GET, POST]
-
-codebender_library_compile_examples:
-    pattern:  /{auth_key}/{version}/compile
-    defaults: { _controller: CodebenderLibraryBundle:Default:compileLibraryExamples }
-
-codebender_library_check_for_external_updates:
-    pattern: /{auth_key}/{version}/checkforexternalupdates
-    defaults: {_controller:CodebenderLibraryBundle:Default:checkForExternalUpdates}
+    pattern:  /{authorizationKey}/view
+    defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
 
 codebender_library_get_library_git_meta:
-    pattern: /getlibgitmeta
+    pattern: /{authorizationKey}/getlibgitmeta
     defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
     methods:  [POST]
 
+codebender_library_download:
+    pattern: /{authorizationKey}/download/{library}
+    defaults: { _controller: CodebenderLibraryBundle:Views:download }
+
+codebender_library_new_external:
+    pattern: /{authorizationKey}/new
+    defaults: {_controller:CodebenderLibraryBundle:Views:newLibrary}
+    methods:  [GET, POST]
+
+codebender_library_check_github_updates:
+    pattern: /{authorizationKey}/gitUpdates
+    defaults: {_controller:CodebenderLibraryBundle:Views:gitUpdates}
+
 codebender_library_search:
-    pattern: /search
-    defaults: {_controller:CodebenderLibraryBundle:Default:search}
+    pattern: /{authorizationKey}/search
+    defaults: { _controller: CodebenderLibraryBundle:Views:search }
 
 codebender_library_status_change:
-    pattern: /statuschange
-    defaults: {_controller:CodebenderLibraryBundle:Default:changeLibraryStatus}
+    pattern: /{authorizationKey}/toggleStatus/{library}
+    defaults: {_controller:CodebenderLibraryBundle:Views:changeLibraryStatus}
     methods:  [POST]
 
 codebender_library_get_keywords:
-    pattern:  /{auth_key}/{version}/getkeywords
+    pattern:  /{authorizationKey}/{version}/getKeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
 
+codebender_api_handler:
+    pattern:  /{authorizationKey}/{version}
+    defaults: { _controller: CodebenderLibraryBundle:Default:apiHandler }
+    methods:  [POST]
