@@ -17,7 +17,7 @@ class DefaultController extends Controller
      * @return Response
      */
 	public function statusAction() {
-		return new Response(json_encode(array("success" => true, "status" => "OK")));
+		return new Response(json_encode(array("success" => true, "katasta" => "OK")));
 	}
 
     /**
