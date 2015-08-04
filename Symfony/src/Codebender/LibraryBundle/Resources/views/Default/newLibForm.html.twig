@@ -20,7 +20,7 @@
                     if(data.success)
                     {
                         $("#newLibMessage").text("Library Found!");
-                        update_git($owner, $repo)
+                        update_git(data.owner, data.repo);
                         var $el = $("#machineNames");
                         select_github();
                         $el.empty();

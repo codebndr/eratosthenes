@@ -149,14 +149,27 @@ class DefaultController extends Controller
     public function getLibraryGitMetaAction($authorizationKey)
     {
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
+            return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
         }
 
         $handler = $this->get('codebender_library.handler');
 
-        $owner = $this->get('request')->request->get('gitOwner');
-        $repo = $this->get('request')->request->get('gitRepo');
-        $githubLibrary = json_decode($handler->getLibFromGithub($owner, $repo, true), true);
+        $githubUrl = $this->getRequest()->request->get('githubUrl');
+        $processedGitUrl = $handler->processGithubUrl($githubUrl);
+
+        if ($processedGitUrl['success'] !== true) {
+            return new Response(json_encode(array('success' => false, 'message' => 'Could not process provided url')));
+        }
+
+        $githubLibrary = json_decode(
+            $handler->getLibFromGithub(
+                $processedGitUrl['owner'],
+                $processedGitUrl['repo'],
+                $processedGitUrl['folder'],
+                true)
+            , true
+        );
+
         if (!$githubLibrary['success']) {
             $response = new Response(json_encode($githubLibrary));
             $response->headers->set('Content-Type', 'application/json');
@@ -171,7 +184,9 @@ class DefaultController extends Controller
 
         $headers = $this->findHeadersFromLibFiles($libraryCode['contents']);
         $names = $this->getLibNamesFromHeaders($headers);
-        $response = new Response(json_encode(array("success" => true, "names" => $names)));
+        $response = new Response(json_encode(
+            array('success' => true, 'names' => $names, 'owner' => $processedGitUrl['owner'], 'repo' => $processedGitUrl['repo'])
+        ));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }

@@ -194,7 +194,7 @@ class DefaultHandler
 
     }
 
-    public function getLibFromGithub($owner, $repo, $onlyMeta = false)
+    public function getLibFromGithub($owner, $repo, $folder, $onlyMeta = false)
     {
 
         $url = "https://api.github.com/repos/" . $owner . "/" . $repo . "/contents";
@@ -325,5 +325,40 @@ class DefaultHandler
 
         curl_close($curl_req);
         return $contents;
+    }
+
+    public function processGithubUrl($url)
+    {
+        $urlParts = parse_url($url);
+        /*
+         * If hostname is other than github.com, the url is invalid
+         */
+        if ($urlParts['host'] != 'github.com') {
+            return array('success' => false);
+        }
+
+        $path = $urlParts['path'];
+        if ($path == '') {
+            return array('success' => false);
+        }
+        /*
+         * Remove prepending slash from the path, if any (produces empty array values when 'exploding' the path)
+         */
+        if (substr($path, 0, 1) == '/') {
+            $path = substr($path, 1);
+        }
+        $pathComponents = explode('/', $path);
+
+        $owner = $pathComponents[0]; // The first part of the path is always the author
+        $repo = $pathComponents[1]; // The next part of the path is always the repo name
+        $folder = str_replace("$owner/$repo", '', $path); // Return the rest of the path, if any
+        /*
+         * Replace the folder with an empty string, if it's just a slash (not valid)
+         */
+        if ($folder == '/') {
+            $folder = '';
+        }
+
+        return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'folder' => $folder);
     }
 }
