@@ -197,7 +197,7 @@ class DefaultHandler
     public function getLibFromGithub($owner, $repo, $branch, $folder, $onlyMeta = false)
     {
 
-        $url = "https://api.github.com/repos/$owner/$repo/git/trees/$branch?recursive=1";
+        $url = "https://api.github.com/repos/$owner/$repo/contents?ref=$branch";
         $processedDirectory = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
 
         if (!$processedDirectory['success']) {
@@ -225,10 +225,10 @@ class DefaultHandler
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $url = $baseurl . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $url = $baseurl . "&client_id=" . $client_id . "&client_secret=" . $client_secret;
 
         /*
-         * See the docs here https://developer.github.com/v3/git/trees/
+         * See the docs here https://developer.github.com/v3/repos/contents/
          * for more info on the json returned.
          * Note: Not sure if setting the User-Agent is necessary
          */
@@ -236,14 +236,6 @@ class DefaultHandler
 
         if (array_key_exists('message', $json_contents)) {
             return json_encode(array("success" => false, "message" => $json_contents["message"]));
-        }
-
-        /*
-         * If `truncated` flag is set to false, it means that we didn't get the whole JSON output
-         * and the user must request for a subtree of the repo structure
-         */
-        if ($json_contents['truncated'] !== false) {
-            return json_encode(array('success' => false, 'message' => 'Truncated output. Try a subtree of the repo'));
         }
 
         $files = array();
