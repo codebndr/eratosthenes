@@ -198,7 +198,7 @@ class DefaultHandler
     {
 
         $url = "https://api.github.com/repos/" . $owner . "/" . $repo . "/contents";
-        $dir = json_decode($this->processGitDir($url, "", $onlyMeta), true);
+        $dir = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
 
         if (!$dir['success'])
             return json_encode($dir);
