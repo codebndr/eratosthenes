@@ -197,18 +197,24 @@ class DefaultHandler
     public function getLibFromGithub($owner, $repo, $folder, $onlyMeta = false)
     {
 
-        $url = "https://api.github.com/repos/" . $owner . "/" . $repo . "/contents";
-        $dir = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
+        $url = "https://api.github.com/repos/" . $owner . "/" . $repo . "/git/trees/master?recursive=1";
+        $processedDirectory = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
 
-        if (!$dir['success'])
-            return json_encode($dir);
-        else
-            $dir = $dir['directory'];
-        $baseDir = json_decode($this->findBaseDir($dir), true);
-        if (!$baseDir['success'])
-            return json_encode($baseDir);
-        else
-            $baseDir = $baseDir['directory'];
+        if (!$processedDirectory['success']) {
+            return json_encode($processedDirectory);
+        }
+
+        $dir = $processedDirectory['directory'];
+
+        /*
+         * Get the root directory of the repo
+         */
+        $baseDirectory = json_decode($this->findBaseDir($dir), true);
+        if (!$baseDirectory['success']) {
+            return json_encode($baseDirectory);
+        }
+
+        $baseDir = $baseDirectory['directory'];
 
         return json_encode(array("success" => true, "library" => $baseDir));
     }
@@ -219,13 +225,27 @@ class DefaultHandler
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $url = ($path == "" ? $baseurl : $baseurl . "/" . $path) . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $url = $baseurl . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
 
+        /*
+         * See the docs here https://developer.github.com/v3/git/trees/
+         * for more info on the json returned.
+         * Note: Not sure if setting the User-Agent is necessary
+         */
         $json_contents = json_decode($this->curlRequest($url, NULL, array('User-Agent: ' . $github_app_name)), true);
 
         if (array_key_exists('message', $json_contents)) {
             return json_encode(array("success" => false, "message" => $json_contents["message"]));
         }
+
+        /*
+         * If `truncated` flag is set to false, it means that we didn't get the whole JSON output
+         * and the user must request for a subtree of the repo structure
+         */
+        if ($json_contents['truncated'] !== false) {
+            return json_encode(array('success' => false, 'message' => 'Truncated output. Try a subtree of the repo'));
+        }
+
         $files = array();
         foreach ($json_contents as $c) {
 
