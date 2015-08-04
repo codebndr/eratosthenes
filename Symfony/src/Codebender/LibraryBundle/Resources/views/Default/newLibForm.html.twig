@@ -8,24 +8,14 @@
         function get_lib_from_github()
         {
             var $url = $("#githubUrl").val();
-            var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+\/?$/;
+            var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+/;
             if (!$github_url_pattern.test($url))
                 $("#newLibMessage").text("Invalid Github URL");
             else
             {
-                if(endsWith($url, "/"))
-                {
-                    $url = $url.substr(0, $url.length-1);
-                }
-                var $lastSlash = $url.lastIndexOf("/");
-                var $repo = $url.substr($lastSlash+1);
-                $url = $url.substr(0, $url.length - $repo.length - 1);
-                $lastSlash = $url.lastIndexOf("/");
-                var $owner = $url.substr($lastSlash+1);
-
 
                 $("#newLibMessage").text("Loading Library.....");
-                $.post( "{{ path('codebender_library_get_library_git_meta', {'authorizationKey' : authorizationKey}) }}", { gitOwner: $owner, gitRepo: $repo })
+                $.post( "{{ path('codebender_library_get_library_git_meta', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
                     .done(function( data ) {
                     if(data.success)
                     {
