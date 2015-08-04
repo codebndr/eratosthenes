@@ -152,10 +152,6 @@ class DefaultController extends Controller
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
-        if ($this->getRequest()->getMethod() != 'POST') {
-            return new Response(json_encode(array("success" => false)));
-        }
-
         $handler = $this->get('codebender_library.handler');
 
         $owner = $this->get('request')->request->get('gitOwner');
