@@ -165,6 +165,7 @@ class DefaultController extends Controller
             $handler->getLibFromGithub(
                 $processedGitUrl['owner'],
                 $processedGitUrl['repo'],
+                $processedGitUrl['branch'],
                 $processedGitUrl['folder'],
                 true)
             , true
@@ -185,7 +186,13 @@ class DefaultController extends Controller
         $headers = $this->findHeadersFromLibFiles($libraryCode['contents']);
         $names = $this->getLibNamesFromHeaders($headers);
         $response = new Response(json_encode(
-            array('success' => true, 'names' => $names, 'owner' => $processedGitUrl['owner'], 'repo' => $processedGitUrl['repo'])
+            array(
+                'success' => true,
+                'names' => $names,
+                'owner' => $processedGitUrl['owner'],
+                'repo' => $processedGitUrl['repo'],
+                'branch' => $processedGitUrl['branch']
+                )
         ));
         $response->headers->set('Content-Type', 'application/json');
         return $response;

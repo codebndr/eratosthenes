@@ -20,7 +20,7 @@
                     if(data.success)
                     {
                         $("#newLibMessage").text("Library Found!");
-                        update_git(data.owner, data.repo);
+                        update_git(data.owner, data.repo, data.branch);
                         var $el = $("#machineNames");
                         select_github();
                         $el.empty();
@@ -45,10 +45,11 @@
             $("#newLibrary_MachineName").val($("#machineNames").val());
         }
 
-        function update_git(owner, repo)
+        function update_git(owner, repo, branch)
         {
             $("#newLibrary_GitOwner").val(owner);
             $("#newLibrary_GitRepo").val(repo);
+            $("newLibrary_GitBranch").val(branch);
         }
 
         function endsWith(str, suffix) {
@@ -96,6 +97,7 @@
         {
             $("#newLibrary_GitOwner").attr("disabled", "disabled");
             $("#newLibrary_GitRepo").attr("disabled", "disabled");
+            $("#newLibrary_GitBranch").attr("disabled", "disabled");
             $("#newLibrary_Zip").removeAttr("disabled");
             $("#newLibrary_Url").removeAttr("disabled");
             $("#gitHubDiv").hide();
@@ -108,6 +110,7 @@
         {
             $("#newLibrary_GitOwner").removeAttr("disabled");
             $("#newLibrary_GitRepo").removeAttr("disabled");
+            $("#newLibrary_GitBranch").removeAttr("disabled");
             $("#newLibrary_Zip").attr("disabled", "disabled");
             $("#newLibrary_Url").val("http://github.com/"+$("#newLibrary_GitOwner").val()+"/"+ $("#newLibrary_GitRepo").val());
             $("#zipDiv").hide();

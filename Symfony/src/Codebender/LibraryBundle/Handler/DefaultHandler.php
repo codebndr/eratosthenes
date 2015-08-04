@@ -194,10 +194,10 @@ class DefaultHandler
 
     }
 
-    public function getLibFromGithub($owner, $repo, $folder, $onlyMeta = false)
+    public function getLibFromGithub($owner, $repo, $branch, $folder, $onlyMeta = false)
     {
 
-        $url = "https://api.github.com/repos/" . $owner . "/" . $repo . "/git/trees/master?recursive=1";
+        $url = "https://api.github.com/repos/$owner/$repo/git/trees/$branch?recursive=1";
         $processedDirectory = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
 
         if (!$processedDirectory['success']) {
@@ -379,6 +379,11 @@ class DefaultHandler
             $folder = '';
         }
 
-        return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'folder' => $folder);
+        $branch = 'master';
+        if (preg_match("/\/tree\/(\w+)\//", $path, $matches)) {
+            $branch = $matches[1];
+        }
+
+        return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'branch' => $branch, 'folder' => $folder);
     }
 }
