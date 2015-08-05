@@ -197,8 +197,7 @@ class DefaultHandler
     public function getLibFromGithub($owner, $repo, $branch, $folder, $onlyMeta = false)
     {
 
-        $url = "https://api.github.com/repos/$owner/$repo/contents";
-        $processedDirectory = json_decode($this->processGitDir($url, $branch, $folder, $onlyMeta), true);
+        $processedDirectory = json_decode($this->processGitDir($owner, $repo, $branch, $folder, $onlyMeta), true);
 
         if (!$processedDirectory['success']) {
             return json_encode($processedDirectory);
@@ -219,50 +218,54 @@ class DefaultHandler
         return json_encode(array("success" => true, "library" => $baseDir));
     }
 
-    private function processGitDir($baseurl, $branch, $path, $onlyMeta = false)
+    private function processGitDir($owner, $repo, $branch, $path, $onlyMeta = false)
     {
 
-        $client_id = $this->container->getParameter('github_app_client_id');
-        $client_secret = $this->container->getParameter('github_app_client_secret');
-        $github_app_name = $this->container->getParameter('github_app_name');
-        $currentUrl = $baseurl;
-        if ($path != '') {
-            $currentUrl = "$baseurl/$path";
-        }
-        $currentUrl = $currentUrl . "?ref=$branch&client_id=$client_id&client_secret=$client_secret";
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+        $githubAppName = $this->container->getParameter('github_app_name');
+        $currentUrl = "https://api.github.com/repos/$owner/$repo/git/trees/$branch";
+
+        $currentUrl = $currentUrl . "?recursive=1&client_id=$clientId&client_secret=$clientSecret";
 
         /*
          * See the docs here https://developer.github.com/v3/repos/contents/
          * for more info on the json returned.
          * Note: Not sure if setting the User-Agent is necessary
          */
-        $json_contents = json_decode($this->curlRequest($currentUrl, NULL, array('User-Agent: ' . $github_app_name)), true);
+        $gitResponse = json_decode($this->curlRequest($currentUrl, null, array('User-Agent: ' . $githubAppName)), true);
 
-        if (array_key_exists('message', $json_contents)) {
-            return json_encode(array("success" => false, "message" => $json_contents["message"]));
+        if (array_key_exists('message', $gitResponse)) {
+            return json_encode(array('success' => false, 'message' => $gitResponse['message']));
+        }
+        if ($gitResponse['truncated'] !== false) {
+            return json_encode(array('success' => false, 'message' => 'Truncated data. Try using a subtree of the repo'));
         }
 
-        $files = array();
-        foreach ($json_contents as $c) {
+        /*
+         * The value of `tree` key in the response contains all the files
+         * and their metadata.
+         * If a specific folder of the repo is requested, only paths
+         * matching the folder will be returned.
+         */
+        $filePaths = array();
+        /*
+         * Only `blobs` are valid files, as a result we need to filter the `tree` values out of the array
+         */
+        $gitResponse['tree'] = array_filter($gitResponse['tree'], function ($file) {if ($file['type'] != 'blob') {return false;} return true;});
+        foreach ($gitResponse['tree'] as $file) {
 
-            if ($c['type'] == "file") {
-                $file = json_decode($this->processGitFile($baseurl, $c, $onlyMeta), true);
-                if ($file['success'])
-                    array_push($files, $file['file']);
-                else if ($file['message'] != "Bad Encoding")
-                    return json_encode($file);
-            } else if ($c['type'] == "dir") {
-                $subdir = json_decode($this->processGitDir($baseurl, $branch, $c['path'], $onlyMeta), true);
-
-                if ($subdir['success'])
-                    array_push($files, $subdir['directory']);
-                else
-                    return json_encode($subdir);
+            if ($path != '' && strpos($file['path'], $path) === false) {
+                continue;
             }
+            $filePaths[] = $file['path'];
         }
 
-        $name = ($path == "" ? "base" : $path);
-        return json_encode(array("success" => true, "directory" => array("name" => $name, "type" => "dir", "contents" => $files)));
+        $directory = $owner . '/' . $repo;
+        if ($path != '') {
+            $directory .= '/' . $path;
+        }
+        return json_encode(array('success' => true, 'name' => $directory, 'type' => 'dir', 'contents' => $filePaths));
     }
 
     private function processGitFile($baseurl, $file, $onlyMeta = false)
