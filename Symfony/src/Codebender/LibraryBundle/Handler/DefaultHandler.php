@@ -229,7 +229,7 @@ class DefaultHandler
         $currentUrl = $currentUrl . "?recursive=1&client_id=$clientId&client_secret=$clientSecret";
 
         /*
-         * See the docs here https://developer.github.com/v3/repos/contents/
+         * See the docs here https://developer.github.com/v3/git/trees/
          * for more info on the json returned.
          * Note: Not sure if setting the User-Agent is necessary
          */
