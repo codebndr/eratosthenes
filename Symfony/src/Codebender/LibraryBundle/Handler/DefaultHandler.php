@@ -125,7 +125,7 @@ class DefaultHandler
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
         $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits" . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
-        $json_contents = json_decode($this->curlRequest($url, NULL, array('User-Agent: ' . $github_app_name)), true);
+        $json_contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
         return $json_contents[0]['sha'];
     }
@@ -273,10 +273,10 @@ class DefaultHandler
             $github_app_name = $this->container->getParameter('github_app_name');
             $url = ($baseurl . "/" . $file['path']) . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
 
-            $contents = $this->curlRequest($url, NULL, array('Accept: application/vnd.github.v3.raw', 'User-Agent: ' . $github_app_name));
+            $contents = $this->curlRequest($url, null, array('Accept: application/vnd.github.v3.raw', 'User-Agent: ' . $github_app_name));
             $json_contents = json_decode($contents, true);
 
-            if ($json_contents === NULL) {
+            if ($json_contents === null) {
                 if (!mb_check_encoding($contents, 'UTF-8'))
                     $contents = mb_convert_encoding($contents, 'UTF-8');
 
@@ -322,7 +322,7 @@ class DefaultHandler
     }
 
 
-    public function curlRequest($url, $post_request_data = NULL, $http_header = NULL)
+    public function curlRequest($url, $post_request_data = null, $http_header = null)
     {
         $curl_req = curl_init();
         curl_setopt_array($curl_req, array(
@@ -332,10 +332,10 @@ class DefaultHandler
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
         ));
-        if ($post_request_data !== NULL)
+        if ($post_request_data !== null)
             curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
 
-        if ($http_header !== NULL)
+        if ($http_header !== null)
             curl_setopt($curl_req, CURLOPT_HTTPHEADER, $http_header);
 
         $contents = curl_exec($curl_req);
