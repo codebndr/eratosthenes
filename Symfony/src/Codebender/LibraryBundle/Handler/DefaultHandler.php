@@ -197,8 +197,8 @@ class DefaultHandler
     public function getLibFromGithub($owner, $repo, $branch, $folder, $onlyMeta = false)
     {
 
-        $url = "https://api.github.com/repos/$owner/$repo/contents?ref=$branch";
-        $processedDirectory = json_decode($this->processGitDir($url, $folder, $onlyMeta), true);
+        $url = "https://api.github.com/repos/$owner/$repo/contents";
+        $processedDirectory = json_decode($this->processGitDir($url, $branch, $folder, $onlyMeta), true);
 
         if (!$processedDirectory['success']) {
             return json_encode($processedDirectory);
@@ -219,20 +219,24 @@ class DefaultHandler
         return json_encode(array("success" => true, "library" => $baseDir));
     }
 
-    private function processGitDir($baseurl, $path, $onlyMeta = false)
+    private function processGitDir($baseurl, $branch, $path, $onlyMeta = false)
     {
 
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $url = $baseurl . "&client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $currentUrl = $baseurl;
+        if ($path != '') {
+            $currentUrl = "$baseurl/$path";
+        }
+        $currentUrl = $currentUrl . "?ref=$branch&client_id=$client_id&client_secret=$client_secret";
 
         /*
          * See the docs here https://developer.github.com/v3/repos/contents/
          * for more info on the json returned.
          * Note: Not sure if setting the User-Agent is necessary
          */
-        $json_contents = json_decode($this->curlRequest($url, NULL, array('User-Agent: ' . $github_app_name)), true);
+        $json_contents = json_decode($this->curlRequest($currentUrl, NULL, array('User-Agent: ' . $github_app_name)), true);
 
         if (array_key_exists('message', $json_contents)) {
             return json_encode(array("success" => false, "message" => $json_contents["message"]));
@@ -248,7 +252,8 @@ class DefaultHandler
                 else if ($file['message'] != "Bad Encoding")
                     return json_encode($file);
             } else if ($c['type'] == "dir") {
-                $subdir = json_decode($this->processGitDir($baseurl, $c['path'], $onlyMeta), true);
+                $subdir = json_decode($this->processGitDir($baseurl, $branch, $c['path'], $onlyMeta), true);
+
                 if ($subdir['success'])
                     array_push($files, $subdir['directory']);
                 else
@@ -353,29 +358,33 @@ class DefaultHandler
         if ($path == '') {
             return array('success' => false);
         }
-        /*
-         * Remove prepending slash from the path, if any (produces empty array values when 'exploding' the path)
-         */
-        if (substr($path, 0, 1) == '/') {
-            $path = substr($path, 1);
-        }
+
+        $path = $this->cleanPrependingSlash($path);
         $pathComponents = explode('/', $path);
 
         $owner = $pathComponents[0]; // The first part of the path is always the author
         $repo = $pathComponents[1]; // The next part of the path is always the repo name
         $folder = str_replace("$owner/$repo", '', $path); // Return the rest of the path, if any
-        /*
-         * Replace the folder with an empty string, if it's just a slash (not valid)
-         */
-        if ($folder == '/') {
-            $folder = '';
-        }
+
+        $folder = $this->cleanPrependingSlash($folder);
 
         $branch = 'master';
-        if (preg_match("/\/tree\/(\w+)\//", $path, $matches)) {
+        if (preg_match("/tree\/(\w+)\//", $path, $matches)) {
             $branch = $matches[1];
+            $folder = str_replace("tree/$branch", '', $folder);
         }
 
+        $folder = $this->cleanPrependingSlash($folder);
+
         return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'branch' => $branch, 'folder' => $folder);
+    }
+
+    private function cleanPrependingSlash($path)
+    {
+        if (substr($path, 0, 1) == '/') {
+            $path = substr($path, 1);
+        }
+
+        return $path;
     }
 }
