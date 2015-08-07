@@ -391,4 +391,34 @@ class DefaultHandler
 
         return $path;
     }
+
+    public function fetchRepoRefsFromGit($owner, $repo)
+    {
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+
+        $githubAppName = $this->container->getParameter('github_app_name');
+        $url = "https://api.github.com/repos/$owner/$repo/git/refs/heads";
+
+        $url .= "?client_id=$clientId&client_secret=$clientSecret";
+
+        /*
+         * See the docs here https://developer.github.com/v3/git/refs/
+         * for more info on the json returned.
+         * Note: Not sure if setting the User-Agent is necessary
+         */
+        $gitResponse = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $githubAppName)), true);
+
+        if (array_key_exists('message', $gitResponse)) {
+            return array('success' => false, 'message' => $gitResponse['message']);
+        }
+
+        $headRefs = array();
+        foreach ($gitResponse as $ref) {
+            $headRefs[] = str_replace('refs/heads/', '', $ref['ref']);
+        }
+
+        return array('success' => true, 'headRefs' => $headRefs);
+    }
+
 }

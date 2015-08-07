@@ -146,6 +146,36 @@ class DefaultController extends Controller
         return new Response($example, 200, array('content-type' => 'application/json'));
     }
 
+    public function getLibraryGitBranchesAction($authorizationKey)
+    {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
+            return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
+        }
+
+        $handler = $this->get('codebender_library.handler');
+
+        $githubUrl = $this->getRequest()->request->get('githubUrl');
+        $processedGitUrl = $handler->processGithubUrl($githubUrl);
+
+        if ($processedGitUrl['success'] !== true) {
+            return new Response(json_encode(array('success' => false, 'message' => 'Could not process provided url')));
+        }
+
+        $repoBranches = $handler->fetchRepoRefsFromGit($processedGitUrl['owner'], $processedGitUrl['repo']);
+
+        if ($repoBranches['success'] != true) {
+            return new Response(json_encode(array(
+                        'success' => false,
+                        'message' => 'Something went wrong while fetching the library. Please double check the Url you provided.'
+                    )));
+        }
+
+        $response = new Response(json_encode(array('success' => true, 'branches' => $repoBranches['headRefs'])));
+
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+
     public function getLibraryGitMetaAction($authorizationKey)
     {
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {

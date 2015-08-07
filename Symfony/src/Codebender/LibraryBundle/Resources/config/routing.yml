@@ -15,6 +15,11 @@ codebender_library_get_library_git_meta:
     defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
     methods:  [POST]
 
+codebender_library_get_library_git_branches:
+    pattern: /{authorizationKey}/getlibgitbranches
+    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
+    methods:  [POST]
+
 codebender_library_download:
     pattern: /{authorizationKey}/download/{library}
     defaults: { _controller: CodebenderLibraryBundle:Views:download }
