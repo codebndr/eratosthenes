@@ -18,6 +18,7 @@ class NewLibraryForm extends AbstractType{
             ->add('MachineName', 'hidden')
             ->add('Description', 'text', array('label' => 'Description: '))
             ->add('Url', 'text', array('label' => 'Info Url: '))
+            ->add('SourceUrl', 'text', array('label' => 'Source Url: '))
             ->add('Go', 'submit');
 
     }
