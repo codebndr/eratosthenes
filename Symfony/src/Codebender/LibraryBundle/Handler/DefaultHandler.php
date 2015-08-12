@@ -386,6 +386,13 @@ class DefaultHandler
             $fileStructure['children'][] = $result;
         }
 
+        /*
+         * If any headers exist among the children of a node,
+         * they should be listed as possible machine names of the library,
+         * in case this node is the root directory of a library
+         */
+        $fileStructure['machineNames'] = $this->getMachineNamesFromChildren($fileStructure['children']);
+
         return  $fileStructure;
     }
 
@@ -411,6 +418,27 @@ class DefaultHandler
             $subtree[] = $element;
         }
         return $subtree;
+    }
+
+    /**
+     * Detects header files within the provided array and
+     * returns a list containing the names of these files.
+     *
+     * @param array $children
+     * @return array
+     */
+    private function getMachineNamesFromChildren($children)
+    {
+        $machineNames = array();
+
+        foreach ($children as $child) {
+            if ($child['type'] != 'blob' || pathinfo($child['path'], PATHINFO_EXTENSION) != 'h') {
+                continue;
+            }
+            $machineNames[] = pathinfo($child['path'], PATHINFO_BASENAME);
+        }
+
+        return $machineNames;
     }
 
     public function fetchRepoRefsFromGit($owner, $repo)
