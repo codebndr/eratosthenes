@@ -373,7 +373,7 @@ class DefaultHandler
                 continue;
             }
             $fileStructure['children'][] = array_merge(
-                array('text' => pathinfo($file['path'], PATHINFO_BASENAME), 'icon' => 'fa fa-file'),
+                array('text' => pathinfo($file['path'], PATHINFO_BASENAME), 'icon' => 'fa fa-file', 'state' => array('disabled' => true)),
                 $file);
         }
 
