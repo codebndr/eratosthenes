@@ -186,6 +186,7 @@ class DefaultController extends Controller
 
         $githubUrl = $this->getRequest()->request->get('githubUrl');
         $processedGitUrl = $handler->processGithubUrl($githubUrl);
+        $gitBranch = $this->getRequest()->request->get('githubBranch');
 
         if ($processedGitUrl['success'] !== true) {
             return new Response(json_encode(array('success' => false, 'message' => 'Could not process provided url')));
@@ -195,7 +196,8 @@ class DefaultController extends Controller
             $handler->getRepoTreeStructure(
                 $processedGitUrl['owner'],
                 $processedGitUrl['repo'],
-                $processedGitUrl['branch']
+                $gitBranch,
+                $processedGitUrl['folder']
             )
             , true
         );
