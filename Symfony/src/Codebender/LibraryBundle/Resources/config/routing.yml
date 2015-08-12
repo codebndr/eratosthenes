@@ -15,9 +15,9 @@ codebender_library_get_repo_tree_meta:
     defaults: {_controller:CodebenderLibraryBundle:Default:getRepoGitTreeAndMeta}
     methods:  [POST]
 
-codebender_library_get_repo_owner_branches:
-    pattern: /{authorizationKey}/get_repo_name_owner_branches
-    defaults: {_controller:CodebenderLibraryBundle:Default:getRepoNameOwnerBranches}
+codebender_library_get_library_git_branches:
+    pattern: /{authorizationKey}/getlibgitbranches
+    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
     methods:  [POST]
 
 codebender_library_download:

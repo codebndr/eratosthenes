@@ -146,7 +146,7 @@ class DefaultController extends Controller
         return new Response($example, 200, array('content-type' => 'application/json'));
     }
 
-    public function getRepoNameOwnerBranchesAction($authorizationKey)
+    public function getLibraryGitBranchesAction($authorizationKey)
     {
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
