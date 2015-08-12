@@ -194,31 +194,7 @@ class DefaultHandler
 
     }
 
-    public function getLibFromGithub($owner, $repo, $branch, $folder, $onlyMeta = false)
-    {
-
-        $processedDirectory = json_decode($this->processGitDir($owner, $repo, $branch, $folder, $onlyMeta), true);
-
-        if (!$processedDirectory['success']) {
-            return json_encode($processedDirectory);
-        }
-
-        $dir = $processedDirectory['directory'];
-
-        /*
-         * Get the root directory of the repo
-         */
-        $baseDirectory = json_decode($this->findBaseDir($dir), true);
-        if (!$baseDirectory['success']) {
-            return json_encode($baseDirectory);
-        }
-
-        $baseDir = $baseDirectory['directory'];
-
-        return json_encode(array("success" => true, "library" => $baseDir));
-    }
-
-    private function processGitDir($owner, $repo, $branch, $path, $onlyMeta = false)
+    public function getRepoTreeStructure($owner, $repo, $branch)
     {
 
         $clientId = $this->container->getParameter('github_app_client_id');
@@ -243,30 +219,9 @@ class DefaultHandler
             return json_encode(array('success' => false, 'message' => 'Truncated data. Try using a subtree of the repo'));
         }
 
-        /*
-         * The value of `tree` key in the response contains all the files
-         * and their metadata.
-         * If a specific folder of the repo is requested, only paths
-         * matching the folder will be returned.
-         */
-        $filePaths = array();
-        /*
-         * Only `blobs` are valid files, as a result we need to filter the `tree` values out of the array
-         */
-        $gitResponse['tree'] = array_filter($gitResponse['tree'], function ($file) {if ($file['type'] != 'blob') {return false;} return true;});
-        foreach ($gitResponse['tree'] as $file) {
+        $fileStructure = $this->createJsTreeStructure($gitResponse['tree'], $repo, '.', array('sha' => $gitResponse['sha'], 'type' => 'tree'));
 
-            if ($path != '' && strpos($file['path'], $path) === false) {
-                continue;
-            }
-            $filePaths[] = $file['path'];
-        }
-
-        $directory = $owner . '/' . $repo;
-        if ($path != '') {
-            $directory .= '/' . $path;
-        }
-        return json_encode(array('success' => true, 'name' => $directory, 'type' => 'dir', 'contents' => $filePaths));
+        return json_encode(array('success' => true, 'files' => $fileStructure));
     }
 
     private function processGitFile($baseurl, $file, $onlyMeta = false)
@@ -390,6 +345,72 @@ class DefaultHandler
         }
 
         return $path;
+    }
+
+    /**
+     * @param array $repoTree The tree of blobs and sub-trees returned from Github's API
+     * @param string $nodeName The name of the file tree node processed in the current iteration of the function
+     * @param string $path The root node of the file structure on each iteration of the function
+     * @param array $gitMeta The git metadata of the tree node processed in the current iteration
+     * @return array The file structure in a format that can be viewed by jsTree jQuery plugin
+     * @url for more info on jsTree, check this out https://www.jstree.com/
+     */
+    public function createJsTreeStructure($repoTree, $nodeName, $path, $gitMeta)
+    {
+        $fileStructure = array_merge(array('text' => $nodeName, 'icon' => 'fa fa-folder', 'children' => array()), $gitMeta);
+
+        /*
+         * Create two separate arrays, one containing the files found in the treee,
+         * and one containing the nodes (folders).
+         * Remember that files are listed as `blobs` and directories are listed as `trees`
+         * array_values is used to re-index the two arrays
+         */
+        $subtreeNodes = array_values(array_filter($repoTree, function($element) { if ($element['type'] == 'tree') { return true; } return false; }));
+        $files = array_values(array_filter($repoTree, function($element) { if ($element['type'] == 'blob') { return true; } return false; }));
+
+        foreach ($files as $file) {
+            if (pathinfo($file['path'], PATHINFO_DIRNAME) != $path) {
+                continue;
+            }
+            $fileStructure['children'][] = array_merge(
+                array('text' => pathinfo($file['path'], PATHINFO_BASENAME), 'icon' => 'fa fa-file'),
+                $file);
+        }
+
+        foreach ($subtreeNodes as $directory) {
+            if (pathinfo($directory['path'], PATHINFO_DIRNAME) != $path) {
+                continue;
+            }
+            $treeUnderCurrentDir = $this->getTreeUnderProvidedDirectory($repoTree, $directory['path']);
+            $result = $this->createJsTreeStructure($treeUnderCurrentDir, pathinfo($directory['path'], PATHINFO_BASENAME), $directory['path'], $directory);
+            $fileStructure['children'][] = $result;
+        }
+
+        return  $fileStructure;
+    }
+
+    /**
+     * Returns the blobs and trees of a provided tree that belong to
+     * a specific directory.
+     * Uses a regular expression in order to strictly check if the
+     * provided directory is the beginning of each of the tree elements.
+     *
+     * @param array $initialTree
+     * @param string $directory
+     * @return array
+     */
+    private function getTreeUnderProvidedDirectory($initialTree, $directory)
+    {
+        $subtree = array();
+
+        foreach ($initialTree as $element) {
+            if (!preg_match('/^' . preg_quote($directory, '/') . '/', pathinfo($element['path'], PATHINFO_DIRNAME))) {
+                continue;
+            }
+
+            $subtree[] = $element;
+        }
+        return $subtree;
     }
 
     public function fetchRepoRefsFromGit($owner, $repo)

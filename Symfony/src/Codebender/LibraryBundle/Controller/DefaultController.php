@@ -176,7 +176,7 @@ class DefaultController extends Controller
         return $response;
     }
 
-    public function getLibraryGitMetaAction($authorizationKey)
+    public function getRepoGitTreeAndMetaAction($authorizationKey)
     {
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
@@ -192,12 +192,11 @@ class DefaultController extends Controller
         }
 
         $githubLibrary = json_decode(
-            $handler->getLibFromGithub(
+            $handler->getRepoTreeStructure(
                 $processedGitUrl['owner'],
                 $processedGitUrl['repo'],
-                $processedGitUrl['branch'],
-                $processedGitUrl['folder'],
-                true)
+                $processedGitUrl['branch']
+            )
             , true
         );
 
@@ -207,21 +206,14 @@ class DefaultController extends Controller
             return $response;
         }
 
-        /*
-         * Library found in Github. The `library` field of the assoc array
-         * returned is the actual code of the library.
-         */
-        $libraryCode = $githubLibrary['library'];
-
-        $headers = $this->findHeadersFromLibFiles($libraryCode['contents']);
-        $names = $this->getLibNamesFromHeaders($headers);
         $response = new Response(json_encode(
             array(
                 'success' => true,
-                'names' => $names,
+                'files' => $githubLibrary['files'],
                 'owner' => $processedGitUrl['owner'],
                 'repo' => $processedGitUrl['repo'],
-                'branch' => $processedGitUrl['branch']
+                'branch' => $processedGitUrl['branch'],
+                'providedPathInRepo' => $processedGitUrl['folder']
                 )
         ));
         $response->headers->set('Content-Type', 'application/json');
