@@ -221,11 +221,11 @@
     function handle_tree_selection(data)
     {
         $('#verify').show();
+        $('#form').hide();
         // Empty the machine names list
         populate_machine_names_and_update([]);
         if (data.selected.length == 0) {
             update_repo_info_message('None selected');
-            $('#form').hide();
             return;
         }
         // The currently selected node
