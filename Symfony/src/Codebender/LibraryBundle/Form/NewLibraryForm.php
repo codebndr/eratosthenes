@@ -13,7 +13,7 @@ class NewLibraryForm extends AbstractType{
             ->add('GitOwner', 'hidden')
             ->add('GitRepo', 'hidden')
             ->add('GitBranch', 'hidden')
-            ->add('GitSha', 'hidden')
+            ->add('GitPath', 'hidden')
             ->add('Zip', 'file')
             ->add('HumanName', 'text', array('label' => 'Human Name: '))
             ->add('MachineName', 'hidden')

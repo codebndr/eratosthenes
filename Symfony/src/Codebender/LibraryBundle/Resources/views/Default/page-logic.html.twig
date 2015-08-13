@@ -85,7 +85,6 @@
         $("#newLibrary_GitOwner").val(owner);
         $("#newLibrary_GitRepo").val(repo);
         $("#newLibrary_GitBranch").val(branch);
-        $("#newLibrary_GitSha").val(branch);
         $("#newLibrary_Description").val(description);
     }
 
@@ -144,7 +143,7 @@
     {
         $('#steps').find('.active').removeClass('active');
         $('.step1').addClass('active');
-        $("#githubUrl, #newLibrary_GitRepo, #newLibrary_GitOwner, #newLibrary_Zip, #newLibrary_GitBranch, #newLibrary_GitSha").removeAttr("disabled");
+        $("#githubUrl, #newLibrary_GitRepo, #newLibrary_GitOwner, #newLibrary_Zip, #newLibrary_GitBranch, #newLibrary_GitPath").removeAttr("disabled");
         $("#orDiv, #gitHubDiv, #zipDiv, #step1").show();
         $("#step2").hide();
         $("#step3, #step3 #verify, #step3 #form").hide();
@@ -155,7 +154,7 @@
         $("#newLibrary_GitOwner").attr("disabled", "disabled");
         $("#newLibrary_GitRepo").attr("disabled", "disabled");
         $("#newLibrary_GitBranch").attr("disabled", "disabled");
-        $("#newLibrary_GitSha").attr("disabled", "disabled");
+        $("#newLibrary_GitPath").attr("disabled", "disabled");
         $("#newLibrary_Zip").removeAttr("disabled");
         $("#newLibrary_Url").removeAttr("disabled");
         selectStep(3);
@@ -167,7 +166,7 @@
         $("#newLibrary_GitOwner").removeAttr("disabled");
         $("#newLibrary_GitRepo").removeAttr("disabled");
         $("#newLibrary_GitBranch").removeAttr("disabled");
-        $("#newLibrary_GitSha").removeAttr("disabled");
+        $("#newLibrary_GitPath").removeAttr("disabled");
         $("#newLibrary_Zip").attr("disabled", "disabled");
         $('#newLibrary_Zip').val('');
         var $url = $("#githubUrl").val();
@@ -235,12 +234,15 @@
         if ($nodeMetadata.machineNames) {
             populate_machine_names_and_update($nodeMetadata.machineNames);
         }
-        if ($nodeMetadata.sha) {
-            $("#newLibrary_GitSha").val($nodeMetadata.sha);
-        }
+
         // The full path of the node
         var $nodeFullPath = data.instance.get_path($libraryNode, '/');
         update_repo_info_message($nodeFullPath);
+
+        // Update the path that will be used to request the library contents
+        var $repoName = $("#newLibrary_GitRepo").val();
+        var $pathInRepo = $nodeFullPath.replace(new RegExp("^" + $repoName + "\/", "g"), '');
+        $("#newLibrary_GitPath").val($pathInRepo);
 
     }
 
