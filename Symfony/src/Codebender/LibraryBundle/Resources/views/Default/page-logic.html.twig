@@ -212,6 +212,7 @@
     function handle_tree_selection(data)
     {
         $('#verify').show();
+        // Empty the machine names list
         populate_machine_names_and_update([]);
         if (data.selected.length == 0) {
             $('#form').hide();
@@ -223,6 +224,9 @@
         var $nodeMetadata = data.instance.get_node($libraryNode).original;
         if ($nodeMetadata.machineNames) {
             populate_machine_names_and_update($nodeMetadata.machineNames);
+        }
+        if ($nodeMetadata.sha) {
+            $("#newLibrary_GitSha").val($nodeMetadata.sha);
         }
         // The full path of the node
         var $nodeFullPath = data.instance.get_path($libraryNode, '/');
