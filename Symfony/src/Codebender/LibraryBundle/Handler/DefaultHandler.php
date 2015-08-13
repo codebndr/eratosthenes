@@ -505,4 +505,35 @@ class DefaultHandler
         return array('success' => true, 'headRefs' => $headRefs);
     }
 
+    /**
+     * Returns the description of a Github repository
+     *
+     * @param string $owner The owner of the repository
+     * @param string $repo The repository name
+     * @return string The description of the repo, if any
+     */
+    public function getRepoDefaultDescription($owner, $repo)
+    {
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+        $githubAppName = $this->container->getParameter('github_app_name');
+
+        $url = "https://api.github.com/repos/$owner/$repo";
+
+        $url .= "?client_id=$clientId&client_secret=$clientSecret";
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/
+         * for more info on the json returned.
+         * Note: Not sure if setting the User-Agent is necessary
+         */
+        $gitResponse = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $githubAppName)), true);
+
+        if (!array_key_exists('description', $gitResponse)) {
+            return '';
+        }
+
+        return $gitResponse['description'];
+    }
+
 }

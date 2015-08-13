@@ -208,6 +208,8 @@ class DefaultController extends Controller
             return $response;
         }
 
+        $description = $handler->getRepoDefaultDescription($processedGitUrl['owner'], $processedGitUrl['repo']);
+
         $response = new Response(json_encode(
             array(
                 'success' => true,
@@ -215,7 +217,7 @@ class DefaultController extends Controller
                 'owner' => $processedGitUrl['owner'],
                 'repo' => $processedGitUrl['repo'],
                 'branch' => $gitBranch,
-                'providedPathInRepo' => $processedGitUrl['folder']
+                'description' => $description
                 )
         ));
         $response->headers->set('Content-Type', 'application/json');
