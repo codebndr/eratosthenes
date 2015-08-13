@@ -37,7 +37,7 @@ class ViewsController extends Controller
 
             $formData = $form->getData();
 
-            if ($formData["GitOwner"] === NULL && $formData["GitRepo"] === NULL && $formData["Zip"] !== NULL)
+            if ($formData["GitOwner"] === null && $formData["GitRepo"] === null && $formData["Zip"] !== null)
                 $lib = json_decode($this->getLibFromZipFile($formData["Zip"]), true);
             else
                 $lib = json_decode($handler->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
@@ -45,8 +45,8 @@ class ViewsController extends Controller
                 return new Response(json_encode($lib));
             else
                 $lib = $lib['library'];
-            if ($formData["GitOwner"] === NULL && $formData["GitRepo"] === NULL && $formData["Zip"] !== NULL)
-                $lastCommit = NULL;
+            if ($formData["GitOwner"] === null && $formData["GitRepo"] === null && $formData["Zip"] !== null)
+                $lastCommit = null;
             else
                 $lastCommit = $handler->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']);
 
@@ -121,7 +121,7 @@ class ViewsController extends Controller
         $json = $request->query->get('json');
         $names = array();
 
-        if ($query !== NULL && $query != "") {
+        if ($query !== null && $query != "") {
             $em = $this->getDoctrine()->getManager();
             $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
             $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
@@ -132,7 +132,7 @@ class ViewsController extends Controller
                     $names[] = $lib->getMachineName();
             }
         }
-        if ($json !== NULL && $json = true)
+        if ($json !== null && $json = true)
             return new Response(json_encode(array("success" => true, "libs" => $names)));
         else
             return $this->render('CodebenderLibraryBundle:Default:search.html.twig', array("authorizationKey" => $authorizationKey, "libs" => $names));
@@ -270,7 +270,7 @@ class ViewsController extends Controller
         foreach ($examples as $example) {
 
             $path_parts = pathinfo($example['filename']);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName . "/" . $example['filename'], NULL);
+            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName . "/" . $example['filename'], null);
         }
 
 
@@ -378,7 +378,7 @@ class ViewsController extends Controller
         if (!mb_check_encoding($contents, 'UTF-8')) {
             $contents = utf8_encode($contents);
         }
-        if ($contents === NULL)
+        if ($contents === null)
             return json_encode(array("success" => false, "message" => "Could not read file " . basename($path)));
 
         return json_encode(array("success" => true, "file" => array("name" => basename($path), "type" => "file", "contents" => $contents)));
