@@ -9,18 +9,17 @@
 
 <body>
 
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="flash-notice">
-            <i>{{ flashMessage }}</i>
-        </div>
-    {% endfor %}
-
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span1"></div>
             <div class="span10">
                 <h2 class="title" style="text-align: center;">Let's add some libraries!</h2>
                 <br/>
+                <h3>
+                    {% for flashMessage in app.session.flashbag.get('error') %}
+                        <i>{{ flashMessage }}</i>
+                    {% endfor %}
+                </h3>
                 <h3 id = "newLibMessage"></h3>
 
                 <div class="row-fluid">
