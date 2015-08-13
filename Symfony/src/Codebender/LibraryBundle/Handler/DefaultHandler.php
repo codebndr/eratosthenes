@@ -194,7 +194,7 @@ class DefaultHandler
 
     }
 
-    public function getRepoTreeStructure($owner, $repo, $branch)
+    public function getRepoTreeStructure($owner, $repo, $branch, $requestedFolder)
     {
 
         $clientId = $this->container->getParameter('github_app_client_id');
@@ -220,6 +220,8 @@ class DefaultHandler
         }
 
         $fileStructure = $this->createJsTreeStructure($gitResponse['tree'], $repo, '.', array('sha' => $gitResponse['sha'], 'type' => 'tree'));
+
+        $fileStructure = $this->findSelectedNode($repo . '/' . $requestedFolder, $fileStructure);
 
         return json_encode(array('success' => true, 'files' => $fileStructure));
     }
@@ -439,6 +441,39 @@ class DefaultHandler
         }
 
         return $machineNames;
+    }
+
+    private function findSelectedNode($path, $files)
+    {
+        /*
+         * Remove trailing slashes
+         */
+        if (substr($path, -1) == '/') {
+            $path = substr($path, 0, strlen($path) - 1);
+        }
+        $path = explode('/', $path);
+
+        $files['state'] = array('opened' => true);
+        if (count($path) == 1) {
+            $files['state'] = array('opened' => true, 'selected' => true);
+            return $files;
+        }
+
+        unset($path[0]);
+        $path = array_values($path);
+        if (count($path) == 0) {
+            return $files;
+        }
+
+        foreach ($files['children'] as &$child) {
+            if ($child['type'] != 'tree' || !array_key_exists('children', $child) || $child['text'] != $path[0]) {
+                continue;
+            }
+            $child = $this->findSelectedNode(implode('/', $path), $child);
+            break;
+        }
+
+        return $files;
     }
 
     public function fetchRepoRefsFromGit($owner, $repo)
