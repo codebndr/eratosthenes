@@ -13,13 +13,14 @@ class NewLibraryForm extends AbstractType{
             ->add('GitOwner', 'hidden')
             ->add('GitRepo', 'hidden')
             ->add('GitBranch', 'hidden')
+            ->add('GitSha', 'hidden')
             ->add('Zip', 'file')
             ->add('HumanName', 'text', array('label' => 'Human Name: '))
             ->add('MachineName', 'hidden')
             ->add('Description', 'text', array('label' => 'Description: '))
             ->add('Url', 'text', array('label' => 'Info Url: '))
             ->add('SourceUrl', 'text', array('label' => 'Source Url: '))
-            ->add('Go', 'submit');
+            ->add('Go', 'submit', array('attr' => array('class' => 'btn')));
 
     }
 
