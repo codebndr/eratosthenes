@@ -1,0 +1,290 @@
+<script type="text/javascript">
+
+    function get_repo_and_meta()
+    {
+        $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching file tree..');
+        var $url = $("#githubUrl").val();
+        var $branch = $("#gitBranches").val();
+        $.post( "{{ path('codebender_library_get_repo_tree_meta', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, githubBranch : $branch })
+            .done(function( data ) {
+                if(data.success)
+                {
+                    if (data.files) {
+                        $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Select Directory');
+                        $('#steps .active').removeClass('active');
+                        $('.step2').show().addClass('active');
+
+                        $('#jstreeDiv').show();
+
+                        $('#jstreeDiv').jstree(true).settings.core.data = data.files;
+                        $('#jstreeDiv').jstree(true).refresh(false, true);
+                        $('#step1').hide();
+                        $('#step2').show();
+                        $('#step3').show();
+                    } else {
+                        $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to get the repository file tree. Please try again.');
+                    }
+                    if (data.owner && data.repo && data.branch && data.description) {
+                        update_git(data.owner, data.repo, data.branch, data.description)
+                    } else {
+                        $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
+                    }
+                }
+                else
+                {
+                    $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> There is no such library');
+                }
+            });
+    }
+
+    function get_github_branches()
+    {
+        var $url = $("#githubUrl").val();
+        var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+/;
+        if (!$github_url_pattern.test($url)) {
+            $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Invalid Github Url');
+            return;
+        }
+        $('#fetchFilesBtn').removeAttr('disabled');
+        $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching branches..');
+        $.post( "{{ path('codebender_library_get_library_git_branches', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
+            .done(function( data ) {
+                if(data.success)
+                {
+                    if (data.branches) {
+                        if (data.branches == 0) {
+                            $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> No branches found');
+                            do_step_1();
+                            return;
+                        }
+
+                        $("#gitBranches").show();
+                        $("#gitBranchDiv").show();
+                        $('#fetchFilesBtn').show();
+                        $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Select a branch');
+                        $("#gitBranches").html('');
+                        update_git_branches(data.branches);
+                    } else {
+                        $("#newLibMessage").html('<span><i class="fa fa-meh-o"></i></span> Something went wrong');
+                    }
+                }
+                else
+                {
+                    $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span>' + data.message);
+                }
+            });
+    }
+
+    function update_machineName()
+    {
+        $("#newLibrary_MachineName").val($("#machineNames").val());
+    }
+
+    function update_git(owner, repo, branch, description)
+    {
+        $("#newLibrary_GitOwner").val(owner);
+        $("#newLibrary_GitRepo").val(repo);
+        $("#newLibrary_GitBranch").val(branch);
+        $("#newLibrary_GitSha").val(branch);
+        $("#newLibrary_Description").val(description);
+    }
+
+    function update_git_branches(branches)
+    {
+        for (i = 0; i < branches.length; i++) {
+            $("#gitBranches")
+                .append($("<option></option>")
+                .attr("value", branches[i])
+                .text(branches[i]));
+        }
+    }
+
+    function endsWith(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+
+    function startsWith (str, suffix){
+        return str.indexOf(suffix) == 0;
+    }
+
+    function onerror(message) {
+        alert(message);
+    }
+
+    function getZipFiles(file, onend) {
+        zip.createReader(new zip.BlobReader(file), function(zipReader) {
+            return zipReader.getEntries(onend);
+        }, onerror);
+    }
+
+    function get_lib_from_zip()
+    {
+        select_zip();
+        getZipFiles($("#newLibrary_Zip")[0].files[0], function(entries) {
+            var $el = $("#machineNames");
+            $el.empty();
+            entries.forEach(function(entry) {
+
+                if(endsWith(entry.filename, ".h") && !startsWith(entry.filename, ".")  && !startsWith(entry.filename, "_") )
+                {
+                    var $lastSlash = entry.filename.lastIndexOf("/");
+                    var $header = entry.filename.substr($lastSlash+1);
+                    var $name = $header.substr(0,$header.length -2);
+                    $el.append($("<option></option>")
+                        .attr("value", $name).text($name));
+
+                }
+            });
+            $el.prop("selected", false);
+            update_machineName();
+        });
+    }
+
+    function do_step_1()
+    {
+        $('#steps').find('.active').removeClass('active');
+        $('.step1').addClass('active');
+        $("#githubUrl, #newLibrary_GitRepo, #newLibrary_GitOwner, #newLibrary_Zip").removeAttr("disabled");
+        $("#orDiv, #gitHubDiv, #zipDiv, #step1").show();
+        $("#step2, #step2 #dirSelection, #step2 #dirStructure").hide();
+        $("#step3, #step3 #verify, #step3 #form").hide();
+    }
+
+    function select_zip()
+    {
+        $("#newLibrary_GitOwner").attr("disabled", "disabled");
+        $("#newLibrary_GitRepo").attr("disabled", "disabled");
+        $("#newLibrary_GitBranch").attr("disabled", "disabled");
+        $("#newLibrary_GitSha").attr("disabled", "disabled");
+        $("#newLibrary_Zip").removeAttr("disabled");
+        $("#newLibrary_Url").removeAttr("disabled");
+        selectStep(3);
+        $('#step3, #step3 #form').show();
+    }
+
+    function select_github()
+    {
+        $("#newLibrary_GitOwner").removeAttr("disabled");
+        $("#newLibrary_GitRepo").removeAttr("disabled");
+        $("#newLibrary_GitBranch").removeAttr("disabled");
+        $("#newLibrary_GitSha").removeAttr("disabled");
+        $("#newLibrary_Zip").attr("disabled", "disabled");
+        var $url = $("#githubUrl").val();
+        $("#newLibrary_Url").val($url);
+        $("#zipDiv").hide();
+        $("#orDiv").hide();
+    }
+
+    function selectStep(step) {
+        $('#steps').find('.active').removeClass('active');
+        $('.step' + step).addClass('active');
+
+        if (step == 1) {
+            do_step_1();
+        }
+
+        if (step == 2) {
+            $("#orDiv, #gitHubDiv, #zipDiv, #step1").hide();
+            $("#step3, #step3 #verify, #step3 #form").hide();
+            $("#step2, #step2 #dirSelection, #step2 #dirStructure").show();
+        }
+
+        if (step == 3) {
+            $("#orDiv, #gitHubDiv").hide();
+            $("#step3").show();
+            $("#step2").hide();
+        }
+
+    }
+
+    function populate_machine_names_and_update(names)
+    {
+        var $el = $("#machineNames");
+        $el.empty();
+        $.each(names, function(k,v){
+            $el.append($("<option></option>")
+                    .attr("value", v).text(v));
+        });
+        $el.prop("selected", false);
+        update_machineName();
+    }
+
+    function handle_tree_selection(data)
+    {
+        $('#verify').show();
+        populate_machine_names_and_update([]);
+        if (data.selected.length == 0) {
+            $('#form').hide();
+            return;
+        }
+        // The currently selected node
+        var $libraryNode = data.selected[0];
+        // The original metadata added to the node by the backend of the app
+        var $nodeMetadata = data.instance.get_node($libraryNode).original;
+        if ($nodeMetadata.machineNames) {
+            populate_machine_names_and_update($nodeMetadata.machineNames);
+        }
+        // The full path of the node
+        var $nodeFullPath = data.instance.get_path($libraryNode, '/');
+
+    }
+
+    $(document).ready(function()
+    {
+        $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Choose one of the available options');
+        $("#gitBranchDiv").hide();
+        $("#gitBranches").hide();
+        $('#fetchBranchesBtn').click(function(){ get_github_branches(); });
+        $('#fetchFilesBtn').click(function(){ get_repo_and_meta(); }).hide();
+        $("#newLibrary_Zip").change(function(){ $('#gitHubDiv').hide(); get_lib_from_zip(); });
+        $("#machineNames").change(function(){ update_machineName(); });
+        $("#metaDiv").hide();
+
+        $('#steps ol li a').tooltip();
+
+        $("#step3 #verify #yes").click(function(){
+            select_github();
+            $('#steps').find('.active').removeClass('active');
+            $('.step3').addClass('active');
+            $('#verify').hide();
+            $('#form').show();
+        });
+
+        $("#step3 #verify #no").click(function(){
+            do_step_1();
+        });
+
+        $("#githubUrl").keyup(function() {
+            $('#fetchFilesBtn').attr('disabled', 'disabled');
+            if ($("#githubUrl").val() != '') {
+                $('#orDiv').hide();
+                $('#zipDiv').hide();
+            } else {
+                $('#orDiv').show();
+                $('#zipDiv').show();
+            }
+        });
+
+        /*
+        Create a jsTree instance that will later be populated with
+        the files and directories found in the repo
+         */
+        $(function () {
+            $('#jstreeDiv')
+                .on('changed.jstree', function (e, data) {
+                        handle_tree_selection(data);
+                    })
+                .jstree({
+                    'checkbox' : {
+                        'whole_node' : false
+                    },
+                    'plugins' : ["changed", "checkbox"],
+                    'core' : {
+                        'data' : []
+                    }
+                });
+        });
+
+    });
+
+</script>
