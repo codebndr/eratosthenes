@@ -36,3 +36,5 @@
 #step2, #step2 #dirStructure, #step2 #dirSelection { max-height: 400px; overflow: hidden; display: none; }
 
 #step3, #step3 #form, #step3 #verify { display: none; }
+
+input[type="file"] { width: 175px; }
