@@ -169,6 +169,7 @@
         $("#newLibrary_GitBranch").removeAttr("disabled");
         $("#newLibrary_GitSha").removeAttr("disabled");
         $("#newLibrary_Zip").attr("disabled", "disabled");
+        $('#newLibrary_Zip').val('');
         var $url = $("#githubUrl").val();
         $("#newLibrary_Url").val($url);
         $("#zipDiv").hide();
