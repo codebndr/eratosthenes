@@ -108,12 +108,6 @@ class ViewsController extends Controller
 
         //TODO: create the twig and render it on return
         return $handlerResponse;
-//        return $this->render('CodebenderLibraryBundle:Default:gitUpdatesView.html.twig', array(
-//            "library" => $filename,
-//            "files" => $response,
-//            "examples" => $examples,
-//            "meta" => $meta
-//        ));
     }
 
     public function searchAction($authorizationKey)
@@ -153,7 +147,6 @@ class ViewsController extends Controller
         if ($this->getRequest()->getMethod() != 'POST') {
             return new Response(json_encode(array("success" => false, "message" => "POST should be used.")));
         }
-//            $library = $this->get('request')->request->get('library');
 
         $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($library, true), true);
@@ -274,15 +267,9 @@ class ViewsController extends Controller
         $arduino_library_files = $this->container->getParameter('arduino_library_directory');
         $examples = $handler->fetchLibraryExamples(new Finder(), $arduino_library_files . "/external-libraries/" . $machineName);
 
-//        $libfilesForCompilation = $this->fetchLibraryFiles(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
-
         foreach ($examples as $example) {
 
-//            $filesForCompilation = $libfilesForCompilation;
             $path_parts = pathinfo($example['filename']);
-//            $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
-//            $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
-//            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'],json_encode($boards['boards']));
             $this->saveExampleMeta($path_parts['filename'], $lib, $machineName . "/" . $example['filename'], NULL);
         }
 
