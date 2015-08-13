@@ -214,7 +214,7 @@ class DefaultController extends Controller
                 'files' => $githubLibrary['files'],
                 'owner' => $processedGitUrl['owner'],
                 'repo' => $processedGitUrl['repo'],
-                'branch' => $processedGitUrl['branch'],
+                'branch' => $gitBranch,
                 'providedPathInRepo' => $processedGitUrl['folder']
                 )
         ));
