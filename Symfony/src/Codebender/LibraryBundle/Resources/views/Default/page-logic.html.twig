@@ -210,12 +210,21 @@
         update_machineName();
     }
 
+    function update_repo_info_message(path)
+    {
+        $('#repoInfoOwner').html($("#newLibrary_GitOwner").val());
+        $('#repoInfoRepoName').html($("#newLibrary_GitRepo").val());
+        $('#repoInfoBranch').html($("#newLibrary_GitBranch").val());
+        $('#repoInfoFolder').html(path);
+    }
+
     function handle_tree_selection(data)
     {
         $('#verify').show();
         // Empty the machine names list
         populate_machine_names_and_update([]);
         if (data.selected.length == 0) {
+            update_repo_info_message('None selected');
             $('#form').hide();
             return;
         }
@@ -231,6 +240,7 @@
         }
         // The full path of the node
         var $nodeFullPath = data.instance.get_path($libraryNode, '/');
+        update_repo_info_message($nodeFullPath);
 
     }
 

@@ -72,9 +72,13 @@
                     <div class="span6">
                         <div id="step3" class="box metadiv">
                             <div id="verify">
-                                <h4>Double check the files listed on the left and proceed</h4>
+                                <h5 id="githubChangeInfo" class="labelcontent clearfix">
+                                    Repository owner: <span id="repoInfoOwner"></span>
+                                    Repository name: <span id="repoInfoRepoName"></span>
+                                    Selected branch: <span id="repoInfoBranch"></span>
+                                    Selected folder: <span id="repoInfoFolder"></span>
+                                </h5>
                                 <a href="javascript:void(0);" class="btn btn-success" id="yes">All good</a>
-                                <a href="javascript:void(0);" class="btn btn-warning" id="no">Get me back</a>
                             </div>
                             <div id="form">
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Human Name:</span> {{ form_widget(form.HumanName) }}</h3>
