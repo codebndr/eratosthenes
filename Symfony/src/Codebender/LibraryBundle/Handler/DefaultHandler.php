@@ -109,7 +109,7 @@ class DefaultHandler
             $gitRepo = $lib->getRepo();
 
             if ($gitOwner !== null and $gitRepo !== null) {
-                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, 'master');
+                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
                 if ($lastCommitFromGithub !== $lib->getLastCommit())
                     $needToUpdate[] = array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
             }
@@ -122,12 +122,15 @@ class DefaultHandler
         return new Response(json_encode($response));
     }
 
-    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha)
+    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
         $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits" . "?sha=". $sha ."&client_id=" . $client_id . "&client_secret=" . $client_secret;
+        if ($path != '') {
+            $url .= "&path=$path";
+        }
         $json_contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
         return $json_contents[0]['sha'];
