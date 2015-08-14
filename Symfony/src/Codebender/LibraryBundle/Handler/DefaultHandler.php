@@ -119,12 +119,12 @@ class DefaultHandler
         return new Response(json_encode($response));
     }
 
-    public function getLastCommitFromGithub($gitOwner, $gitRepo)
+    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha)
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits" . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits" . "?sha=". $sha ."&client_id=" . $client_id . "&client_secret=" . $client_secret;
         $json_contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
         return $json_contents[0]['sha'];
