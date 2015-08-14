@@ -96,6 +96,9 @@ class DefaultHandler
         }
     }
 
+    /*
+     * TODO This function is never actually used. Need to test it
+     */
     public function checkGithubUpdates()
     {
         $needToUpdate = array();
@@ -106,7 +109,7 @@ class DefaultHandler
             $gitRepo = $lib->getRepo();
 
             if ($gitOwner !== null and $gitRepo !== null) {
-                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
+                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, 'master');
                 if ($lastCommitFromGithub !== $lib->getLastCommit())
                     $needToUpdate[] = array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
             }
