@@ -88,8 +88,9 @@ class ViewsController extends Controller
         $handler = $this->get('codebender_library.handler');
         $lastCommit = null;
         if ($uploadType['type'] == 'git') {
-            $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $data['GitPath']);
-            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $data['GitPath']);
+            $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
+            $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
+            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
         }
 
         if ($uploadType['type'] == 'zip') {
@@ -140,6 +141,29 @@ class ViewsController extends Controller
         }
 
         return array('success' => false);
+    }
+
+    /**
+     * Determines whether the basepath is exactly the same or is the
+     * root directory of a provided path. Returns an empty string if the
+     * two paths are equal or strips the basepath from the path, if
+     * the first is a substring of the latter.
+     *
+     * @param string $basePath The name of the repo
+     * @param string $path The provided path
+     * @return string
+     */
+    private function getInRepoPath($basePath, $path)
+    {
+        if ($path == $basePath) {
+            return '';
+        }
+
+        if (preg_match("/^$basePath\//", $path)) {
+            return preg_replace("/^$basePath\//", '', $path);
+        }
+
+        return $path;
     }
 
     public function viewLibraryAction($authorizationKey)

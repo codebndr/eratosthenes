@@ -239,10 +239,7 @@
         var $nodeFullPath = data.instance.get_path($libraryNode, '/');
         update_repo_info_message($nodeFullPath);
 
-        // Update the path that will be used to request the library contents
-        var $repoName = $("#newLibrary_GitRepo").val();
-        var $pathInRepo = $nodeFullPath.replace(new RegExp("^" + $repoName + "\/", "g"), '');
-        $("#newLibrary_GitPath").val($pathInRepo);
+        $("#newLibrary_GitPath").val($nodeFullPath);
 
     }
 

@@ -247,6 +247,9 @@ class DefaultHandler
          */
         $contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
+        if ($path == '') {
+            $path = $repo;
+        }
         $libraryContents = array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'dir', 'contents' => array());
         foreach ($contents as $element) {
             if ($element['type'] == 'file') {
