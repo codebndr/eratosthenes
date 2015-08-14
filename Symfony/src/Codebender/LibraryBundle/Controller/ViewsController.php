@@ -107,6 +107,10 @@ class ViewsController extends Controller
          */
         $libraryStructure = $libraryStructure['library'];
 
+        if ($uploadType['type'] == 'git') {
+            $libraryStructure = $this->fixGitPaths($libraryStructure, $libraryStructure['name'], '');
+        }
+
         /*
          * Save the library, that is write the files to the disk and
          * create the new ExternalLibrary Entity that represents the uploaded library.
@@ -164,6 +168,21 @@ class ViewsController extends Controller
         }
 
         return $path;
+    }
+
+    private function fixGitPaths($files, $root, $parentPath)
+    {
+        if ($parentPath != '' && $parentPath != $root) {
+            $files['name'] = $parentPath . '/' . $files['name'];
+        }
+        $parentPath = $files['name'];
+        foreach ($files['contents'] as &$element) {
+            if ($element['type'] != 'dir') {
+                continue;
+            }
+            $element = $this->fixGitPaths($element, $root, $parentPath);
+        }
+        return $files;
     }
 
     public function viewLibraryAction($authorizationKey)
