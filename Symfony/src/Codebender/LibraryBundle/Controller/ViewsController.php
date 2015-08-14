@@ -20,9 +20,17 @@ use ZipArchive;
 class ViewsController extends Controller
 {
 
+    /**
+     * Creates and handles a form for adding external libraries to the
+     * library management system. Will render the form page adding a flashbag
+     * error upon failure. Will redirect to the newly created view page of the library
+     * upon success.
+     *
+     * @param $authorizationKey
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function newLibraryAction($authorizationKey)
     {
-
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
@@ -31,30 +39,22 @@ class ViewsController extends Controller
 
         $form->handleRequest($this->getRequest());
 
-        $handler = $this->get('codebender_library.handler');
-
         if ($form->isValid()) {
-
             $formData = $form->getData();
 
-            if ($formData["GitOwner"] === null && $formData["GitRepo"] === null && $formData["Zip"] !== null)
-                $lib = json_decode($this->getLibFromZipFile($formData["Zip"]), true);
-            else
-                $lib = json_decode($handler->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
-            if (!$lib['success'])
-                return new Response(json_encode($lib));
-            else
-                $lib = $lib['library'];
-            if ($formData["GitOwner"] === null && $formData["GitRepo"] === null && $formData["Zip"] !== null)
-                $lastCommit = null;
-            else
-                $lastCommit = $handler->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']);
+            $libraryAdded = $this->addLibrary($formData);
+            if ($libraryAdded['success'] != true){
+                $flashBag = $this->get('session')->getFlashBag();
+                $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
+                $form = $this->createForm(new NewLibraryForm());
 
-            $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit, $formData['Url'], $lib), true);
-            if ($saved['success'])
-                return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "library" => $formData["MachineName"], "disabled" => 1)));
-            return new Response(json_encode($saved));
+                return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+                    'authorizationKey' => $authorizationKey,
+                    'form' => $form->createView()
+                ));
+            }
 
+            return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "library" => $formData["MachineName"], "disabled" => 1)));
         }
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
             'authorizationKey' => $authorizationKey,
