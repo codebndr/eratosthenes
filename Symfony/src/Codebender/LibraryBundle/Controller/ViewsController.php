@@ -89,7 +89,7 @@ class ViewsController extends Controller
         $lastCommit = null;
         if ($uploadType['type'] == 'git') {
             $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $data['GitPath']);
-            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch']);
+            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $data['GitPath']);
         }
 
         if ($uploadType['type'] == 'zip') {
