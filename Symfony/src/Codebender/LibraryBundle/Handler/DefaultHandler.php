@@ -229,28 +229,66 @@ class DefaultHandler
         return json_encode(array('success' => true, 'files' => $fileStructure));
     }
 
-    private function processGitFile($baseurl, $file, $onlyMeta = false)
+    public function getGithubRepoCode($owner, $repo, $branch, $path)
     {
-        if (!$onlyMeta) {
-            $client_id = $this->container->getParameter('github_app_client_id');
-            $client_secret = $this->container->getParameter('github_app_client_secret');
-            $github_app_name = $this->container->getParameter('github_app_name');
-            $url = ($baseurl . "/" . $file['path']) . "?client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $client_id = $this->container->getParameter('github_app_client_id');
+        $client_secret = $this->container->getParameter('github_app_client_secret');
+        $github_app_name = $this->container->getParameter('github_app_name');
+        $url = "https://api.github.com/repos/$owner/$repo/contents/$path?ref=$branch";
+        $url .= "&client_id=" . $client_id . "&client_secret=" . $client_secret;
 
-            $contents = $this->curlRequest($url, null, array('Accept: application/vnd.github.v3.raw', 'User-Agent: ' . $github_app_name));
-            $json_contents = json_decode($contents, true);
+        /*
+         * See the docs here https://developer.github.com/v3/repos/contents/
+         * for more info on the json returned.
+         * Note: Not sure if setting the User-Agent is necessary
+         */
+        $contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
-            if ($json_contents === null) {
-                if (!mb_check_encoding($contents, 'UTF-8'))
-                    $contents = mb_convert_encoding($contents, 'UTF-8');
-
-                return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file", "contents" => $contents)));
-            } else {
-                return json_encode(array("success" => false, "message" => $json_contents['message']));
+        $libraryContents = array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'dir', 'contents' => array());
+        foreach ($contents as $element) {
+            if ($element['type'] == 'file') {
+                $code = $this->getGithubFileCode($owner, $repo, $branch, $element['path']);
+                if ($code['success'] == false) {
+                    return $code;
+                }
+                $libraryContents['contents'][] = $code['file'];
+                continue;
             }
-        } else {
-            return json_encode(array("success" => true, "file" => array("name" => $file['name'], "type" => "file")));
+            $directoryContents = $this->getGithubRepoCode($owner, $repo, $branch, $element['path']);
+            if ($directoryContents['success'] !== true) {
+                return $directoryContents;
+            }
+            $libraryContents['contents'][] = $directoryContents['library'];
         }
+
+        return array('success' => true, 'library' => $libraryContents);
+    }
+
+
+    private function getGithubFileCode($owner, $repo, $branch, $path)
+    {
+        $client_id = $this->container->getParameter('github_app_client_id');
+        $client_secret = $this->container->getParameter('github_app_client_secret');
+        $github_app_name = $this->container->getParameter('github_app_name');
+        $url = "https://api.github.com/repos/$owner/$repo/contents/$path?ref=$branch";
+        $url .= "&client_id=" . $client_id . "&client_secret=" . $client_secret;
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/contents/
+         * for more info on the json returned.
+         * Note: Not sure if setting the User-Agent is necessary
+         */
+        $contents = $this->curlRequest($url, null, array('Accept: application/vnd.github.v3.raw', 'User-Agent: ' . $github_app_name));
+        $jsonDecodedContent = json_decode($contents, true);
+
+        if (json_last_error() == JSON_ERROR_NONE && array_key_exists('message', $jsonDecodedContent)) {
+            return array('success' => false, 'message' => $jsonDecodedContent['message']);
+        }
+        if (!mb_check_encoding($contents, 'UTF-8')) {
+            $contents = mb_convert_encoding($contents, 'UTF-8');
+        }
+
+        return array('success' => true, 'file' => array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'file', 'contents' => $contents));
     }
 
     public function findBaseDir($dir)
