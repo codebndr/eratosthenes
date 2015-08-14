@@ -62,6 +62,86 @@ class ViewsController extends Controller
         ));
     }
 
+    /**
+     * Performs the actual addition of an external library, as well as
+     * input validation of the provided form data.
+     *
+     * @param array $data The data of the received form
+     * @return array
+     */
+    private function addLibrary($data)
+    {
+        /*
+         * Check whether the right combination of data was provided,
+         * and figure out the type of library addition, that is a zip archive (zip)
+         * or a Github repository (git)
+         */
+        $uploadType = $this->validateFormData($data);
+        if ($uploadType['success'] != true) {
+            return array('success' => false, 'message' => 'Invalid form. Please try again.');
+        }
+
+        /*
+         * Then get the files of the library (either from extracting the zip,
+         * or fetching them from Githib) and proceed
+         */
+        $handler = $this->get('codebender_library.handler');
+        $lastCommit = null;
+        if ($uploadType['type'] == 'git') {
+            $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $data['GitPath']);
+            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch']);
+        }
+
+        if ($uploadType['type'] == 'zip') {
+            $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
+        }
+
+        if ($libraryStructure['success'] !== true) {
+            return array('success' => false, 'message' => $libraryStructure['message']);
+        }
+
+        /*
+         * In both ways of fething, the code of the library is found
+         * under the 'library' key of the response, upon success.
+         */
+        $libraryStructure = $libraryStructure['library'];
+
+        /*
+         * Save the library, that is write the files to the disk and
+         * create the new ExternalLibrary Entity that represents the uploaded library.
+         * Remember onnly external libraries are uploaded through this process
+         */
+        $creationResponse = json_decode(
+            $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
+            $data['GitOwner'], $data['GitRepo'], $data['Description'],
+                $lastCommit, $data['Url'], $libraryStructure)
+            , true);
+        if ($creationResponse['success'] != true) {
+            return array('success' => false, 'message' => $creationResponse['message']);
+        }
+
+        return array('success' => true);
+    }
+
+    /**
+     * Makes sure the received form does not contain Github data and
+     * a zip archive at once. In such a case, the form is considered invalid.
+     *
+     * @param array $data The form data array
+     * @return array
+     */
+    private function validateFormData($data)
+    {
+        if (($data['GitOwner'] === null && $data['GitRepo'] === null && $data['GitBranch'] === null && $data['GitPath'] === null) && is_object($data['Zip'])) {
+            return array('success' => true, 'type' => 'zip');
+        }
+        if (($data['GitOwner'] !== null && $data['GitRepo'] !== null && $data['GitBranch'] !== null && $data['GitPath'] !== null) && $data['Zip'] === null) {
+            return array('success' => true, 'type' => 'git');
+        }
+
+        return array('success' => false);
+    }
+
     public function viewLibraryAction($authorizationKey)
     {
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
