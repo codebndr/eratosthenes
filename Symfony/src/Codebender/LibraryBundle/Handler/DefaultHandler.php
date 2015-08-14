@@ -481,7 +481,7 @@ class DefaultHandler
             if ($child['type'] != 'blob' || pathinfo($child['path'], PATHINFO_EXTENSION) != 'h') {
                 continue;
             }
-            $machineNames[] = pathinfo($child['path'], PATHINFO_BASENAME);
+            $machineNames[] = pathinfo($child['path'], PATHINFO_FILENAME);
         }
 
         return $machineNames;
