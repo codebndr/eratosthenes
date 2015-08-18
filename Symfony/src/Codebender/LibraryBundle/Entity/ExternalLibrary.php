@@ -57,6 +57,20 @@ class ExternalLibrary
     private $repo;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="branch", type="string", length=255, nullable = true)
+     */
+    private $branch;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="notes", type="text", nullable = true)
+     */
+    private $notes;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="verified", type="boolean")
@@ -83,6 +97,13 @@ class ExternalLibrary
      * @ORM\Column(name="url", type="string", length=512, nullable = true)
      */
     private $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="source_url", type="string", length=512, nullable = true)
+     */
+    private $sourceUrl;
 
     /**
      * Get id
@@ -210,6 +231,50 @@ class ExternalLibrary
     }
 
     /**
+     * Set branch
+     *
+     * @param string $branch
+     * @return ExternalLibrary
+     */
+    public function setBranch($branch)
+    {
+        $this->branch = $branch;
+        return $this;
+    }
+
+    /**
+     * Get branch
+     *
+     * @return string
+     */
+    public function getBranch()
+    {
+        return $this->branch;
+    }
+
+    /**
+     * Set notes
+     *
+     * @param string $notes
+     * @return ExternalLibrary
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+
+    /**
+     * Get notes
+     *
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
      * Set verified
      *
      * @param boolean $verified
@@ -301,4 +366,26 @@ class ExternalLibrary
         return $this->url;
     }
 
+    /**
+     * Set sourceUrl
+     *
+     * @param string $sourceUrl
+     * @return ExternalLibrary
+     */
+    public function setSourceUrl($sourceUrl)
+    {
+        $this->sourceUrl = $sourceUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get sourceUrl
+     *
+     * @return string
+     */
+    public function getSourceUrl()
+    {
+        return $this->sourceUrl;
+    }
 }
