@@ -281,7 +281,8 @@ class DefaultHandler
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $url = "https://api.github.com/repos/$owner/$repo/contents/$path?ref=$branch";
+        $urlEncodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
+        $url = "https://api.github.com/repos/$owner/$repo/contents/$urlEncodedPath?ref=$branch";
         $url .= "&client_id=" . $client_id . "&client_secret=" . $client_secret;
 
         /*
