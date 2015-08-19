@@ -425,10 +425,23 @@ class ViewsController extends Controller
                     return (json_encode($create));
             } else {
                 file_put_contents($path . $file['name'], $file['contents']);
+                $this->fixFileEncoding($path . $files['name']);
             }
         }
 
         return json_encode(array('success' => true));
+    }
+
+    private function fixFileEncoding($path)
+    {
+        $fileHandle = finfo_open(FILEINFO_MIME);
+        $mimeType = finfo_file($fileHandle, $path);
+        finfo_close($fileHandle);
+
+        $fileContents = file_get_contents($path);
+        if (strpos($mimeType, 'text/') !== false && mb_check_encoding($fileContents, 'UTF-8')) {
+            file_put_contents($path, mb_convert_encoding($fileContents, 'UTF-8'));
+        }
     }
 
     private function saveExampleMeta($name, $lib, $path, $boards)
@@ -501,9 +514,7 @@ class ViewsController extends Controller
     private function processZipFile($path)
     {
         $contents = file_get_contents($path);
-        if (!mb_check_encoding($contents, 'UTF-8')) {
-            $contents = utf8_encode($contents);
-        }
+
         if ($contents === null)
             return json_encode(array("success" => false, "message" => "Could not read file " . basename($path)));
 
