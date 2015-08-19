@@ -75,9 +75,20 @@ class DefaultHandler
                 if ($renderView) {
                     $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files . "/external-libraries/" . $filename);
 
-                    $libmeta = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $filename));
-                    $filename = $libmeta[0]->getMachineName();
-                    $meta = array("humanName" => $libmeta[0]->getHumanName(), "description" => $libmeta[0]->getDescription(), "verified" => $libmeta[0]->getVerified(), "gitOwner" => $libmeta[0]->getOwner(), "gitRepo" => $libmeta[0]->getRepo(), "url" => $libmeta[0]->getUrl(), "active" => $libmeta[0]->getActive());
+                    $libmeta = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
+                    $filename = $libmeta->getMachineName();
+                    $meta = array(
+                        'humanName' => $libmeta->getHumanName(),
+                        'description' => $libmeta->getDescription(),
+                        'verified' => $libmeta->getVerified(),
+                        'gitOwner' => $libmeta->getOwner(),
+                        'gitRepo' => $libmeta->getRepo(),
+                        'url' => $libmeta->getUrl(),
+                        'active' => $libmeta->getActive(),
+                        'sourceUrl' => $libmeta->getSourceUrl(),
+                        'gitBranch' => $libmeta->getBranch(),
+                        'gitLastCommit' => $libmeta->getLastCommit()
+                    );
 
                 }
             }
