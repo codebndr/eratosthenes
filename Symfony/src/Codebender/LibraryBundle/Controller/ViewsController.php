@@ -119,7 +119,7 @@ class ViewsController extends Controller
         $creationResponse = json_decode(
             $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
             $data['GitOwner'], $data['GitRepo'], $data['Description'],
-                $lastCommit, $data['Url'], $libraryStructure)
+                $lastCommit, $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $libraryStructure)
             , true);
         if ($creationResponse['success'] != true) {
             return array('success' => false, 'message' => $creationResponse['message']);
@@ -361,7 +361,7 @@ class ViewsController extends Controller
         return new Response($value, $htmlcode, $headers);
     }
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $libfiles)
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $libfiles)
     {
         $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($machineName), true);
@@ -378,6 +378,9 @@ class ViewsController extends Controller
         $lib->setDescription($description);
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
+        $lib->setBranch($branch);
+        $lib->setSourceUrl($sourceUrl);
+        $lib->setNotes($notes);
         $lib->setVerified(false);
         $lib->setActive(false);
         $lib->setLastCommit($lastCommit);
