@@ -258,7 +258,7 @@ class DefaultHandler
         $libraryContents = array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'dir', 'contents' => array());
         foreach ($contents as $element) {
             if ($element['type'] == 'file') {
-                $code = $this->getGithubFileCode($owner, $repo, $branch, $element['path']);
+                $code = $this->getGithubFileCode($owner, $repo, $element['path'], $element['sha']);
                 if ($code['success'] == false) {
                     return $code;
                 }
@@ -276,31 +276,30 @@ class DefaultHandler
     }
 
 
-    private function getGithubFileCode($owner, $repo, $branch, $path)
+    private function getGithubFileCode($owner, $repo, $path, $blobSha)
     {
         $client_id = $this->container->getParameter('github_app_client_id');
         $client_secret = $this->container->getParameter('github_app_client_secret');
         $github_app_name = $this->container->getParameter('github_app_name');
-        $urlEncodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
-        $url = "https://api.github.com/repos/$owner/$repo/contents/$urlEncodedPath?ref=$branch";
-        $url .= "&client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $url = "https://api.github.com/repos/$owner/$repo/git/blobs/$blobSha";
+        $url .= "?client_id=" . $client_id . "&client_secret=" . $client_secret;
 
         /*
-         * See the docs here https://developer.github.com/v3/repos/contents/
+         * See the docs here https://developer.github.com/v3/git/blobs/
          * for more info on the json returned.
          * Note: Not sure if setting the User-Agent is necessary
          */
-        $contents = $this->curlRequest($url, null, array('Accept: application/vnd.github.v3.raw', 'User-Agent: ' . $github_app_name));
-        $jsonDecodedContent = json_decode($contents, true);
+        $jsonDecodedContent = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
         if (json_last_error() == JSON_ERROR_NONE && array_key_exists('message', $jsonDecodedContent)) {
             return array('success' => false, 'message' => $jsonDecodedContent['message']);
         }
-        if (!mb_check_encoding($contents, 'UTF-8')) {
-            $contents = mb_convert_encoding($contents, 'UTF-8');
+
+        if ($jsonDecodedContent['encoding'] != 'base64') {
+            return array('success' => false, 'message' => 'Received ' . $path . ' file from Github encoded in ' . $jsonDecodedContent['encoding'] . 'encoding, which cannot be handled.');
         }
 
-        return array('success' => true, 'file' => array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'file', 'contents' => $contents));
+        return array('success' => true, 'file' => array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'file', 'contents' => base64_decode($jsonDecodedContent['content'])));
     }
 
     public function findBaseDir($dir)
