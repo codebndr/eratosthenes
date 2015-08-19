@@ -425,7 +425,7 @@ class ViewsController extends Controller
                     return (json_encode($create));
             } else {
                 file_put_contents($path . $file['name'], $file['contents']);
-                $this->fixFileEncoding($path . $files['name']);
+                $this->fixFileEncoding($path . $file['name']);
             }
         }
 
