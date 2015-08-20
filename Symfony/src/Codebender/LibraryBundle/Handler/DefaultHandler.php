@@ -75,9 +75,9 @@ class DefaultHandler
                 if ($renderView) {
                     $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files . "/external-libraries/" . $filename);
 
-                    $libmeta = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
-                    $filename = $libmeta->getMachineName();
-                    $meta = $libmeta->getLiraryMeta();
+                    $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
+                    $filename = $externalLibrary->getMachineName();
+                    $meta = $externalLibrary->getLiraryMeta();
                 }
             }
         }
