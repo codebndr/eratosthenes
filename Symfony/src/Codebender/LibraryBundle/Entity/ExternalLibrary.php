@@ -66,6 +66,13 @@ class ExternalLibrary
     /**
      * @var string
      *
+     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
+     */
+    private $inRepoPath;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="notes", type="text", nullable = true)
      */
     private $notes;
@@ -250,6 +257,28 @@ class ExternalLibrary
     public function getBranch()
     {
         return $this->branch;
+    }
+
+    /**
+     * Set inRepoPath
+     *
+     * @param string $inRepoPath
+     * @return ExternalLibrary
+     */
+    public function setInRepoPath($inRepoPath)
+    {
+        $this->branch = $inRepoPath;
+        return $this;
+    }
+
+    /**
+     * Get inRepoPath
+     *
+     * @return string
+     */
+    public function getInRepoPath()
+    {
+        return $this->inRepoPath;
     }
 
     /**

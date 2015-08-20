@@ -86,6 +86,7 @@ class ViewsController extends Controller
          * or fetching them from Githib) and proceed
          */
         $handler = $this->get('codebender_library.handler');
+        $path = '';
         $lastCommit = null;
         if ($uploadType['type'] == 'git') {
             $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
@@ -119,7 +120,7 @@ class ViewsController extends Controller
         $creationResponse = json_decode(
             $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
             $data['GitOwner'], $data['GitRepo'], $data['Description'],
-                $lastCommit, $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $libraryStructure)
+                $lastCommit, $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $path, $libraryStructure)
             , true);
         if ($creationResponse['success'] != true) {
             return array('success' => false, 'message' => $creationResponse['message']);
@@ -361,7 +362,7 @@ class ViewsController extends Controller
         return new Response($value, $htmlcode, $headers);
     }
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $libfiles)
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $inRepoPath, $libfiles)
     {
         $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($machineName), true);
@@ -379,6 +380,7 @@ class ViewsController extends Controller
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
         $lib->setBranch($branch);
+        $lib->setInRepoPath($inRepoPath);
         $lib->setSourceUrl($sourceUrl);
         $lib->setNotes($notes);
         $lib->setVerified(false);
