@@ -338,7 +338,7 @@ class ViewsController extends Controller
             }
         }
 
-        $files = $handler->fetchLibraryFiles($finder, $path);
+        $files = $handler->fetchLibraryFiles($finder, $path, false);
         $examples = $handler->fetchLibraryExamples($exampleFinder, $path);
 
         $zipname = "/tmp/asd.zip";
@@ -354,7 +354,8 @@ class ViewsController extends Controller
                 $htmlcode = 404;
             } else {
                 foreach ($files as $file) {
-                    $zip->addFromString($library . "/" . $file["filename"], $file["content"]);
+                    $contents = $handler->binarySafeGetContents($path . '/' . $file['filename']);
+                    $zip->addFromString($library . '/' . $file['filename'], $contents);
                 }
                 foreach ($examples as $file) {
                     $zip->addFromString($library . "/" . $file["filename"], $file["content"]);

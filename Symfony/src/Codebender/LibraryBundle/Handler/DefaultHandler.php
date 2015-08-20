@@ -616,4 +616,19 @@ class DefaultHandler
         return $gitResponse['description'];
     }
 
+    public function binarySafeGetContents($path)
+    {
+        $contents = file_get_contents($path);
+
+        $fileHandle = finfo_open(FILEINFO_MIME);
+        $mimeType = finfo_file($fileHandle, $path);
+        finfo_close($fileHandle);
+
+        if (strpos($mimeType, 'text/') !== false && mb_check_encoding($contents, 'UTF-8')) {
+            return mb_convert_encoding($contents, 'UTF-8');
+        }
+
+        return $contents;
+    }
+
 }
