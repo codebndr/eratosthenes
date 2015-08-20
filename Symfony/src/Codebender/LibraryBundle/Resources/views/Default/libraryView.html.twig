@@ -28,31 +28,46 @@
         <div style="text-align: center;">
             <h1>{{ library }} </h1>
                 {% if meta %}
-                    <label
-                            {% if meta.verified %}
-                                class="icon-ok" title="This is a Verified Library."
-                            {% else %}
-                                class="icon-warning-sign" title="Not Verified. Use at your own risk."
-                            {% endif %}
-                            >
-                    </label>
-                    <label>
-                        {% if meta.active %}
-                            <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger">Disable Library</button>
-                        {% else %}
-                            <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library</button>
-                        {% endif %}
-                    </label>
+                    {% if meta.verified %}
+                        <span class="label label-success" title="This is a Verified Library."><label class="icon-ok"></label> This is a Verified Library.</span>
+                    {% else %}
+                        <span class="label label-warning" title="Not Verified. Use at your own risk."><label class="icon-warning-sign"></label> Not Verified. Use at your own risk.</span>
+                    {% endif %}
+                    <br/><br/>
+                    {% if meta.active %}
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger">Disable Library (won't be available on codebender)</button>
+                    {% else %}
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library (will be available on codebender)</button>
+                    {% endif %}
                 <h3>{{ meta.humanName }}</h3>
                 <p>{{ meta.description }}</p>
-                {% if meta.gitOwner and meta.gitRepo %}
-                    <a class="btn btn-primary" href = "{{ meta.url }}">Github Repository</a>
+                {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
+                    {% if meta.gitInRepoPath %}
+                        <label class="label label-info">You will find the files in the "<strong>{{ meta.gitInRepoPath }}</strong>" directory of the Github repository </label><br/><br/>
+                    {% endif %}
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Github repo hosting the library code">Github Repository</a>
+                {% elseif meta.url and meta.url != '' %}
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.humanName }} is hosted here</a>
+                {% endif %}
+                {% if meta.sourceUrl and meta.sourceUrl != '' %}
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.sourceUrl }}" title="The original source code of the library">{{ meta.humanName }} source code</a>
+                {% endif %}
+                <br/><br/>
+                {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
+                    {% if inSyncWithGit == true %}
+                        <span class="label label-success"><label class="icon-ok"></label> In sync with {{ meta.gitBranch }} branch.</span>
+                    {% else %}
+                        <span class="label label-warning"><label class="icon-warning-sign"></label> Not in sync with {% if meta.gitBranch %} {{ meta.gitBranch }} {% else %}any{% endif %} branch.</span>
+                    {% endif %}
+                {% else %}
+                    <span class="label label-info">Not a Github library (might need manual update)</span>
                 {% endif %}
             {% endif %}
 
             {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
-        <a id="download" class="btn btn-success"
-            href="{{ path('codebender_library_download', download_hash) }}">Download</a>
+        <br/><br/>
+        <a id="download" class="btn btn-success" target="_blank"
+            href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
         </div>
         <div>
             <h3>Files:</h3>
@@ -78,21 +93,25 @@
 
             <h3>Examples:</h3>
             <div class="accordion" id="examples_accordion">
-                {% for file in examples %}
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
-                                {{ file.filename }} <label class = 'icon-chevron-down'></label>
-                            </a>
-                        </div>
-                        {#TODO make it work for multifiled examples#}
-                        <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
-                            <div class="accordion-inner">
-                                <pre>{{ file.content }}</pre>
+                {% if examples | length == 0 %}
+                    <h2><small>The library contains no examples.</small></h2>
+                {% else %}
+                    {% for file in examples %}
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                                <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
+                                    {{ file.filename }} <label class = 'icon-chevron-down'></label>
+                                </a>
+                            </div>
+                            {#TODO make it work for multifiled examples#}
+                            <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
+                                <div class="accordion-inner">
+                                    <pre>{{ file.content }}</pre>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     <div class="span1"></div>
@@ -112,11 +131,11 @@
                     $("#statusbutton").toggleClass("btn-danger");
                     if ($("#statusbutton").html() == "Disable Library")
                     {
-                        $("#statusbutton").html("Enable Library");
+                        $("#statusbutton").html("Enable Library (will be available on codebender)");
                     }
                     else
                     {
-                        $("#statusbutton").html("Disable Library");
+                        $("#statusbutton").html("Disable Library (won't be available on codebender)");
                     }
 
                 }
