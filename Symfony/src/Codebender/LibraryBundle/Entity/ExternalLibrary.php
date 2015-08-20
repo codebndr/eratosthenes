@@ -267,7 +267,7 @@ class ExternalLibrary
      */
     public function setInRepoPath($inRepoPath)
     {
-        $this->branch = $inRepoPath;
+        $this->inRepoPath = $inRepoPath;
         return $this;
     }
 
