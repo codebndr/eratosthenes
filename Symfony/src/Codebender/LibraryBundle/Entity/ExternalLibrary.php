@@ -417,4 +417,26 @@ class ExternalLibrary
     {
         return $this->sourceUrl;
     }
+
+    /**
+     * Get the metadata of the library
+     *
+     * @return array
+     */
+    public function getLiraryMeta()
+    {
+        return array(
+            'humanName' => $this->getHumanName(),
+            'description' => $this->getDescription(),
+            'verified' => $this->getVerified(),
+            'gitOwner' => $this->getOwner(),
+            'gitRepo' => $this->getRepo(),
+            'url' => $this->getUrl(),
+            'active' => $this->getActive(),
+            'sourceUrl' => $this->getSourceUrl(),
+            'gitBranch' => $this->getBranch(),
+            'gitLastCommit' => $this->getLastCommit(),
+            'gitInRepoPath' => $this->getInRepoPath()
+        );
+    }
 }

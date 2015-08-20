@@ -77,20 +77,7 @@ class DefaultHandler
 
                     $libmeta = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
                     $filename = $libmeta->getMachineName();
-                    $meta = array(
-                        'humanName' => $libmeta->getHumanName(),
-                        'description' => $libmeta->getDescription(),
-                        'verified' => $libmeta->getVerified(),
-                        'gitOwner' => $libmeta->getOwner(),
-                        'gitRepo' => $libmeta->getRepo(),
-                        'url' => $libmeta->getUrl(),
-                        'active' => $libmeta->getActive(),
-                        'sourceUrl' => $libmeta->getSourceUrl(),
-                        'gitBranch' => $libmeta->getBranch(),
-                        'gitLastCommit' => $libmeta->getLastCommit(),
-                        'gitInRepoPath' => $libmeta->getInRepoPath()
-                    );
-
+                    $meta = $libmeta->getLiraryMeta();
                 }
             }
         }
