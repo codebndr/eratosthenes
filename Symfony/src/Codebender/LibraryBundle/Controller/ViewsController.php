@@ -213,7 +213,7 @@ class ViewsController extends Controller
             $response['meta']['gitRepo'],
             $response['meta']['gitBranch'],
             $response['meta']['gitInRepoPath'],
-            $request['meta']['gitLastCommit']
+            $response['meta']['gitLastCommit']
         );
 
         return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
