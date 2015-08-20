@@ -91,9 +91,10 @@
                 {% endfor %}
             </div>
 
-            <h3>Examples:</h3>
+            {% set exampleCount = examples | length %}
+            <h3>Examples ({{ exampleCount }} found): </h3>
             <div class="accordion" id="examples_accordion">
-                {% if examples | length == 0 %}
+                {% if exampleCount == 0 %}
                     <h2><small>The library contains no examples.</small></h2>
                 {% else %}
                     {% for file in examples %}
