@@ -22,75 +22,80 @@
     </script>
 </head>
 <body>
-<div>
-    <h1>{{ library }} </h1>
-        {% if meta %}
-            <label
-                    {% if meta.verified %}
-                        class="icon-ok" title="This is a Verified Library."
-                    {% else %}
-                        class="icon-warning-sign" title="Not Verified. Use at your own risk."
-                    {% endif %}
-                    >
-            </label>
-            <label>
-                {% if meta.active %}
-                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger">Disable Library</button>
-                {% else %}
-                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library</button>
+<div class="container-fluid">
+    <div class="span1"></div>
+    <div class="span10"></div>
+        <div style="text-align: center;">
+            <h1>{{ library }} </h1>
+                {% if meta %}
+                    <label
+                            {% if meta.verified %}
+                                class="icon-ok" title="This is a Verified Library."
+                            {% else %}
+                                class="icon-warning-sign" title="Not Verified. Use at your own risk."
+                            {% endif %}
+                            >
+                    </label>
+                    <label>
+                        {% if meta.active %}
+                            <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger">Disable Library</button>
+                        {% else %}
+                            <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library</button>
+                        {% endif %}
+                    </label>
+                <h3>{{ meta.humanName }}</h3>
+                <p>{{ meta.description }}</p>
+                {% if meta.gitOwner and meta.gitRepo %}
+                    <a class="btn btn-primary" href = "{{ meta.url }}">Github Repository</a>
                 {% endif %}
-            </label>
-        <h3>{{ meta.humanName }}</h3>
-        <p>{{ meta.description }}</p>
-        {% if meta.gitOwner and meta.gitRepo %}
-            <a class="btn btn-primary" href = "{{ meta.url }}">Github Repository</a>
-        {% endif %}
-    {% endif %}
+            {% endif %}
 
-    {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
-<a id="download" class="btn btn-success"
-    href="{{ path('codebender_library_download', download_hash) }}">Download</a>
-</div>
-<div>
-    <h3>Files:</h3>
-
-    <div class="accordion" id="files_accordion">
-        {% set get_example_hash = { 'authorizationKey':   (authorizationKey)  , 'version': 'v1' } %}
-        {% for file in files %}
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
-                    {{ file.filename }} <label class = 'icon-chevron-down'></label>
-                </a>
-                {#TODO make it work for multifiled examples#}
-            </div>
-            <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
-                <div class="accordion-inner">
-                    <pre>{{ file.content }}</pre>
-                </div>
-            </div>
+            {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+        <a id="download" class="btn btn-success"
+            href="{{ path('codebender_library_download', download_hash) }}">Download</a>
         </div>
-        {% endfor %}
-    </div>
+        <div>
+            <h3>Files:</h3>
 
-    <h3>Examples:</h3>
-    <div class="accordion" id="examples_accordion">
-        {% for file in examples %}
-            <div class="accordion-group">
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
-                        {{ file.filename }} <label class = 'icon-chevron-down'></label>
-                    </a>
-                </div>
-                {#TODO make it work for multifiled examples#}
-                <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
-                    <div class="accordion-inner">
-                        <pre>{{ file.content }}</pre>
+            <div class="accordion" id="files_accordion">
+                {% set get_example_hash = { 'authorizationKey':   (authorizationKey)  , 'version': 'v1' } %}
+                {% for file in files %}
+                <div class="accordion-group">
+                    <div class="accordion-heading">
+                        <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
+                            {{ file.filename }} <label class = 'icon-chevron-down'></label>
+                        </a>
+                        {#TODO make it work for multifiled examples#}
+                    </div>
+                    <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                            <pre>{{ file.content }}</pre>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
+
+            <h3>Examples:</h3>
+            <div class="accordion" id="examples_accordion">
+                {% for file in examples %}
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
+                                {{ file.filename }} <label class = 'icon-chevron-down'></label>
+                            </a>
+                        </div>
+                        {#TODO make it work for multifiled examples#}
+                        <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <pre>{{ file.content }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    <div class="span1"></div>
 </div>
 
 <script type="text/javascript">
