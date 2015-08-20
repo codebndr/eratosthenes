@@ -87,7 +87,8 @@ class DefaultHandler
                         'active' => $libmeta->getActive(),
                         'sourceUrl' => $libmeta->getSourceUrl(),
                         'gitBranch' => $libmeta->getBranch(),
-                        'gitLastCommit' => $libmeta->getLastCommit()
+                        'gitLastCommit' => $libmeta->getLastCommit(),
+                        'gitInRepoPath' => $libmeta->getInRepoPath()
                     );
 
                 }
@@ -209,6 +210,35 @@ class DefaultHandler
             return $response;
         }
 
+    }
+
+    /**
+     * Determines whether an ExternalLibrary is in sync with its Github origin repo, if any.
+     *
+     * @param $owner
+     * @param $repo
+     * @param $branch
+     * @param $inRepoPath
+     * @param $lastCommit
+     * @return bool
+     */
+    public function isLibraryInSyncWithGit($owner, $repo, $branch, $inRepoPath, $lastCommit)
+    {
+        if ($owner === null || $repo === null || $branch === null || $lastCommit === null) {
+            return false;
+        }
+
+        if ($inRepoPath === null) {
+            $inRepoPath = '';
+        }
+
+        $originLastCommit = $this->getLastCommitFromGithub($owner, $repo, $branch, $inRepoPath);
+
+        if ($originLastCommit != $lastCommit) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getRepoTreeStructure($owner, $repo, $branch, $requestedFolder)

@@ -208,11 +208,20 @@ class ViewsController extends Controller
         if ($response["success"] === false)
             return new Response(json_encode($response));
 
+        $inSync = $handler->isLibraryInSyncWithGit(
+            $response['meta']['gitOwner'],
+            $response['meta']['gitRepo'],
+            $response['meta']['gitBranch'],
+            $response['meta']['gitInRepoPath'],
+            $request['meta']['gitLastCommit']
+        );
+
         return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
-            "library" => $response["library"],
-            "files" => $response["files"],
-            "examples" => $response["examples"],
-            "meta" => $response["meta"]
+            'library' => $response['library'],
+            'files' => $response['files'],
+            'examples' => $response['examples'],
+            'meta' => $response['meta'],
+            'inSyncWithGit' => $inSync
         ));
     }
 
