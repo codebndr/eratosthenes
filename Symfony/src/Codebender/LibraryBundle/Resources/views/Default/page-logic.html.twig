@@ -146,7 +146,7 @@
         $("#githubUrl, #newLibrary_GitRepo, #newLibrary_GitOwner, #newLibrary_Zip, #newLibrary_GitBranch, #newLibrary_GitPath").removeAttr("disabled");
         $("#orDiv, #gitHubDiv, #zipDiv, #step1").show();
         $("#step2").hide();
-        $("#step3, #step3 #verify, #step3 #form").hide();
+        $("#step3").hide();
     }
 
     function select_zip()
@@ -185,8 +185,8 @@
 
         if (step == 2) {
             $("#orDiv, #gitHubDiv, #zipDiv, #step1").hide();
-            $("#step3, #step3 #verify, #step3 #form").hide();
-            $("#step2, #step2 #dirSelection, #step2 #dirStructure").show();
+            $("#step2").show();
+            $("#step3").show();
         }
 
         if (step == 3) {
