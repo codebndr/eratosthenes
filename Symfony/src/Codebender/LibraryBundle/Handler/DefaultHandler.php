@@ -123,16 +123,19 @@ class DefaultHandler
 
     public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
     {
-        $client_id = $this->container->getParameter('github_app_client_id');
-        $client_secret = $this->container->getParameter('github_app_client_secret');
-        $github_app_name = $this->container->getParameter('github_app_name');
-        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits" . "?sha=". $sha ."&client_id=" . $client_id . "&client_secret=" . $client_secret;
+        /*
+         * See the docs here https://developer.github.com/v3/repos/commits/
+         * for more info on the json returned.
+         */
+        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
+        $queryParams = "?sha=". $sha;
         if ($path != '') {
-            $url .= "&path=$path";
+            $queryParams .= "&path=$path";
         }
-        $json_contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
 
-        return $json_contents[0]['sha'];
+        $lastCommitResponse = $this->curlGitRequest($url, $queryParams);
+
+        return $lastCommitResponse[0]['sha'];
     }
 
     public function checkIfBuiltInExists($library)
@@ -230,20 +233,15 @@ class DefaultHandler
 
     public function getRepoTreeStructure($owner, $repo, $branch, $requestedFolder)
     {
-
-        $clientId = $this->container->getParameter('github_app_client_id');
-        $clientSecret = $this->container->getParameter('github_app_client_secret');
-        $githubAppName = $this->container->getParameter('github_app_name');
         $currentUrl = "https://api.github.com/repos/$owner/$repo/git/trees/$branch";
 
-        $currentUrl = $currentUrl . "?recursive=1&client_id=$clientId&client_secret=$clientSecret";
+        $queryParams = "?recursive=1";
 
         /*
          * See the docs here https://developer.github.com/v3/git/trees/
          * for more info on the json returned.
-         * Note: Not sure if setting the User-Agent is necessary
          */
-        $gitResponse = json_decode($this->curlRequest($currentUrl, null, array('User-Agent: ' . $githubAppName)), true);
+        $gitResponse = $this->curlGitRequest($currentUrl, $queryParams);
 
         if (array_key_exists('message', $gitResponse)) {
             return json_encode(array('success' => false, 'message' => $gitResponse['message']));
@@ -262,19 +260,15 @@ class DefaultHandler
 
     public function getGithubRepoCode($owner, $repo, $branch, $path)
     {
-        $client_id = $this->container->getParameter('github_app_client_id');
-        $client_secret = $this->container->getParameter('github_app_client_secret');
-        $github_app_name = $this->container->getParameter('github_app_name');
         $urlEncodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
-        $url = "https://api.github.com/repos/$owner/$repo/contents/$urlEncodedPath?ref=$branch";
-        $url .= "&client_id=" . $client_id . "&client_secret=" . $client_secret;
+        $url = "https://api.github.com/repos/$owner/$repo/contents/$urlEncodedPath";
+        $queryParams = "?ref=$branch";
 
         /*
          * See the docs here https://developer.github.com/v3/repos/contents/
          * for more info on the json returned.
-         * Note: Not sure if setting the User-Agent is necessary
          */
-        $contents = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
+        $contents = $this->curlGitRequest($url, $queryParams);
 
         if (array_key_exists('message', $contents)) {
             return array('success' => false, 'message' => $contents['message']);
@@ -306,18 +300,13 @@ class DefaultHandler
 
     private function getGithubFileCode($owner, $repo, $path, $blobSha)
     {
-        $client_id = $this->container->getParameter('github_app_client_id');
-        $client_secret = $this->container->getParameter('github_app_client_secret');
-        $github_app_name = $this->container->getParameter('github_app_name');
         $url = "https://api.github.com/repos/$owner/$repo/git/blobs/$blobSha";
-        $url .= "?client_id=" . $client_id . "&client_secret=" . $client_secret;
 
         /*
          * See the docs here https://developer.github.com/v3/git/blobs/
          * for more info on the json returned.
-         * Note: Not sure if setting the User-Agent is necessary
          */
-        $jsonDecodedContent = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $github_app_name)), true);
+        $jsonDecodedContent = $this->curlGitRequest($url);
 
         if (json_last_error() == JSON_ERROR_NONE && array_key_exists('message', $jsonDecodedContent)) {
             return array('success' => false, 'message' => $jsonDecodedContent['message']);
@@ -383,6 +372,33 @@ class DefaultHandler
 
         curl_close($curl_req);
         return $contents;
+    }
+
+    /**
+     * A wrapper for the curlRequest function which adds Github authentication
+     * to the Github API request
+     * Returns the json decoded Github response.
+     *
+     * @param string $url The requested url
+     * @param string $queryParams Additional query parameters to be added to the request url
+     * @return mixed
+     */
+    private function curlGitRequest($url, $queryParams = '')
+    {
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+        $githubAppName = $this->container->getParameter('github_app_name');
+
+        $requestUrl = $url . "?client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        if ($queryParams != '') {
+            $requestUrl = $url . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        }
+        /*
+         * Note: Not sure if setting the User-Agent is necessary
+         */
+        $jsonDecodedContent = json_decode($this->curlRequest($requestUrl, null, array('User-Agent: ' . $githubAppName)), true);
+
+        return  $jsonDecodedContent;
     }
 
     public function processGithubUrl($url)
@@ -558,20 +574,13 @@ class DefaultHandler
 
     public function fetchRepoRefsFromGit($owner, $repo)
     {
-        $clientId = $this->container->getParameter('github_app_client_id');
-        $clientSecret = $this->container->getParameter('github_app_client_secret');
-
-        $githubAppName = $this->container->getParameter('github_app_name');
         $url = "https://api.github.com/repos/$owner/$repo/git/refs/heads";
-
-        $url .= "?client_id=$clientId&client_secret=$clientSecret";
 
         /*
          * See the docs here https://developer.github.com/v3/git/refs/
          * for more info on the json returned.
-         * Note: Not sure if setting the User-Agent is necessary
          */
-        $gitResponse = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $githubAppName)), true);
+        $gitResponse = $this->curlGitRequest($url);
 
         if (array_key_exists('message', $gitResponse)) {
             return array('success' => false, 'message' => $gitResponse['message']);
@@ -594,20 +603,13 @@ class DefaultHandler
      */
     public function getRepoDefaultDescription($owner, $repo)
     {
-        $clientId = $this->container->getParameter('github_app_client_id');
-        $clientSecret = $this->container->getParameter('github_app_client_secret');
-        $githubAppName = $this->container->getParameter('github_app_name');
-
         $url = "https://api.github.com/repos/$owner/$repo";
-
-        $url .= "?client_id=$clientId&client_secret=$clientSecret";
 
         /*
          * See the docs here https://developer.github.com/v3/repos/
          * for more info on the json returned.
-         * Note: Not sure if setting the User-Agent is necessary
          */
-        $gitResponse = json_decode($this->curlRequest($url, null, array('User-Agent: ' . $githubAppName)), true);
+        $gitResponse = $this->curlGitRequest($url);
 
         if (!array_key_exists('description', $gitResponse)) {
             return '';
