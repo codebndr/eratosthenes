@@ -488,29 +488,6 @@ class DefaultController extends Controller
         return (array('library_name' => $libraryName, 'example_name' => $exampleName));
     }
 
-    private function getLibNamesFromHeaders($headers)
-    {
-        $names = array();
-        foreach ($headers as $header) {
-            $dot = strpos($header['name'], '.');
-            $name = substr($header['name'], 0, $dot);
-            array_push($names, $name);
-        }
-
-        return $names;
-    }
-
-    private function findHeadersFromLibFiles($libFiles)
-    {
-        $headers = array();
-        foreach ($libFiles as $file) {
-            if ($file['type'] == 'file' && substr($file['name'], -2) === ".h") {
-                $headers[] = $file;
-            }
-        }
-        return $headers;
-    }
-
     private function getKeywords($library)
     {
         if ($library === null) {
