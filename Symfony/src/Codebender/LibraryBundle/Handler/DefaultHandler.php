@@ -391,7 +391,7 @@ class DefaultHandler
 
         $requestUrl = $url . "?client_id=" . $clientId . "&client_secret=" . $clientSecret;
         if ($queryParams != '') {
-            $requestUrl = $url . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
+            $requestUrl = $url . $queryParams . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
         }
         /*
          * Note: Not sure if setting the User-Agent is necessary
