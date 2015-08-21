@@ -436,7 +436,8 @@ class ExternalLibrary
             'sourceUrl' => $this->getSourceUrl(),
             'gitBranch' => $this->getBranch(),
             'gitLastCommit' => $this->getLastCommit(),
-            'gitInRepoPath' => $this->getInRepoPath()
+            'gitInRepoPath' => $this->getInRepoPath(),
+            'libraryNotes' => $this->getNotes()
         );
     }
 }

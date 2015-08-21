@@ -26,7 +26,7 @@
     <div class="span1"></div>
     <div class="span10"></div>
         <div style="text-align: center;">
-            <h1>{{ library }} </h1>
+            <h1>{{ meta.humanName }} (main header: {{ library }})</h1>
                 {% if meta %}
                     {% if meta.verified %}
                         <span class="label label-success" title="This is a Verified Library."><label class="icon-ok"></label> This is a Verified Library.</span>
@@ -39,8 +39,7 @@
                     {% else %}
                         <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success">Enable Library (will be available on codebender)</button>
                     {% endif %}
-                <h3>{{ meta.humanName }}</h3>
-                <p>{{ meta.description }}</p>
+                    <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
                     {% if meta.gitInRepoPath %}
                         <label class="label label-info">You will find the files in the "<strong>{{ meta.gitInRepoPath }}</strong>" directory of the Github repository </label><br/><br/>
@@ -55,7 +54,7 @@
                 <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
                     {% if inSyncWithGit == true %}
-                        <span class="label label-success"><label class="icon-ok"></label> In sync with {{ meta.gitBranch }} branch.</span>
+                        <span class="label label-success"><label class="icon-ok"></label> In sync with <strong>{{ meta.gitBranch }}</strong> branch.</span>
                     {% else %}
                         <span class="label label-warning"><label class="icon-warning-sign"></label> Not in sync with {% if meta.gitBranch %} {{ meta.gitBranch }} {% else %}any{% endif %} branch.</span>
                     {% endif %}
@@ -69,6 +68,20 @@
         <a id="download" class="btn btn-success" target="_blank"
             href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
         </div>
+        {% if meta %}
+            {% if meta.description %}
+                <h3>Library Description:</h3>
+                <div class="well">
+                    <p>{{ meta.description }}</p>
+                </div>
+            {% endif %}
+            {% if meta.libraryNotes %}
+                <h3>Notes for us codebenders:</h3>
+                <div class="well">
+                    <p>{{ meta.libraryNotes }}</p>
+                </div>
+            {% endif %}
+        {% endif %}
         <div>
             <h3>Files:</h3>
 
