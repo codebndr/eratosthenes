@@ -171,6 +171,18 @@ class ViewsController extends Controller
         return $path;
     }
 
+    /**
+     * The zip upload implementation, creates an assoc array in which the filenames of each file
+     * include the absolute path to the file under the library root directory. This option is not available
+     * when fetching libraries from Git, since filenames contain no paths. This function is called
+     * recursively, and figures out the absolute path for each of the files of the provided file structure,
+     * making the git assoc array compatible to the zip assoc array.
+     * 
+     * @param $files
+     * @param $root
+     * @param $parentPath
+     * @return mixed
+     */
     private function fixGitPaths($files, $root, $parentPath)
     {
         if ($parentPath != '' && $parentPath != $root) {
