@@ -88,14 +88,15 @@ class ViewsController extends Controller
         $handler = $this->get('codebender_library.handler');
         $path = '';
         $lastCommit = null;
-        if ($uploadType['type'] == 'git') {
-            $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
-            $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
-            $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
-        }
-
-        if ($uploadType['type'] == 'zip') {
-            $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
+        switch ($uploadType['type']) {
+            case 'git':
+                $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
+                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
+                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
+                break;
+            case 'zip':
+                $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
+                break;
         }
 
         if ($libraryStructure['success'] !== true) {
