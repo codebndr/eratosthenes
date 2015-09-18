@@ -25,7 +25,7 @@
 <div class="container-fluid">
     <div class="span1"></div>
     <div class="span10"></div>
-        <div style="text-align: center;">
+        <div style="text-align: left;">
             <h2>{{ meta.humanName }}</h2>
             <h3>(main header: {{ library }}.h)</h3>
                 {% if meta %}
@@ -36,9 +36,9 @@
                     {% endif %}
                     <br/><br/>
                     {% if meta.active == true %}
-                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
                     {% else %}
-                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
                     {% endif %}
                     <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
@@ -140,6 +140,9 @@
                 var response = jQuery.parseJSON(data);
                 if(response.success)
                 {
+                    $("#statusbutton").toggleClass("btn-success");
+                    $("#statusbutton").toggleClass("btn-danger");
+
                     if ($("#statusbutton").text().indexOf('enabled') > 0)
                     {
                         $("#statusbutton").html("Library <strong>disabled</strong> on codebender. Click to enable.");
