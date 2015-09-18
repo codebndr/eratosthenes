@@ -96,7 +96,7 @@
                     </div>
                     <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
                         <div class="accordion-inner">
-                            <pre>{{ file.content }}</pre>
+                            <pre>{{ file.content | raw }}</pre>
                         </div>
                     </div>
                 </div>

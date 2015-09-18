@@ -179,7 +179,7 @@ class DefaultHandler
                     $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
                 else
                     $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
-                $response[] = array("filename" => $file->getRelativePathname(), "content" => $content);
+                $response[] = array("filename" => $file->getRelativePathname(), "content" => htmlspecialchars($content));
             } else
                 $response[] = array("filename" => $file->getRelativePathname());
         }
@@ -194,7 +194,11 @@ class DefaultHandler
 
             $response = array();
             foreach ($finder as $file) {
-                $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
+                $contents = $file->getContents();
+                if (!mb_check_encoding($contents, 'UTF-8')) {
+                    $contents = mb_convert_encoding($contents, "UTF-8");
+                }
+                $response[] = array("filename" => $file->getRelativePathname(), "content" => htmlspecialchars($contents));
             }
 
             return $response;
