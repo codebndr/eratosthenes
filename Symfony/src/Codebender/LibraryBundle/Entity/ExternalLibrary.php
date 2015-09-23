@@ -188,7 +188,7 @@ class ExternalLibrary
      */
     public function getDescription()
     {
-        return $this->description;
+        return htmlspecialchars($this->description);
     }
 
     /**
