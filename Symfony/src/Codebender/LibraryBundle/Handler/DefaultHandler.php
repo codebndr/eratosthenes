@@ -95,8 +95,15 @@ class DefaultHandler
         }
     }
 
-    /*
-     * TODO This function is never actually used. Need to test it
+    /**
+     * Checks all external libraries that are uploaded from Github, making sure the commit
+     * hash stored in our database is the same as the last commit on the repo origin.
+     * If no branch is stored in the database for a specific library, the default (master) is
+     * used. In case no in-repo path is stored in the database, an empty path is used during the
+     * last commit fetching, that is, the last commit for the root directory of the repo is fethced.
+     * TODO: Enchance the method, making it able to auto-update any outdated libraries.
+     *
+     * @return Response
      */
     public function checkGithubUpdates()
     {
@@ -107,18 +114,35 @@ class DefaultHandler
             $gitOwner = $lib->getOwner();
             $gitRepo = $lib->getRepo();
 
-            if ($gitOwner !== null and $gitRepo !== null) {
-                $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo);
-                if ($lastCommitFromGithub !== $lib->getLastCommit())
-                    $needToUpdate[] = array('Machine Name' => $lib->getMachineName(), "Human Name" => $lib->getHumanName(), "Git Owner" => $lib->getOwner(), "Git Repo" => $lib->getRepo());
+            if ($gitOwner === null || $gitRepo === null) {
+                continue;
             }
+
+            $branch = $lib->getBranch();
+            if ($branch === null){
+                $branch = 'master';
+            }
+
+            $directoryInRepo = $lib->getInRepoPath();
+            if ($directoryInRepo === null){
+                $directoryInRepo = '';
+            }
+
+            $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
+            if ($lastCommitFromGithub !== $lib->getLastCommit())
+                $needToUpdate[] = array(
+                    'Machine Name' => $lib->getMachineName(),
+                    'Human Name' => $lib->getHumanName(),
+                    'Git Owner' => $lib->getOwner(),
+                    'Git Repo' => $lib->getRepo(),
+                    'Git Branch' => $lib->getBranch(),
+                    'Path in Git Repo' => $lib->getInRepoPath()
+                );
         }
         if (empty($needToUpdate))
-            $response = array("success" => true, "message" => "No Libraries need to update");
-        else
-            $response = array("success" => true, "message" => "There are Libraries that need to update", "libraries" => $needToUpdate);
+            return new Response(json_encode(array("success" => true, "message" => "No external libraries need to be updated")));
 
-        return new Response(json_encode($response));
+        return new Response(json_encode(array("success" => true, "message" => "There are external libraries that need to be updated", "libraries" => $needToUpdate)));
     }
 
     public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
