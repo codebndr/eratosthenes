@@ -139,10 +139,12 @@ class DefaultHandler
                     'Path in Git Repo' => $lib->getInRepoPath()
                 );
         }
-        if (empty($needToUpdate))
+        if (empty($needToUpdate)) {
             return new Response(json_encode(array("success" => true, "message" => "No external libraries need to be updated")));
 
-        return new Response(json_encode(array("success" => true, "message" => "There are external libraries that need to be updated", "libraries" => $needToUpdate)));
+        }
+
+        return new Response(json_encode(array("success" => true, "message" => count($needToUpdate) . " external libraries need to be updated", "libraries" => $needToUpdate)));
     }
 
     public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
