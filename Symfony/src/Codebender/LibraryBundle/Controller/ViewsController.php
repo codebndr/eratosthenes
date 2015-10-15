@@ -322,7 +322,8 @@ class ViewsController extends Controller
         $htmlcode = 200;
         $value = "";
 
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory') . "/";
+        $builtinLibraryFilesPath = $this->container->getParameter('builtin_libraries') . "/";
+        $externalLibraryFilesPath = $this->container->getParameter('external_libraries') . "/";
         $finder = new Finder();
         $exampleFinder = new Finder();
 
@@ -339,11 +340,11 @@ class ViewsController extends Controller
         $handler = $this->get('codebender_library.handler');
         $isBuiltIn = json_decode($handler->checkIfBuiltInExists($filename), true);
         if ($isBuiltIn["success"])
-            $path = $arduino_library_files . "/libraries/" . $filename;
+            $path = $builtinLibraryFilesPath . "/libraries/" . $filename;
         else {
             $isExternal = json_decode($handler->checkIfExternalExists($filename), true);
             if ($isExternal["success"]) {
-                $path = $arduino_library_files . "/external-libraries/" . $filename;
+                $path = $externalLibraryFilesPath . '/' . $filename;
             } else {
                 $value = "";
                 $htmlcode = 404;
@@ -417,8 +418,8 @@ class ViewsController extends Controller
         $em->persist($lib);
         $em->flush();
 
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory');
-        $examples = $handler->fetchLibraryExamples(new Finder(), $arduino_library_files . "/external-libraries/" . $machineName);
+        $externalLibrariesPath = $this->container->getParameter('external_libraries');
+        $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $machineName);
 
         foreach ($examples as $example) {
 
@@ -433,7 +434,7 @@ class ViewsController extends Controller
 
     private function createLibFiles($machineName, $lib)
     {
-        $libBaseDir = $this->container->getParameter('arduino_library_directory') . "/external-libraries/" . $machineName . "/";
+        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $machineName . "/";
         return ($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
     }
 

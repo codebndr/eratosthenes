@@ -29,7 +29,8 @@ class DefaultHandler
 
     public function getLibraryCode($library, $disabled, $renderView = false)
     {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory') . "/";
+        $builtinLibrariesPath = $this->container->getParameter('builtin_libraries') . "/";
+        $externalLibrariesPath = $this->container->getParameter('external_libraries') . "/";
 
         $finder = new Finder();
         $exampleFinder = new Finder();
@@ -58,10 +59,10 @@ class DefaultHandler
         $exists = json_decode($this->checkIfBuiltInExists($filename), true);
 
         if ($exists["success"]) {
-            $response = $this->fetchLibraryFiles($finder, $arduino_library_files . "/libraries/" . $filename);
+            $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
 
             if ($renderView) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files . "/libraries/" . $filename);
+                $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
                 $meta = array();
             }
         } else {
@@ -69,11 +70,11 @@ class DefaultHandler
             if (!$response['success']) {
                 return new Response(json_encode($response));
             } else {
-                $response = $this->fetchLibraryFiles($finder, $arduino_library_files . "/external-libraries/" . $filename);
+                $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename);
                 if (empty($response))
                     return new Response(json_encode(array("success" => false, "message" => "No files for Library named " . $library . " found.")));
                 if ($renderView) {
-                    $examples = $this->fetchLibraryExamples($exampleFinder, $arduino_library_files . "/external-libraries/" . $filename);
+                    $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/" . $filename);
 
                     $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
                     $filename = $externalLibrary->getMachineName();
@@ -166,7 +167,7 @@ class DefaultHandler
 
     public function checkIfBuiltInExists($library)
     {
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory') . "/";
+        $arduino_library_files = $this->container->getParameter('builtin_libraries') . "/";
         if (is_dir($arduino_library_files . "/libraries/" . $library))
             return json_encode(array("success" => true, "message" => "Library found"));
         else

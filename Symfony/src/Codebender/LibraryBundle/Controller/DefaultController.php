@@ -98,10 +98,14 @@ class DefaultController extends Controller
     private function listAll()
     {
 
-        $arduinoLibraryFiles = $this->container->getParameter('arduino_library_directory') . "/";
+        $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
 
         $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles . "examples");
         $includedLibraries = $this->getLibariesListFromDir($arduinoLibraryFiles . "libraries");
+        /*
+         * External libraries list is fetched from the database, because we need to list
+         * active libraries only
+         */
         $externalLibraries = $this->getExternalLibrariesList();
 
         ksort($builtinExamples);
@@ -131,14 +135,14 @@ class DefaultController extends Controller
 
         switch ($type['type']) {
             case 'builtin':
-                $dir = $this->container->getParameter('arduino_library_directory') . "/libraries/";
+                $dir = $this->container->getParameter('builtin_libraries') . "/libraries/";
                 $example = $this->getExampleCodeFromDir($dir, $library, $example);
                 break;
             case 'external':
                 $example = $this->getExternalExampleCode($library, $example);
                 break;
             case 'example':
-                $dir = $this->container->getParameter('arduino_library_directory') . "/examples/";
+                $dir = $this->container->getParameter('builtin_libraries') . "/examples/";
                 $example = $this->getExampleCodeFromDir($dir, $library, $example);
                 break;
         }
@@ -235,12 +239,12 @@ class DefaultController extends Controller
         /*
          * Assume the requested library is an example
          */
-        $path = $this->container->getParameter('arduino_library_directory') . "/examples/" . $library;
+        $path = $this->container->getParameter('builtin_libraries') . "/examples/" . $library;
         if ($exists['type'] == 'external') {
-            $path = $this->container->getParameter('arduino_library_directory') . "/external-libraries/" . $library;
+            $path = $this->container->getParameter('external_libraries') . '/' . $library;
         }
         if ($exists['type'] == 'builtin') {
-            $path = $this->container->getParameter('arduino_library_directory') . "/libraries/" . $library;
+            $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
         }
         $inoFinder = new Finder();
         $inoFinder->in($path);
@@ -341,7 +345,7 @@ class DefaultController extends Controller
         } else {
             $meta = $exampleMeta[0];
         }
-        $fullPath = $this->container->getParameter('arduino_library_directory') . "/external-libraries/" . $meta->getPath();
+        $fullPath = $this->container->getParameter('external_libraries') . '/' . $meta->getPath();
 
         $path = pathinfo($fullPath, PATHINFO_DIRNAME);
         $files = $this->getExampleFilesFromDir($path);
@@ -408,7 +412,7 @@ class DefaultController extends Controller
 
     private function checkIfBuiltInExampleFolderExists($library)
     {
-        $arduinoLibraryFiles = $this->container->getParameter('arduino_library_directory') . "/";
+        $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
         if (is_dir($arduinoLibraryFiles . "/examples/" . $library)) {
             return json_encode(array("success" => true, "message" => "Library found"));
         }
@@ -504,9 +508,9 @@ class DefaultController extends Controller
 
         $path = "";
         if ($exists['type'] == 'external') {
-            $path = $this->container->getParameter('arduino_library_directory') . "/external-libraries/" . $library;
+            $path = $this->container->getParameter('external_libraries') . '/' . $library;
         } else if ($exists['type'] = 'builtin') {
-            $path = $this->container->getParameter('arduino_library_directory') . "/libraries/" . $library;
+            $path = $this->container->getParameter('builti_libraries') . "/libraries/" . $library;
         } else return new Response(json_encode(array("success" => false)));
 
         $keywords = array();
