@@ -65,6 +65,12 @@ class ViewsControllerFunctionalTest extends WebTestCase
 
         $this->assertEquals(
             1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/download/default"]:contains("Download from Eratosthenes")'
+            )->count());
+
+        $this->assertEquals(
+            1,
             $crawler->filter('p:contains("The default Arduino library (in fact it\'s Adafruit\'s GPS library)")'
             )->count());
 
