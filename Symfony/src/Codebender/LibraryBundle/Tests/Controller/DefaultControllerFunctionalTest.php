@@ -4,6 +4,11 @@ namespace Codebender\LibraryBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class DefaultControllerFunctionalTest
+ * @package Codebender\LibraryBundle\Tests\Controller
+ * @SuppressWarnings(PHPMD)
+ */
 class DefaultControllerFunctionalTest extends WebTestCase
 {
     public function testStatus()
