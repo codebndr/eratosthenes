@@ -510,7 +510,7 @@ class DefaultController extends Controller
         if ($exists['type'] == 'external') {
             $path = $this->container->getParameter('external_libraries') . '/' . $library;
         } else if ($exists['type'] = 'builtin') {
-            $path = $this->container->getParameter('builti_libraries') . "/libraries/" . $library;
+            $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
         } else return new Response(json_encode(array("success" => false)));
 
         $keywords = array();
