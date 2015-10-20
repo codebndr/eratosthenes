@@ -73,6 +73,45 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
     }
 
+
+    public function testGetFixtureLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client->request(
+            'POST',
+            '/' . $authorizationKey . '/v1',
+            [],
+            [],
+            [],
+            '{"type":"fetch","library":"default"}',
+            true)
+        ;
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+
+        /*
+         * default.cpp file is supposed to come before default.h
+         */
+        $this->assertEquals('default.cpp', $response['files'][0]['filename']);
+        $this->assertEquals('default.h', $response['files'][1]['filename']);
+
+        $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files/default');
+        $this->assertEquals(
+            file_get_contents($baseLibraryPath . '/default.cpp'),
+            $response['files'][0]['content']
+        );
+
+        $this->assertEquals(
+            file_get_contents($baseLibraryPath . '/default.h'),
+            $response['files'][1]['content']
+        );
+    }
+
     public function testGetExampleCode()
     {
         $client = static::createClient();
