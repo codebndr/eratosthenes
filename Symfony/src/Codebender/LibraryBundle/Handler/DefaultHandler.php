@@ -74,7 +74,7 @@ class DefaultHandler
                 if (empty($response))
                     return new Response(json_encode(array("success" => false, "message" => "No files for Library named " . $library . " found.")));
                 if ($renderView) {
-                    $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/" . $filename);
+                    $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
 
                     $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
                     $filename = $externalLibrary->getMachineName();
