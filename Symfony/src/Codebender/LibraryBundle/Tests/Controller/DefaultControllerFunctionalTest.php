@@ -6,76 +6,77 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerFunctionalTest extends WebTestCase
 {
-	public function testStatus()
-	{
-		$client = static::createClient();
+    public function testStatus()
+    {
+        $client = static::createClient();
 
-		$client->request('GET', '/status');
+        $client->request('GET', '/status');
 
-		$this->assertEquals($client->getResponse()->getContent(), '{"success":true,"status":"OK"}');
+        $this->assertEquals($client->getResponse()->getContent(), '{"success":true,"status":"OK"}');
 
-	}
+    }
 
-	public function testInvalidMethod()
-	{
-		$client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
-
-		$client->request('GET', "/$authorizationKey/v1");
-
-		$this->assertEquals($client->getResponse()->getStatusCode(), 405);
-
-	}
-
-	public function testList()
-	{
-		$client = static::createClient();
-
-		$authorizationKey = $client->getContainer()->getParameter("authorizationKey");
-
-		$client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"list"}', true);
-
-		$response = $client->getResponse()->getContent();
-		$response = json_decode($response, true);
-
-		$this->assertArrayHasKey("success", $response);
-		$this->assertTrue($response["success"]);
-
-		$this->assertArrayHasKey("categories", $response);
-		$categories = $response["categories"];
-
-		$this->assertArrayHasKey("Examples", $categories);
-		$this->assertNotEmpty($categories["Examples"]);
-
-		$this->assertArrayHasKey("Builtin Libraries", $categories);
-		$this->assertNotEmpty($categories["Builtin Libraries"]);
-
-		$this->assertArrayHasKey("External Libraries", $categories);
-		$this->assertNotEmpty($categories["External Libraries"]);
-
-		$basic_examples = $categories["Examples"]["01.Basics"]["examples"];
-
-
-		//Check for a specific, known example
-		$example_found = false;
-		foreach($basic_examples as $example) {
-			if($example["name"] == "AnalogReadSerial") {
-				$this->assertEquals($example["name"], "AnalogReadSerial");
-				$example_found = true;
-			}
-		}
-
-		//Make sure the example was found
-		$this->assertTrue($example_found);
-	}
-
-    public function testGetExampleCode() {
+    public function testInvalidMethod()
+    {
         $client = static::createClient();
 
         $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}', true);
+        $client->request('GET', "/$authorizationKey/v1");
+
+        $this->assertEquals($client->getResponse()->getStatusCode(), 405);
+
+    }
+
+    public function testList()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
+
+        $client->request('POST', '/' . $authorizationKey . '/v1', array(), array(), array(), '{"type":"list"}', true);
+
+        $response = $client->getResponse()->getContent();
+        $response = json_decode($response, true);
+
+        $this->assertArrayHasKey("success", $response);
+        $this->assertTrue($response["success"]);
+
+        $this->assertArrayHasKey("categories", $response);
+        $categories = $response["categories"];
+
+        $this->assertArrayHasKey("Examples", $categories);
+        $this->assertNotEmpty($categories["Examples"]);
+
+        $this->assertArrayHasKey("Builtin Libraries", $categories);
+        $this->assertNotEmpty($categories["Builtin Libraries"]);
+
+        $this->assertArrayHasKey("External Libraries", $categories);
+        $this->assertNotEmpty($categories["External Libraries"]);
+
+        $basic_examples = $categories["Examples"]["01.Basics"]["examples"];
+
+
+        //Check for a specific, known example
+        $example_found = false;
+        foreach ($basic_examples as $example) {
+            if ($example["name"] == "AnalogReadSerial") {
+                $this->assertEquals($example["name"], "AnalogReadSerial");
+                $example_found = true;
+            }
+        }
+
+        //Make sure the example was found
+        $this->assertTrue($example_found);
+    }
+
+    public function testGetExampleCode()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
+
+        $client->request('POST', '/' . $authorizationKey . '/v1', array(), array(), array(), '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -84,12 +85,13 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertContains('void setup()', $response['files'][0]['code']);
     }
 
-    public function testGetExamples() {
+    public function testGetExamples()
+    {
         $client = static::createClient();
 
         $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getExamples","library":"EEPROM"}', true);
+        $client->request('POST', '/' . $authorizationKey . '/v1', array(), array(), array(), '{"type":"getExamples","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -99,12 +101,13 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertArrayHasKey('eeprom_write', $response['examples']);
     }
 
-    public function testFetchLibrary() {
+    public function testFetchLibrary()
+    {
         $client = static::createClient();
 
         $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"fetch","library":"EEPROM"}', true);
+        $client->request('POST', '/' . $authorizationKey . '/v1', array(), array(), array(), '{"type":"fetch","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -115,16 +118,18 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertEquals('keywords.txt', $response['files'][2]['filename']);
     }
 
-    public function testCheckGithubUpdates() {
+    public function testCheckGithubUpdates()
+    {
         $this->markTestIncomplete("Need to setup testing with Github credentials");
     }
 
-    public function testGetKeywords() {
+    public function testGetKeywords()
+    {
         $client = static::createClient();
 
         $authorizationKey = $client->getContainer()->getParameter("authorizationKey");
 
-        $client->request('POST', '/'.$authorizationKey.'/v1', array(), array(), array(), '{"type":"getKeywords","library":"EEPROM"}', true);
+        $client->request('POST', '/' . $authorizationKey . '/v1', array(), array(), array(), '{"type":"getKeywords","library":"EEPROM"}', true);
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
