@@ -63,16 +63,14 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
 
         // Check for a specific, known example
-        $example_found = false;
-        foreach ($basicExamples as $example) {
-            if ($example['name'] == 'AnalogReadSerial') {
-                $this->assertEquals($example['name'], 'AnalogReadSerial');
-                $example_found = true;
+        $foundExample = array_filter($basicExamples, function($element) {
+            if ($element['name'] == 'AnalogReadSerial') {
+                return true;
             }
-        }
+        });
 
         // Make sure the example was found
-        $this->assertTrue($example_found);
+        $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
     }
 
     public function testGetExampleCode()
