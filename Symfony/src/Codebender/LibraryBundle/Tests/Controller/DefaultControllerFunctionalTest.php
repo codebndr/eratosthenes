@@ -186,7 +186,48 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
     public function testCheckGithubUpdates()
     {
-        $this->markTestIncomplete('Need to setup testing with Github credentials');
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client->request(
+            'POST',
+            '/' . $authorizationKey . '/v1',
+            [],
+            [],
+            [],
+            '{"type":"checkGithubUpdates"}',
+            true
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('1 external libraries need to be updated', $response['message']);
+        /*
+         * DynamicArrayHelper library's last commit is not the same as its origin.
+         */
+        $this->assertEquals('DynamicArrayHelper', $response['libraries'][0]['Machine Name']);
+
+        /*
+         * Disabling the library should make it not be returned in the list.
+         */
+        $client->request('POST', '/' . $authorizationKey . '/toggleStatus/DynamicArrayHelper');
+        $client->request(
+            'POST',
+            '/' . $authorizationKey . '/v1',
+            [],
+            [],
+            [],
+            '{"type":"checkGithubUpdates"}',
+            true
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('No external libraries need to be updated', $response['message']);
+
     }
 
     public function testGetKeywords()

@@ -115,7 +115,7 @@ class DefaultHandler
             $gitOwner = $lib->getOwner();
             $gitRepo = $lib->getRepo();
 
-            if ($gitOwner === null || $gitRepo === null) {
+            if ($lib->getActive() === false || $gitOwner === null || $gitRepo === null) {
                 continue;
             }
 
