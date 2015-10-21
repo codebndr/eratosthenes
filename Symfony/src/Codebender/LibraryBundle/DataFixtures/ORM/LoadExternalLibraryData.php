@@ -24,6 +24,7 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
      */
     public function load(ObjectManager $objectManager)
     {
+        // A fake version of the Adafruit GPS library
         $defaultLibrary = new ExternalLibrary();
         $defaultLibrary->setHumanName('Default Arduino Library');
         $defaultLibrary->setMachineName('default');
@@ -39,6 +40,39 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
          */
         $this->setReference('defaultLibrary', $defaultLibrary);
         $objectManager->persist($defaultLibrary);
+
+        // Dynamic Array Helper library hosted on codebender's Github organistion
+        $dahLibrary = new ExternalLibrary();
+        $dahLibrary->setHumanName('Dynamic Array Helper Arduino Library');
+        $dahLibrary->setMachineName('DynamicArrayHelper');
+        $dahLibrary->setActive(true);
+        $dahLibrary->setVerified(false);
+        $dahLibrary->setDescription('DynamicArrayHelper Arduino Library from the Arduino Playground');
+        $dahLibrary->setUrl('https://github.com/codebendercc/DynamicArrayHelper-Arduino-Library');
+        $dahLibrary->setSourceUrl('https://github.com/codebendercc/DynamicArrayHelper-Arduino-Library/archive/1.0.x.zip');
+        $dahLibrary->setBranch('1.0.x');
+        $dahLibrary->setOwner('codebendercc');
+        $dahLibrary->setRepo('DynamicArrayHelper-Arduino-Library');
+        $dahLibrary->setLastCommit('72b8865ee53b3edf159f22f5ff6f9a6dafa7ee1b'); // This is not the last commit of the branch
+
+        $this->setReference('dynamicArrayHelperLibrary', $dahLibrary);
+        $objectManager->persist($dahLibrary);
+
+        $webserialLibrary = new ExternalLibrary();
+        $webserialLibrary->setHumanName('WebSerial Arduino Library');
+        $webserialLibrary->setMachineName('WebSerial');
+        $webserialLibrary->setActive(true);
+        $webserialLibrary->setVerified(false);
+        $webserialLibrary->setDescription('Arduino WebSerial Library');
+        $webserialLibrary->setUrl('https://github.com/codebendercc/webserial');
+        $webserialLibrary->setSourceUrl('https://github.com/codebendercc/WebSerial/archive/master.zip');
+        $webserialLibrary->setOwner('codebendercc');
+        $webserialLibrary->setRepo('WebSerial');
+        // Will not set the branch for this one. The system should default to the `master` branch of the repo.
+        $webserialLibrary->setLastCommit('2dd7838fe42d36ea9b322e731fd654a6b0f176de');
+
+        $this->setReference('webserialLibrary', $webserialLibrary);
+        $objectManager->persist($webserialLibrary);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
