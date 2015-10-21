@@ -58,22 +58,6 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $this->setReference('dynamicArrayHelperLibrary', $dahLibrary);
         $objectManager->persist($dahLibrary);
 
-        $webserialLibrary = new ExternalLibrary();
-        $webserialLibrary->setHumanName('WebSerial Arduino Library');
-        $webserialLibrary->setMachineName('WebSerial');
-        $webserialLibrary->setActive(true);
-        $webserialLibrary->setVerified(false);
-        $webserialLibrary->setDescription('Arduino WebSerial Library');
-        $webserialLibrary->setUrl('https://github.com/codebendercc/webserial');
-        $webserialLibrary->setSourceUrl('https://github.com/codebendercc/WebSerial/archive/master.zip');
-        $webserialLibrary->setOwner('codebendercc');
-        $webserialLibrary->setRepo('WebSerial');
-        // Will not set the branch for this one. The system should default to the `master` branch of the repo.
-        $webserialLibrary->setLastCommit('2dd7838fe42d36ea9b322e731fd654a6b0f176de');
-
-        $this->setReference('webserialLibrary', $webserialLibrary);
-        $objectManager->persist($webserialLibrary);
-
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
