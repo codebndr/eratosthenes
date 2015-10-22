@@ -1,17 +1,10 @@
 <VirtualHost *:80>
-	Alias /compiler/ "/opt/codebender/codebender-arduino-compiler/Symfony/web/"
-	<Directory /opt/codebender/codebender-arduino-compiler/Symfony/web/>
-		Options -Indexes FollowSymLinks MultiViews
-		AllowOverride All
-		Order allow,deny
-		Allow from all
-	</Directory>
-
-        Alias /libs/ "/opt/codebender/codebender-library-manager/Symfony/web/"
-        <Directory /opt/codebender/codebender-library-manager/Symfony/web/>
-                Options -Indexes FollowSymLinks MultiViews
-                AllowOverride All
-                Order allow,deny
-                Allow from all
-        </Directory>
+    DocumentRoot /opt/codebender/eratosthenes/Symfony/web
+    DirectoryIndex app.php
+    SetEnv APPLICATION_ENV "production"
+    <Directory /opt/codebender/eratosthenes/Symfony/web>
+        Options -Indexes +FollowSymLinks +MultiViews
+        Require all granted
+        AllowOverride All
+    </Directory>
 </VirtualHost>
