@@ -2,6 +2,9 @@
 set -x
 set -e
 
+# In order to install this Symfony app, you need to run this script
+# from the root directory of the prohect like 'scripts/install.sh'
+
 PACKAGENAME=eratosthenes
 
 if [[ "$OSTYPE" != "linux-gnu" ]]; then
