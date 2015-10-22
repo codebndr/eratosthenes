@@ -248,9 +248,11 @@
         $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Choose one of the available options');
         $("#gitBranchDiv").hide();
         $("#gitBranches").hide();
+        $("#newLibrary_Zip").hide();
         $('#fetchBranchesBtn').click(function(){ get_github_branches(); });
         $('#fetchFilesBtn').click(function(){ get_repo_and_meta(); }).hide();
-        $("#newLibrary_Zip").change(function(){ $('#gitHubDiv').hide(); get_lib_from_zip(); });
+        $('#takeMeThereButton').click(function(){ $('#step1').hide(); select_zip(); });
+        $("#newLibrary_Zip").change(function(){ get_lib_from_zip(); });
         $("#machineNames").change(function(){ update_machineName(); });
         $("#metaDiv").hide();
 

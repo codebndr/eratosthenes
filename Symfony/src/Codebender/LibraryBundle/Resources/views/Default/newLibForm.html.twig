@@ -25,9 +25,9 @@
                 <div class="row-fluid">
                     <div id="steps" class="span12 clearfix">
                         <ol>
-                            <li><a class="active step1" title="Provide a library" onclick="selectStep(1)">1</a></li>
-                            <li><a class="step2" title="Select directory" onclick="selectStep(2)">2</a></li>
-                            <li><a class="step3" title="Add library" onclick="selectStep(3)">3</a></li>
+                            <li><a class="active step1" title="Select between Github or zip" onclick="selectStep(1)">1</a></li>
+                            <li><a class="step2" title="Select directory (only applies to Github libraries)" onclick="selectStep(2)">2</a></li>
+                            <li><a class="step3" title="Add library (submit the form)" onclick="selectStep(3)">3</a></li>
                         </ol>
                     </div>
                 </div>
@@ -56,12 +56,10 @@
                                 </div>
                             </div>
                             <h3 id='orDiv' class="labelcontent clearfix">- or -</h3>
-                            {{ form_start(form) }}
-                            {{ form_errors(form) }}
                             <div id="zipDiv" style="text-align: center;">
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-upload fa-2x"></i> Upload a zip file</span></h3>
                                 <br/>
-                                {{ form_widget(form.Zip) }}
+                                <button id="takeMeThereButton" class="btn btn-info">Take me there</button>
                             </div>
                         </div>
                         <div id="step2" style="overflow: scroll">
@@ -80,6 +78,9 @@
                                 <a href="javascript:void(0);" class="btn btn-success" id="yes">All good</a>
                             </div>
                             <div id="form">
+                                {{ form_start(form) }}
+                                {{ form_errors(form) }}
+                                {{ form_widget(form.Zip) }}
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Human Name:</span> {{ form_widget(form.HumanName) }}</h3>
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Machine Name:</span> <select id="machineNames">Machine Names</select></h3>
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Description:</span> {{ form_widget(form.Description) }}</h3>
