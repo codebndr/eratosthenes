@@ -72,9 +72,9 @@ sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx `pwd`/Symfony/app/cache `pw
 cd Symfony
 
 set +x
-cat app/config/parameters.yml.dist | grep -iv "github_app_name:" | grep -iv "github_app_client_id:" | grep -iv "github_app_client_secret:" | grep -iv "database_pass:" > app/config/parameters.yml
+cat app/config/parameters.yml.dist | grep -iv "github_app_name:" | grep -iv "github_app_client_id:" | grep -iv "github_app_client_secret:" | grep -iv "database_password:" > app/config/parameters.yml
 
-echo "    database_pass: hello" >> app/config/parameters.yml
+echo "    database_password: hello" >> app/config/parameters.yml
 
 echo "    github_app_name: '$GIT_LIBMGR_APP_NAME'" >> app/config/parameters.yml
 
