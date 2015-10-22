@@ -4,6 +4,9 @@ set -e
 
 # In order to install this Symfony app, you need to run this script
 # from the root directory of the prohect like 'scripts/install.sh'
+# In order to successfully run the tests, you will have to set the
+# env vars `$GIT_LIBMGR_APP_NAME`, `$GIT_LIBMGR_CLIENT_ID` and
+# `$GIT_LIBMGR_CLIENT_SECRET` to valid values
 
 PACKAGENAME=eratosthenes
 
@@ -63,11 +66,18 @@ sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx `pwd`/Symfony/app/cache `pw
 
 cd Symfony
 
-cp app/config/parameters.yml.dist app/config/parameters.yml
+set +x
+cat app/config/parameters.yml.dist | grep -iv "github_app_name:" | grep -iv "github_app_client_id:" | grep -iv "github_app_client_secret:" > app/config/parameters.yml
+echo "    github_app_name: '$GIT_LIBMGR_APP_NAME'" >> app/config/parameters.yml
 
-../scripts/install_dependencies.sh
+echo "    github_app_client_id: '$GIT_LIBMGR_CLIENT_ID'" >> app/config/parameters.yml
+
+echo "    github_app_client_secret: '$GIT_LIBMGR_CLIENT_SECRET'" >> app/config/parameters.yml
+set -x
 
 ../scripts/install_composer.sh
+
+../scripts/install_dependencies.sh
 
 ../scripts/warmup_cache.sh
 
