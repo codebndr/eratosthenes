@@ -69,6 +69,8 @@ class DefaultControllerFunctionalTest extends WebTestCase
             }
         });
 
+        $foundExample = array_values($foundExample);
+
         // Make sure the example was found
         $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
     }
@@ -94,22 +96,19 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $this->assertTrue($response['success']);
 
-        /*
-         * default.cpp file is supposed to come before default.h
-         */
-        $this->assertEquals('default.cpp', $response['files'][0]['filename']);
-        $this->assertEquals('default.h', $response['files'][1]['filename']);
+        $filenames = array_column($response['files'], 'filename');
+
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
 
         $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files/default');
-        $this->assertEquals(
-            file_get_contents($baseLibraryPath . '/default.cpp'),
-            $response['files'][0]['content']
-        );
 
-        $this->assertEquals(
-            file_get_contents($baseLibraryPath . '/default.h'),
-            $response['files'][1]['content']
-        );
+        $contents = array_column($response['files'], 'content');
+
+        $this->assertContains(file_get_contents($baseLibraryPath . '/default.cpp'), $contents);
+
+        $this->assertContains(file_get_contents($baseLibraryPath . '/default.h'), $contents);
+
     }
 
     public function testGetExampleCode()
@@ -179,9 +178,12 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
-        $this->assertEquals('EEPROM.cpp', $response['files'][0]['filename']);
-        $this->assertEquals('EEPROM.h', $response['files'][1]['filename']);
-        $this->assertEquals('keywords.txt', $response['files'][2]['filename']);
+
+        $filenames = array_column($response['files'], 'filename');
+        $this->assertContains('EEPROM.cpp', $filenames);
+        $this->assertContains('EEPROM.h', $filenames);
+        $this->assertContains('keywords.txt', $filenames);
+
     }
 
     public function testCheckGithubUpdates()
