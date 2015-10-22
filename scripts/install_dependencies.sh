@@ -7,5 +7,5 @@ unzip -q master.zip
 sudo cp -r arduino-library-files-master /opt/codebender/codebender-arduino-library-files
 rm master.zip
 # Create the external libraries directory
-mkdir /opt/codebender/codebender-external-library-files
+sudo mkdir /opt/codebender/codebender-external-library-files
 cd -
