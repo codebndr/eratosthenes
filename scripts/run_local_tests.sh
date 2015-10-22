@@ -24,6 +24,7 @@ pwd
 
 # Create the directory where the tests results will be stored
 sudo mkdir -p build/logs
+sudo chmod -R 777 build/logs
 
 ../scripts/install_composer.sh
 
