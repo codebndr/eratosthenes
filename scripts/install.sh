@@ -23,8 +23,13 @@ sudo locale-gen en_US.UTF-8
 # Make sure we have up-to-date stuff
 sudo apt-get install -y php5-intl
 
+# Change mysql default passwords to `hello`, then install mysql-server
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password hello'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password hello'
+sudo apt-get -y install mysql-server
+
 # Install dependencies
-sudo apt-get install -y apache2 libapache2-mod-php5 php-pear php5-xdebug php5-curl php5-sqlite acl curl git
+sudo apt-get install -y apache2 libapache2-mod-php5 php5-mysql php-pear php5-xdebug php5-curl php5-sqlite acl curl git
 
 # Enable Apache configs
 sudo a2enmod rewrite
@@ -67,7 +72,10 @@ sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx `pwd`/Symfony/app/cache `pw
 cd Symfony
 
 set +x
-cat app/config/parameters.yml.dist | grep -iv "github_app_name:" | grep -iv "github_app_client_id:" | grep -iv "github_app_client_secret:" > app/config/parameters.yml
+cat app/config/parameters.yml.dist | grep -iv "github_app_name:" | grep -iv "github_app_client_id:" | grep -iv "github_app_client_secret:" | grep -iv "database_pass:" > app/config/parameters.yml
+
+echo "    database_pass: hello" >> app/config/parameters.yml
+
 echo "    github_app_name: '$GIT_LIBMGR_APP_NAME'" >> app/config/parameters.yml
 
 echo "    github_app_client_id: '$GIT_LIBMGR_CLIENT_ID'" >> app/config/parameters.yml
