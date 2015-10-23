@@ -27,6 +27,7 @@ script:
   # Run the tests
   - sudo mkdir -p build/logs
   - sudo chmod -R 777 build/logs
+  - ../scripts/configure_system.sh
   - ../scripts/run_tests.sh
 
 after_script:
