@@ -274,7 +274,7 @@ class DefaultHandler
             return json_encode(array('success' => false, 'message' => $gitResponse['message']));
         }
         // TODO: Could try some recursive call to all tree nodes of the response, instead of just quitting
-        if ($gitResponse['truncated'] !== false) {
+        if ($gitResponse['truncated'] != false) {
             return json_encode(array('success' => false, 'message' => 'Truncated data. Try using a subtree of the repo'));
         }
 
