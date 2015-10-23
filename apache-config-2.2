@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+	Alias /compiler/ "/opt/codebender/eratosthenes/Symfony/web/"
+	<Directory /opt/codebender/eratosthenes/Symfony/web/>
+		Options -Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+	</Directory>
+</VirtualHost>

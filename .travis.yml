@@ -1,0 +1,29 @@
+language: php
+php:
+  - 5.5.9
+
+env:
+  global:
+    # Encrypted env variable $GIT_LIBMGR_APP_NAME, wil be used to set up the Github client app name for tests
+    - secure: "iWcSWe5RjhKWT2IVFCHXS4u1vlZerYxzBOf87Am8a1aOm0dGszrK3+kM2uBUCS6IRsnUSno2JOA+IY7hUtYekkENdiUzWzo+AN7kBVrT3SMpEQxB0IXJ0QlS9eiC9NF2fDVIt8pgYVI5eZn/zoCt2XdKZbmrRI6q5o8uGlXAzUw="
+    # Encrypted env variable $GIT_LIBMGR_CLIENT_ID, wil be used to set up the Github client id for tests
+    - secure: "MOvnVGLVh64+piLC5QiOvE3PH8NJSji5VkXM8GRSKdBbW0r2RiUCOmP8O/xhJv7l9xr1TTsR4YRbFXZws0Hlocd5RqwVrH6R3Zz7jubPz71/yreth224M59KFvnjN87bW743Fv7OLMWjRwEIFcj4MC1Yhuisew8X3vBjoPnh1co="
+    # Encrypted env variable $GIT_LIBMGR_CLIENT_SECRET, wil be used to set up the Github client secret for tests
+    - secure: "DxJuGHfobvQNpNxbAiXbbzjo8KuSBk56GXHpXJzoBaVgHE9bwqXDoAblf4JlGq0HHxcrdiyBV/axFk0Xg7m9gui3t9+YUV9tT21Hl+dSfdjT1ygrlP6vd+G6l0kAbOAuYypkAg3cIDNvDsN9tsVJvQ195OkIWCGGvKd6fA6aPio="
+
+before_script:
+  - mysql -u root -e "UPDATE user SET Password=PASSWORD('hello') WHERE User='root';FLUSH PRIVILEGES;" mysql
+  - sudo service mysql restart
+  - scripts/travis_install.sh
+  - cd /opt/codebender/eratosthenes/Symfony
+  - sudo chmod -R 777 app/cache app/logs
+  - echo 'error_reporting =  E_ALL' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+
+script:
+  - sudo mkdir -p build/logs
+  - sudo chmod -R 777 build/logs
+  - scripts/run_tests.sh
+
+after_script:
+  - php composer.phar install --dev
+  - php bin/coveralls -v
