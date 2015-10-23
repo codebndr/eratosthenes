@@ -27,8 +27,7 @@ script:
   # Run the tests
   - sudo mkdir -p build/logs
   - sudo chmod -R 777 build/logs
-  - ls -la
-  - scripts/run_tests.sh
+  - ../scripts/run_tests.sh
 
 after_script:
   # Generate coverage
