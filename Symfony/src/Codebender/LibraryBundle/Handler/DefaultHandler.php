@@ -463,7 +463,7 @@ class DefaultHandler
         return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'branch' => $branch, 'folder' => $folder);
     }
 
-    private function cleanPrependingSlash($path)
+    public function cleanPrependingSlash($path)
     {
         if (substr($path, 0, 1) == '/') {
             $path = substr($path, 1);
