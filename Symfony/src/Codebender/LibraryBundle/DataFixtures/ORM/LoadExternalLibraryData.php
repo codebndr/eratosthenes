@@ -55,8 +55,23 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $dahLibrary->setRepo('DynamicArrayHelper-Arduino-Library');
         $dahLibrary->setLastCommit('72b8865ee53b3edf159f22f5ff6f9a6dafa7ee1b'); // This is not the last commit of the branch
 
+        // Another reference
         $this->setReference('dynamicArrayHelperLibrary', $dahLibrary);
         $objectManager->persist($dahLibrary);
+
+        // A fake library with multi-ino examples
+        $multiIno = new ExternalLibrary();
+        $multiIno->setHumanName('MultiIno Arduino Library');
+        $multiIno->setMachineName('MultiIno');
+        $multiIno->setActive(true);
+        $multiIno->setVerified(false);
+        $multiIno->setDescription('A library containing multi-ino examples which should be correctly fetched');
+        $multiIno->setUrl('https://some/url.com');
+        $multiIno->setSourceUrl('https://some/source/url.com');
+
+        // Reference to the MultiIno library
+        $this->setReference('MultiInoLibrary', $multiIno);
+        $objectManager->persist($multiIno);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),

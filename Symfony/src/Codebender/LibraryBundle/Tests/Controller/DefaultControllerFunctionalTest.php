@@ -204,6 +204,31 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
     }
 
+    public function testMultiInoLibraryExampleFetching()
+    {
+        /*
+         * Tests that the code and examples of the MultiIno library are fetched correctly
+         */
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"MultiIno"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        /*
+         * This example contains two ino files (which is valid on Arduino IDE).
+         * The library manager fetches examples by searching for .ino or .pde files,
+         * as a result we get two examples instead of one (and there's more).
+         * Thus the test is marked as incomplete.
+         */
+        $this->assertArrayHasKey('multi_ino_example:methods', $response['examples']);
+        $this->assertArrayHasKey('multi_ino_example', $response['examples']);
+
+        $this->markTestIncomplete('Multi ino examples are not fetched correctly. Need to fix this.');
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *

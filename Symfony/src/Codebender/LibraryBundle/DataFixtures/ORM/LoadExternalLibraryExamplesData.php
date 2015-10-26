@@ -39,6 +39,18 @@ class LoadExternalLibraryExamplesData extends AbstractFixture implements Ordered
         $this->setReference('defaultLibraryExample', $defaultExample);
         $objectManager->persist($defaultExample);
 
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $multiInoLibrary */
+        $multiInoLibrary = $this->getReference('MultiInoLibrary');
+
+        $example = new Example();
+        $example->setName('example_one');
+        $example->setLibrary($multiInoLibrary);
+        $example->setPath('MultiIno/examples/multi_ino_example/multi_ino_example.ino');
+        $example->setBoards(null);
+
+        // Persist the new example
+        $objectManager->persist($example);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
