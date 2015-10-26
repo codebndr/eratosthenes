@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -39,7 +40,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request('POST', '/' . $authorizationKey . '/v1', [], [], [], '{"type":"list"}', true);
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"list"}');
 
         $response = $client->getResponse()->getContent();
         $response = json_decode($response, true);
@@ -82,15 +83,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"fetch","library":"default"}',
-            true)
-        ;
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -117,15 +110,11 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}',
-            true)
-        ;
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}'
+        );
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -140,15 +129,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"getExamples","library":"EEPROM"}',
-            true
-        );
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"EEPROM"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -164,15 +145,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"fetch","library":"EEPROM"}',
-            true
-        );
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"EEPROM"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -192,15 +165,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"checkGithubUpdates"}',
-            true
-        );
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -215,15 +180,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
          * Disabling the library should make it not be returned in the list.
          */
         $client->request('POST', '/' . $authorizationKey . '/toggleStatus/DynamicArrayHelper');
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"checkGithubUpdates"}',
-            true
-        );
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -238,21 +195,36 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client->request(
-            'POST',
-            '/' . $authorizationKey . '/v1',
-            [],
-            [],
-            [],
-            '{"type":"getKeywords","library":"EEPROM"}',
-            true
-        );
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords","library":"EEPROM"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
         $this->assertArrayHasKey('keywords', $response);
         $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
         $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
+    }
+
+    /**
+     * Use this method for library manager API requests with POST data
+     *
+     * @param Client $client
+     * @param string $authKey
+     * @param string $data
+     * @return Client
+     */
+    private function postApiRequest(Client $client, $authKey, $data)
+    {
+        $client->request(
+            'POST',
+            '/' . $authKey . '/v1',
+            [],
+            [],
+            [],
+            $data,
+            true
+        );
+
+        return $client;
     }
 
 }
