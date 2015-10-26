@@ -262,8 +262,10 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"Hidden"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
-        $this->assertEquals(1, count($response['files']));
-        $this->assertEquals('Hidden.h', $response['files'][0]['filename']);
+        $this->assertEquals(2, count($response['files']));
+        $filenames = array_column($response['files'], 'filename');
+        $this->assertContains('Hidden.h', $filenames);
+        $this->assertContains('library.properties', $filenames);
 
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExampleCode","library":"Hidden","example":"hidden_files_example"}');
         $response = json_decode($client->getResponse()->getContent(), true);
