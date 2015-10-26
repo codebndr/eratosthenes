@@ -229,6 +229,25 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->markTestIncomplete('Multi ino examples are not fetched correctly. Need to fix this.');
     }
 
+    public function testLibraryExamplesWithSubcategories()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        /*
+         * The keys of examples contained in subcategories should contain the name
+         * of the subcategory each example belongs to (nesting level > 1 supported)
+         */
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"Subcateg"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('subcateg_example_one', $response['examples']);
+        $this->assertArrayHasKey('experienceBased:Beginners:subcateg_example_two', $response['examples']);
+        $this->assertArrayHasKey('experienceBased:Advanced:Experts:subcateg_example_three', $response['examples']);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *

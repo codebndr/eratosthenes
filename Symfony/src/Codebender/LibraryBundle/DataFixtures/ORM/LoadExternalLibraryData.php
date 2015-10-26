@@ -55,7 +55,7 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $dahLibrary->setRepo('DynamicArrayHelper-Arduino-Library');
         $dahLibrary->setLastCommit('72b8865ee53b3edf159f22f5ff6f9a6dafa7ee1b'); // This is not the last commit of the branch
 
-        // Another reference
+        // Reference to DynamicArrayHelper library
         $this->setReference('dynamicArrayHelperLibrary', $dahLibrary);
         $objectManager->persist($dahLibrary);
 
@@ -69,9 +69,23 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $multiIno->setUrl('https://some/url.com');
         $multiIno->setSourceUrl('https://some/source/url.com');
 
-        // Reference to the MultiIno library
+        // Reference to MultiIno library
         $this->setReference('MultiInoLibrary', $multiIno);
         $objectManager->persist($multiIno);
+
+        // A fake library with examples contained in subcategories
+        $subcategLibrary = new ExternalLibrary();
+        $subcategLibrary->setHumanName('SubCategories Arduino Library');
+        $subcategLibrary->setMachineName('SubCateg');
+        $subcategLibrary->setActive(true);
+        $subcategLibrary->setVerified(false);
+        $subcategLibrary->setDescription('A library containing examples sorted in categories');
+        $subcategLibrary->setUrl('https://some/url.com');
+        $subcategLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to SubCateg library
+        $this->setReference('SubCategLibrary', $subcategLibrary);
+        $objectManager->persist($subcategLibrary);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
