@@ -248,6 +248,30 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertArrayHasKey('experienceBased:Advanced:Experts:subcateg_example_three', $response['examples']);
     }
 
+    public function testLibraryWithHiddenFiles()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        /*
+         * This library contains hidden files in its code and examples.
+         * These hidden elements should not be sent to the client during
+         * either library code or library examples fetching.
+         */
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"Hidden"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals(1, count($response['files']));
+        $this->assertEquals('Hidden.h', $response['files'][0]['filename']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExampleCode","library":"Hidden","example":"hidden_files_example"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals(1, count($response['files']));
+        $this->assertEquals('hidden_files_example.ino', $response['files'][0]['filename']);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *

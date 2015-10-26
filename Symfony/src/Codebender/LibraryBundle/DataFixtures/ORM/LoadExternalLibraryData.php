@@ -87,6 +87,20 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $this->setReference('SubCategLibrary', $subcategLibrary);
         $objectManager->persist($subcategLibrary);
 
+        // A fake library containing hidden files
+        $hiddenFilesLibrary = new ExternalLibrary();
+        $hiddenFilesLibrary->setHumanName('Hidden');
+        $hiddenFilesLibrary->setMachineName('Hidden');
+        $hiddenFilesLibrary->setActive(true);
+        $hiddenFilesLibrary->setVerified(false);
+        $hiddenFilesLibrary->setDescription('A library containing hidden files and directories in its code & examples');
+        $hiddenFilesLibrary->setUrl('https://some/url.com');
+        $hiddenFilesLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to Hidden library
+        $this->setReference('HiddenLibrary', $hiddenFilesLibrary);
+        $objectManager->persist($hiddenFilesLibrary);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager

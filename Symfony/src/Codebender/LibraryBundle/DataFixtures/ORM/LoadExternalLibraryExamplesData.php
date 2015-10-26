@@ -81,6 +81,18 @@ class LoadExternalLibraryExamplesData extends AbstractFixture implements Ordered
         // Persist the new example
         $objectManager->persist($exampleExperiencedCateg);
 
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $hiddenFilesLibrary */
+        $hiddenFilesLibrary = $this->getReference('HiddenLibrary');
+
+        $hiddenFilesExample = new Example();
+        $hiddenFilesExample->setName('hidden_files_example');
+        $hiddenFilesExample->setLibrary($hiddenFilesLibrary);
+        $hiddenFilesExample->setPath('Hidden/examples/hidden_files_example/hidden_files_example.ino');
+        $hiddenFilesExample->setBoards(null);
+
+        // Persist the new example
+        $objectManager->persist($hiddenFilesExample);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
