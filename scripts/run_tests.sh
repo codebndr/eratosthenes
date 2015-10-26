@@ -19,7 +19,7 @@ else
     bin/phpcpd --log-pmd build/pmd-cpd.xml --exclude app --exclude vendor --names-exclude *Test.php, -n .
 
     echo "Running Mess-Detector"
-    bin/phpmd --exclude *Test.php --reportfile build/pmd.xml
+    bin/phpmd src/Codebender/ xml app/phpmd-rule.xml --exclude *Test.php --reportfile build/pmd.xml
 
     set -e
 fi
