@@ -8,10 +8,10 @@ echo "Running Tests"
 if [[ $TRAVIS ]]; then
     # Just run PHPUnit tests if on Travis CI environment
     # `build` directory should already have been created
-    bin/phpunit -c app/ --coverage-clover build/logs/clover.xml
+    bin/phpunit -c app/ --verbose --coverage-clover build/logs/clover.xml
 else
     # Otherwise, run mess and copy-paste detectors too
-    bin/phpunit -c app/ --coverage-clover build/logs/clover.xml --coverage-html=coverage/
+    bin/phpunit -c app/ --verbose --coverage-clover build/logs/clover.xml --coverage-html=coverage/
 
     set +e
 
