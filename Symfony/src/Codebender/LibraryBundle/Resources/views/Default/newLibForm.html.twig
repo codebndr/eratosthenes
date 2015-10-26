@@ -1,200 +1,101 @@
-
-<head>
-{% include 'CodebenderLibraryBundle:Default:includes.html.twig' %}
-<script src={{ asset("js/zip.js") }}></script>
-
-    <script type="text/javascript">
-
-        function get_lib_from_github()
-        {
-            var $url = $("#githubUrl").val();
-            var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+\/?$/;
-            if (!$github_url_pattern.test($url))
-                $("#newLibMessage").text("Invalid Github URL");
-            else
-            {
-                if(endsWith($url, "/"))
-                {
-                    $url = $url.substr(0, $url.length-1);
-                }
-                var $lastSlash = $url.lastIndexOf("/");
-                var $repo = $url.substr($lastSlash+1);
-                $url = $url.substr(0, $url.length - $repo.length - 1);
-                $lastSlash = $url.lastIndexOf("/");
-                var $owner = $url.substr($lastSlash+1);
-
-
-                $("#newLibMessage").text("Loading Library.....");
-                $.post( "{{ path('codebender_library_get_library_git_meta', {'authorizationKey' : authorizationKey}) }}", { gitOwner: $owner, gitRepo: $repo })
-                    .done(function( data ) {
-                    if(data.success)
-                    {
-                        $("#newLibMessage").text("Library Found!");
-                        update_git($owner, $repo)
-                        var $el = $("#machineNames");
-                        select_github();
-                        $el.empty();
-                        $.each(data.names, function(k,v){
-                            $el.append($("<option></option>")
-                                    .attr("value", v).text(v));
-                        });
-                        $el.prop("selected", false);
-                        update_machineName();
-                    }
-                    else
-                    {
-                        $("#newLibMessage").text("There is no such library.");
-                    }
-                });
-            }
-
-        }
-
-        function update_machineName()
-        {
-            $("#newLibrary_MachineName").val($("#machineNames").val());
-        }
-
-        function update_git(owner, repo)
-        {
-            $("#newLibrary_GitOwner").val(owner);
-            $("#newLibrary_GitRepo").val(repo);
-        }
-
-        function endsWith(str, suffix) {
-            return str.indexOf(suffix, str.length - suffix.length) !== -1;
-        }
-
-        function startsWith (str, suffix){
-            return str.indexOf(suffix) == 0;
-        }
-
-        function onerror(message) {
-            alert(message);
-        }
-
-        function getZipFiles(file, onend) {
-            zip.createReader(new zip.BlobReader(file), function(zipReader) {
-                return zipReader.getEntries(onend);
-            }, onerror);
-        }
-
-        function get_lib_from_zip()
-        {
-            select_zip();
-            getZipFiles($("#newLibrary_Zip")[0].files[0], function(entries) {
-                var $el = $("#machineNames");
-                $el.empty();
-                entries.forEach(function(entry) {
-
-                    if(endsWith(entry.filename, ".h") && !startsWith(entry.filename, ".")  && !startsWith(entry.filename, "_") )
-                    {
-                        var $lastSlash = entry.filename.lastIndexOf("/");
-                        var $header = entry.filename.substr($lastSlash+1);
-                        var $name = $header.substr(0,$header.length -2);
-                        $el.append($("<option></option>")
-                                .attr("value", $name).text($name));
-
-                    }
-                });
-                $el.prop("selected", false);
-                update_machineName();
-            });
-        }
-
-        function select_zip()
-        {
-            $("#newLibrary_GitOwner").attr("disabled", "disabled");
-            $("#newLibrary_GitRepo").attr("disabled", "disabled");
-            $("#newLibrary_Zip").removeAttr("disabled");
-            $("#newLibrary_Url").removeAttr("disabled");
-            $("#gitHubDiv").hide();
-            $("#orDiv").hide();
-            $("#metaDiv").show();
-            $("#urlDiv").show();
-        }
-
-        function select_github()
-        {
-            $("#newLibrary_GitOwner").removeAttr("disabled");
-            $("#newLibrary_GitRepo").removeAttr("disabled");
-            $("#newLibrary_Zip").attr("disabled", "disabled");
-            $("#newLibrary_Url").val("http://github.com/"+$("#newLibrary_GitOwner").val()+"/"+ $("#newLibrary_GitRepo").val());
-            $("#zipDiv").hide();
-            $("#orDiv").hide();
-            $("#metaDiv").show();
-            $("#urlDiv").hide();
-        }
-
-        $(document).ready(function()
-        {
-            $("#newLibMessage").text("Add a New Library:");
-            $("#githubUrl").change(function(){get_lib_from_github()});
-            $("#newLibrary_Zip").change(function(){get_lib_from_zip()});
-            $("#machineNames").change(function(){update_machineName()});
-            $("#metaDiv").hide();
-
-        });
-
-    </script>
+<head xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+    {% include 'CodebenderLibraryBundle:Default:includes.html.twig' %}
+    <script src="{{ asset('js/jstree.min.js') }}"></script>
+    <script src={{ asset("js/zip.js") }}></script>
+    {% include 'CodebenderLibraryBundle:Default:page-logic.html.twig' %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/newlibform.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/jstree/themes/default/style.min.css') }}" />
 </head>
+
 <body>
-{% for flashMessage in app.session.flashbag.get('notice') %}
-    <div class="flash-notice">
-        <i>{{ flashMessage }}</i>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span1"></div>
+            <div class="span10">
+                <h2 class="title" style="text-align: center;">Let's add some libraries!</h2>
+                <br/>
+                <h3>
+                    {% for flashMessage in app.session.flashbag.get('error') %}
+                        <i>{{ flashMessage }}</i>
+                    {% endfor %}
+                </h3>
+                <h3 id = "newLibMessage"></h3>
+
+                <div class="row-fluid">
+                    <div id="steps" class="span12 clearfix">
+                        <ol>
+                            <li><a class="active step1" title="Provide a library" onclick="selectStep(1)">1</a></li>
+                            <li><a class="step2" title="Select directory" onclick="selectStep(2)">2</a></li>
+                            <li><a class="step3" title="Add library" onclick="selectStep(3)">3</a></li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span6">
+                        <div id="step1" class="box sourcediv">
+                            <div id="gitHubDiv">
+                                <div class="row-fluid">
+                                    <div class="span12" style="text-align: center;">
+                                        <h3 class="labelcontent clearfix"><span><i class="fa fa-github fa-2x"></i> Use a Github Url</span></h3>
+                                        <br/>
+                                        <input type="text" id="githubUrl" class="input-lg" autocomplete="off" placeholder="Enter Github Url"/>
+                                        <br/>
+                                        <button id="fetchBranchesBtn" class="btn btn-info">Get the branches of the repo</button>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row-fluid">
+                                    <div class="span12" style="text-align: center;">
+                                        <h3 id="gitBranchDiv" class="labelcontent clearfix"><span><i class="fa fa-code-fork fa-2x"></i> Select a branch</span></h3>
+                                        <br/>
+                                        <select id="gitBranches"></select>
+                                        <br/>
+                                        <button id="fetchFilesBtn" class="btn btn-info">Get the files of the repo</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 id='orDiv' class="labelcontent clearfix">- or -</h3>
+                            {{ form_start(form) }}
+                            {{ form_errors(form) }}
+                            <div id="zipDiv" style="text-align: center;">
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-upload fa-2x"></i> Upload a zip file</span></h3>
+                                <br/>
+                                {{ form_widget(form.Zip) }}
+                            </div>
+                        </div>
+                        <div id="step2" style="overflow: scroll">
+                            <div id="jstreeDiv"></div>
+                        </div>
+                    </div>
+                    <div class="span6">
+                        <div id="step3" class="box metadiv">
+                            <div id="verify">
+                                <h5 id="githubChangeInfo" class="labelcontent clearfix">
+                                    Repository owner: <span id="repoInfoOwner"></span><br/>
+                                    Repository name: <span id="repoInfoRepoName"></span><br/>
+                                    Selected branch: <span id="repoInfoBranch"></span><br/>
+                                    Selected folder: <span id="repoInfoFolder"></span><br/>
+                                </h5>
+                                <a href="javascript:void(0);" class="btn btn-success" id="yes">All good</a>
+                            </div>
+                            <div id="form">
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Human Name:</span> {{ form_widget(form.HumanName) }}</h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Machine Name:</span> <select id="machineNames">Machine Names</select></h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Description:</span> {{ form_widget(form.Description) }}</h3>
+                                <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Info Url:</span> {{ form_widget(form.Url) }}</h3>
+                                <h3 id="sourceUrlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Source Url:</span> {{ form_widget(form.SourceUrl) }}</h3>
+                                <h3 id="sourceUrlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Notes for the library:</span><br/> {{ form_widget(form.Notes) }}</h3>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
     </div>
 
-{% endfor %}
-
-
-<h3 id = "newLibMessage"></h3>
-
-
-
-{{ form_start(form) }}
-    {{ form_errors(form) }}
-    <div id="gitHubDiv">
-       <input type="text" id="githubUrl" autocomplete="off" placeholder="Enter Github Url"/></div>
-    </div>
-    <div id='orDiv'>
-        <h3>or</h3>
-    </div>
-    <div id="zipDiv">
-        <h3>
-            Upload Zip File:
-            {{ form_widget(form.Zip) }}
-        </h3>
-    </div>
-    <div id="metaDiv">
-        <div>
-            <p>
-                Human Name:
-                {{ form_widget(form.HumanName) }}
-            </p>
-        </div>
-        <div>
-            <p>
-                Machine Name:
-                <select id="machineNames">Machine Names</select>
-            </p>
-        </div>
-        <div>
-            <p>
-                Description:
-                {{ form_widget(form.Description) }}
-            </p>
-        </div>
-        <div id="urlDiv">
-            <p>
-                Info Url:
-                {{ form_widget(form.Url) }}
-            </p>
-        </div>
-        <div> <button class="btn btn-primary" {{ form_widget(form.Go) }}</button>
-        </div>
-    </div>
-
-{{ form_end(form) }}
 </body>
 
 

@@ -10,9 +10,14 @@ codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
 
-codebender_library_get_library_git_meta:
-    pattern: /{authorizationKey}/getlibgitmeta
-    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitMeta}
+codebender_library_get_repo_tree_meta:
+    pattern: /{authorizationKey}/get_repo_tree_meta
+    defaults: {_controller:CodebenderLibraryBundle:Default:getRepoGitTreeAndMeta}
+    methods:  [POST]
+
+codebender_library_get_library_git_branches:
+    pattern: /{authorizationKey}/getlibgitbranches
+    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
     methods:  [POST]
 
 codebender_library_download:

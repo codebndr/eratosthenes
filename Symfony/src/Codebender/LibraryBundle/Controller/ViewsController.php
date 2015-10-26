@@ -20,9 +20,17 @@ use ZipArchive;
 class ViewsController extends Controller
 {
 
+    /**
+     * Creates and handles a form for adding external libraries to the
+     * library management system. Will render the form page adding a flashbag
+     * error upon failure. Will redirect to the newly created view page of the library
+     * upon success.
+     *
+     * @param $authorizationKey
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function newLibraryAction($authorizationKey)
     {
-
         if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
@@ -31,30 +39,22 @@ class ViewsController extends Controller
 
         $form->handleRequest($this->getRequest());
 
-        $handler = $this->get('codebender_library.handler');
-
         if ($form->isValid()) {
-
             $formData = $form->getData();
 
-            if($formData["GitOwner"] === NULL && $formData["GitRepo"]===NULL && $formData["Zip"]!==NULL)
-                $lib = json_decode($this->getLibFromZipFile($formData["Zip"]) ,true);
-            else
-                $lib = json_decode($handler->getLibFromGithub($formData["GitOwner"], $formData["GitRepo"]), true);
-            if (!$lib['success'])
-                return new Response(json_encode($lib));
-            else
-                $lib = $lib['library'];
-            if($formData["GitOwner"] === NULL && $formData["GitRepo"]===NULL && $formData["Zip"]!==NULL)
-                $lastCommit=NULL;
-            else
-                $lastCommit = $handler->getLastCommitFromGithub($formData['GitOwner'], $formData['GitRepo']);
+            $libraryAdded = $this->addLibrary($formData);
+            if ($libraryAdded['success'] != true){
+                $flashBag = $this->get('session')->getFlashBag();
+                $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
+                $form = $this->createForm(new NewLibraryForm());
 
-            $saved = json_decode($this->saveNewLibrary($formData['HumanName'], $formData['MachineName'], $formData['GitOwner'], $formData['GitRepo'], $formData['Description'], $lastCommit, $formData['Url'], $lib), true);
-            if($saved['success'])
-                return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'),"library" => $formData["MachineName"], "disabled"=>1)));
-            return new Response(json_encode($saved));
+                return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+                    'authorizationKey' => $authorizationKey,
+                    'form' => $form->createView()
+                ));
+            }
 
+            return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "library" => $formData["MachineName"], "disabled" => 1)));
         }
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
             'authorizationKey' => $authorizationKey,
@@ -62,10 +62,146 @@ class ViewsController extends Controller
         ));
     }
 
+    /**
+     * Performs the actual addition of an external library, as well as
+     * input validation of the provided form data.
+     *
+     * @param array $data The data of the received form
+     * @return array
+     */
+    private function addLibrary($data)
+    {
+        /*
+         * Check whether the right combination of data was provided,
+         * and figure out the type of library addition, that is a zip archive (zip)
+         * or a Github repository (git)
+         */
+        $uploadType = $this->validateFormData($data);
+        if ($uploadType['success'] != true) {
+            return array('success' => false, 'message' => 'Invalid form. Please try again.');
+        }
+
+        /*
+         * Then get the files of the library (either from extracting the zip,
+         * or fetching them from Githib) and proceed
+         */
+        $handler = $this->get('codebender_library.handler');
+        $path = '';
+        $lastCommit = null;
+        switch ($uploadType['type']) {
+            case 'git':
+                $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
+                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
+                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
+                break;
+            case 'zip':
+                $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
+                break;
+        }
+
+        if ($libraryStructure['success'] !== true) {
+            return array('success' => false, 'message' => $libraryStructure['message']);
+        }
+
+        /*
+         * In both ways of fething, the code of the library is found
+         * under the 'library' key of the response, upon success.
+         */
+        $libraryStructure = $libraryStructure['library'];
+
+        if ($uploadType['type'] == 'git') {
+            $libraryStructure = $this->fixGitPaths($libraryStructure, $libraryStructure['name'], '');
+        }
+
+        /*
+         * Save the library, that is write the files to the disk and
+         * create the new ExternalLibrary Entity that represents the uploaded library.
+         * Remember onnly external libraries are uploaded through this process
+         */
+        $creationResponse = json_decode(
+            $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
+            $data['GitOwner'], $data['GitRepo'], $data['Description'],
+                $lastCommit, $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $path, $libraryStructure)
+            , true);
+        if ($creationResponse['success'] != true) {
+            return array('success' => false, 'message' => $creationResponse['message']);
+        }
+
+        return array('success' => true);
+    }
+
+    /**
+     * Makes sure the received form does not contain Github data and
+     * a zip archive at once. In such a case, the form is considered invalid.
+     *
+     * @param array $data The form data array
+     * @return array
+     */
+    private function validateFormData($data)
+    {
+        if (($data['GitOwner'] === null && $data['GitRepo'] === null && $data['GitBranch'] === null && $data['GitPath'] === null) && is_object($data['Zip'])) {
+            return array('success' => true, 'type' => 'zip');
+        }
+        if (($data['GitOwner'] !== null && $data['GitRepo'] !== null && $data['GitBranch'] !== null && $data['GitPath'] !== null) && $data['Zip'] === null) {
+            return array('success' => true, 'type' => 'git');
+        }
+
+        return array('success' => false);
+    }
+
+    /**
+     * Determines whether the basepath is exactly the same or is the
+     * root directory of a provided path. Returns an empty string if the
+     * two paths are equal or strips the basepath from the path, if
+     * the first is a substring of the latter.
+     *
+     * @param string $basePath The name of the repo
+     * @param string $path The provided path
+     * @return string
+     */
+    private function getInRepoPath($basePath, $path)
+    {
+        if ($path == $basePath) {
+            return '';
+        }
+
+        if (preg_match("/^$basePath\//", $path)) {
+            return preg_replace("/^$basePath\//", '', $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * The zip upload implementation, creates an assoc array in which the filenames of each file
+     * include the absolute path to the file under the library root directory. This option is not available
+     * when fetching libraries from Git, since filenames contain no paths. This function is called
+     * recursively, and figures out the absolute path for each of the files of the provided file structure,
+     * making the git assoc array compatible to the zip assoc array.
+     * 
+     * @param $files
+     * @param $root
+     * @param $parentPath
+     * @return mixed
+     */
+    private function fixGitPaths($files, $root, $parentPath)
+    {
+        if ($parentPath != '' && $parentPath != $root) {
+            $files['name'] = $parentPath . '/' . $files['name'];
+        }
+        $parentPath = $files['name'];
+        foreach ($files['contents'] as &$element) {
+            if ($element['type'] != 'dir') {
+                continue;
+            }
+            $element = $this->fixGitPaths($element, $root, $parentPath);
+        }
+        return $files;
+    }
+
     public function viewLibraryAction($authorizationKey)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
 
@@ -85,18 +221,26 @@ class ViewsController extends Controller
         if ($response["success"] === false)
             return new Response(json_encode($response));
 
+        $inSync = $handler->isLibraryInSyncWithGit(
+            $response['meta']['gitOwner'],
+            $response['meta']['gitRepo'],
+            $response['meta']['gitBranch'],
+            $response['meta']['gitInRepoPath'],
+            $response['meta']['gitLastCommit']
+        );
+
         return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
-            "library" => $response["library"],
-            "files" => $response["files"],
-            "examples" => $response["examples"],
-            "meta" => $response["meta"]
+            'library' => $response['library'],
+            'files' => $response['files'],
+            'examples' => $response['examples'],
+            'meta' => $response['meta'],
+            'inSyncWithGit' => $inSync
         ));
     }
 
     public function gitUpdatesAction($authorizationKey)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
 
@@ -104,25 +248,17 @@ class ViewsController extends Controller
 
         $handlerResponse = $handler->checkGithubUpdates();
 
-        if ($handlerResponse["success"] === false)
-        {
+        if ($handlerResponse["success"] === false) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
 
         //TODO: create the twig and render it on return
         return $handlerResponse;
-//        return $this->render('CodebenderLibraryBundle:Default:gitUpdatesView.html.twig', array(
-//            "library" => $filename,
-//            "files" => $response,
-//            "examples" => $examples,
-//            "meta" => $meta
-//        ));
     }
 
     public function searchAction($authorizationKey)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
 
@@ -131,49 +267,43 @@ class ViewsController extends Controller
         $json = $request->query->get('json');
         $names = array();
 
-        if($query !== NULL && $query != "")
-        {
+        if ($query !== null && $query != "") {
             $em = $this->getDoctrine()->getManager();
             $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
-            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')->setParameter('token', "%".$query."%")->getQuery()->getResult();
+            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
 
 
-            foreach($libraries as $lib)
-            {
-                if($lib->getActive())
+            foreach ($libraries as $lib) {
+                if ($lib->getActive())
                     $names[] = $lib->getMachineName();
             }
         }
-        if($json!==NULL && $json = true)
+        if ($json !== null && $json = true)
             return new Response(json_encode(array("success" => true, "libs" => $names)));
         else
-            return $this->render('CodebenderLibraryBundle:Default:search.html.twig' , array("authorizationKey" => $authorizationKey, "libs" => $names));
+            return $this->render('CodebenderLibraryBundle:Default:search.html.twig', array("authorizationKey" => $authorizationKey, "libs" => $names));
     }
 
     public function changeLibraryStatusAction($authorizationKey, $library)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
         }
 
-        if ($this->getRequest()->getMethod() != 'POST')
-        {
+        if ($this->getRequest()->getMethod() != 'POST') {
             return new Response(json_encode(array("success" => false, "message" => "POST should be used.")));
         }
-//            $library = $this->get('request')->request->get('library');
 
-        $handler =  $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($library, true), true);
 
-        if($exists['success'] === false)
-        {
+        if ($exists['success'] === false) {
             return new Response(json_encode(array("success" => false, "message" => "Library not found.")));
         }
 
         $em = $this->getDoctrine()->getManager();
         $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
-        if($lib[0]->getActive())
+        if ($lib[0]->getActive())
             $lib[0]->setActive(0);
         else
             $lib[0]->setActive(1);
@@ -185,15 +315,14 @@ class ViewsController extends Controller
 
     public function downloadAction($authorizationKey, $library)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey'))
-        {
+        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
             return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
         }
 
         $htmlcode = 200;
         $value = "";
 
-        $arduino_library_files = $this->container->getParameter('arduino_library_directory')."/";
+        $arduino_library_files = $this->container->getParameter('arduino_library_directory') . "/";
         $finder = new Finder();
         $exampleFinder = new Finder();
 
@@ -202,59 +331,49 @@ class ViewsController extends Controller
         $directory = "";
 
         $last_slash = strrpos($library, "/");
-        if($last_slash !== false )
-        {
+        if ($last_slash !== false) {
             $filename = substr($library, $last_slash + 1);
             $vendor = substr($library, 0, $last_slash);
         }
 
         $handler = $this->get('codebender_library.handler');
         $isBuiltIn = json_decode($handler->checkIfBuiltInExists($filename), true);
-        if($isBuiltIn["success"])
-            $path = $arduino_library_files."/libraries/".$filename;
-        else
-        {
+        if ($isBuiltIn["success"])
+            $path = $arduino_library_files . "/libraries/" . $filename;
+        else {
             $isExternal = json_decode($handler->checkIfExternalExists($filename), true);
-            if($isExternal["success"])
-            {
-                $path = $arduino_library_files."/external-libraries/".$filename;
-            }
-            else
-            {
+            if ($isExternal["success"]) {
+                $path = $arduino_library_files . "/external-libraries/" . $filename;
+            } else {
                 $value = "";
                 $htmlcode = 404;
                 return new Response($value, $htmlcode);
             }
         }
 
-        $files = $handler->fetchLibraryFiles($finder, $path);
+        $files = $handler->fetchLibraryFiles($finder, $path, false);
         $examples = $handler->fetchLibraryExamples($exampleFinder, $path);
 
         $zipname = "/tmp/asd.zip";
 
         $zip = new ZipArchive();
 
-        if ($zip->open($zipname, ZIPARCHIVE::CREATE)===false)
-        {
+        if ($zip->open($zipname, ZIPARCHIVE::CREATE) === false) {
             $value = "";
             $htmlcode = 404;
-        }
-        else
-        {
-            if($zip->addEmptyDir($filename)!==true)
-            {
+        } else {
+            if ($zip->addEmptyDir($filename) !== true) {
                 $value = "";
                 $htmlcode = 404;
-            }
-            else
-            {
-                foreach($files as $file)
-                {
-                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+            } else {
+                foreach ($files as $file) {
+                    /*
+                     * No special handling needed for binary files, since addFromString method is binary safe.
+                     */
+                    $zip->addFromString($library . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
                 }
-                foreach($examples as $file)
-                {
-                    $zip->addFromString($library."/".$file["filename"], $file["content"]);
+                foreach ($examples as $file) {
+                    $zip->addFromString($library . "/" . $file["filename"], $file["content"]);
                 }
                 $zip->close();
                 $value = file_get_contents($zipname);
@@ -262,21 +381,21 @@ class ViewsController extends Controller
             unlink($zipname);
         }
 
-        $headers = array('Content-Type'		=> 'application/octet-stream',
-            'Content-Disposition' => 'attachment;filename="'.$filename.'.zip"');
+        $headers = array('Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment;filename="' . $filename . '.zip"');
 
         return new Response($value, $htmlcode, $headers);
     }
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $libfiles)
+    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $inRepoPath, $libfiles)
     {
         $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($machineName), true);
-        if($exists['success'])
-            return json_encode(array("success" => false, "message" => "Library named ".$machineName." already exists."));
+        if ($exists['success'])
+            return json_encode(array("success" => false, "message" => "Library named " . $machineName . " already exists."));
 
         $create = json_decode($this->createLibFiles($machineName, $libfiles), true);
-        if(!$create['success'])
+        if (!$create['success'])
             return json_encode($create);
 
         $lib = new ExternalLibrary();
@@ -285,6 +404,10 @@ class ViewsController extends Controller
         $lib->setDescription($description);
         $lib->setOwner($gitOwner);
         $lib->setRepo($gitRepo);
+        $lib->setBranch($branch);
+        $lib->setInRepoPath($inRepoPath);
+        $lib->setSourceUrl($sourceUrl);
+        $lib->setNotes($notes);
         $lib->setVerified(false);
         $lib->setActive(false);
         $lib->setLastCommit($lastCommit);
@@ -295,19 +418,12 @@ class ViewsController extends Controller
         $em->flush();
 
         $arduino_library_files = $this->container->getParameter('arduino_library_directory');
-        $examples = $handler->fetchLibraryExamples(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+        $examples = $handler->fetchLibraryExamples(new Finder(), $arduino_library_files . "/external-libraries/" . $machineName);
 
-//        $libfilesForCompilation = $this->fetchLibraryFiles(new Finder(), $arduino_library_files."/external-libraries/".$machineName);
+        foreach ($examples as $example) {
 
-        foreach($examples as $example)
-        {
-
-//            $filesForCompilation = $libfilesForCompilation;
             $path_parts = pathinfo($example['filename']);
-//            $filesForCompilation[]  = array("filename"=>$path_parts['filename'].'.ino', "content" => $example['content']);
-//            $boards = json_decode($this->getBoardsForExample($filesForCompilation), true);
-//            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'],json_encode($boards['boards']));
-            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName."/".$example['filename'], NULL);
+            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName . "/" . $example['filename'], null);
         }
 
 
@@ -317,29 +433,25 @@ class ViewsController extends Controller
 
     private function createLibFiles($machineName, $lib)
     {
-        $libBaseDir = $this->container->getParameter('arduino_library_directory')."/external-libraries/".$machineName."/";
-        return($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
+        $libBaseDir = $this->container->getParameter('arduino_library_directory') . "/external-libraries/" . $machineName . "/";
+        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
     }
 
     private function createLibDirectory($base, $path, $files)
     {
 
-        if(is_dir($path))
+        if (is_dir($path))
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
-        if(!mkdir($path))
+        if (!mkdir($path))
             return json_encode(array("success" => false, "message" => "Cannot Save Library"));
 
-        foreach($files as $file)
-        {
-            if($file['type'] == 'dir')
-            {
-                $create = json_decode($this->createLibDirectory($base, $base.$file['name']."/", $file['contents']), true);
-                if(!$create['success'])
-                    return(json_encode($create));
-            }
-            else
-            {
-                file_put_contents($path.$file['name'], $file['contents']);
+        foreach ($files as $file) {
+            if ($file['type'] == 'dir') {
+                $create = json_decode($this->createLibDirectory($base, $base . $file['name'] . "/", $file['contents']), true);
+                if (!$create['success'])
+                    return (json_encode($create));
+            } else {
+                file_put_contents($path . $file['name'], $file['contents']);
             }
         }
 
@@ -362,33 +474,29 @@ class ViewsController extends Controller
 
     private function getLibFromZipFile($file)
     {
-        if(is_dir('/tmp/lib'))
+        if (is_dir('/tmp/lib'))
             $this->destroy_dir('/tmp/lib');
         $zip = new \ZipArchive;
         $opened = $zip->open($file);
-        if($opened === TRUE)
-        {
+        if ($opened === TRUE) {
             $handler = $this->get('codebender_library.handler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
 
-            if(!$dir['success'])
+            if (!$dir['success'])
                 return json_encode($dir);
             else
                 $dir = $dir['directory'];
-            $baseDir = json_decode($handler->findBaseDir($dir),true);
-            if(!$baseDir['success'])
+            $baseDir = json_decode($handler->findBaseDir($dir), true);
+            if (!$baseDir['success'])
                 return json_encode($baseDir);
             else
                 $baseDir = $baseDir['directory'];
 
             return json_encode(array("success" => true, "library" => $baseDir));
-        }
-
-        else
-        {
-            return json_encode(array("success" => false, "message" => "Could not unzip Archive. Code: ".$opened));
+        } else {
+            return json_encode(array("success" => false, "message" => "Could not unzip Archive. Code: " . $opened));
         }
     }
 
@@ -396,44 +504,39 @@ class ViewsController extends Controller
     {
         $files = array();
         $dir = preg_grep('/^([^.])/', scandir($path));
-        foreach($dir as $file)
-        {
-            if($file === "__MACOSX")
+        foreach ($dir as $file) {
+            if ($file === "__MACOSX")
                 continue;
 
-            if(is_dir($path.'/'.$file))
-            {
-                $subdir = json_decode($this->processZipDir($path.'/'.$file), true);
-                if($subdir['success'])
+            if (is_dir($path . '/' . $file)) {
+                $subdir = json_decode($this->processZipDir($path . '/' . $file), true);
+                if ($subdir['success'])
                     array_push($files, $subdir['directory']);
                 else
                     return json_encode($subdir);
-            }
-            else
-            {
-                $file = json_decode( $this->processZipFile($path.'/'.$file), true);
-                if($file['success'])
+            } else {
+                $file = json_decode($this->processZipFile($path . '/' . $file), true);
+                if ($file['success'])
                     array_push($files, $file['file']);
-                else if($file['message']!="Bad Encoding")
+                else if ($file['message'] != "Bad Encoding")
                     return json_encode($file);
             }
         }
-        return json_encode(array("success" => true, "directory" =>array("name" => substr($path, 9), "type" => "dir", "contents"=>$files)));
+        return json_encode(array("success" => true, "directory" => array("name" => substr($path, 9), "type" => "dir", "contents" => $files)));
     }
 
     private function processZipFile($path)
     {
         $contents = file_get_contents($path);
-        if(! mb_check_encoding($contents, 'UTF-8')){
-            $contents = utf8_encode($contents);
-        }
-        if($contents === NULL)
-            return json_encode(array("success" => false, "message"=>"Could not read file ".basename($path)));
 
-        return json_encode(array("success" => true, "file" => array("name" => basename($path),"type" => "file", "contents" => $contents)));
+        if ($contents === null)
+            return json_encode(array("success" => false, "message" => "Could not read file " . basename($path)));
+
+        return json_encode(array("success" => true, "file" => array("name" => basename($path), "type" => "file", "contents" => $contents)));
     }
 
-    private function destroy_dir($dir) {
+    private function destroy_dir($dir)
+    {
         if (!is_dir($dir) || is_link($dir)) return unlink($dir);
         foreach (scandir($dir) as $file) {
             if ($file == '.' || $file == '..') continue;
