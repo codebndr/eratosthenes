@@ -101,6 +101,20 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $this->setReference('HiddenLibrary', $hiddenFilesLibrary);
         $objectManager->persist($hiddenFilesLibrary);
 
+        // A fake library with non UTF-8 encoded content.
+        $invalidEncodingLibrary = new ExternalLibrary();
+        $invalidEncodingLibrary->setHumanName('Invalid Encoding Library');
+        $invalidEncodingLibrary->setMachineName('Encode');
+        $invalidEncodingLibrary->setActive(true);
+        $invalidEncodingLibrary->setVerified(false);
+        $invalidEncodingLibrary->setDescription('A library containing characters with invalid encoding in it code & examples');
+        $invalidEncodingLibrary->setUrl('https://some/url.com');
+        $invalidEncodingLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to Hidden library
+        $this->setReference('EncodeLibrary', $invalidEncodingLibrary);
+        $objectManager->persist($invalidEncodingLibrary);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager

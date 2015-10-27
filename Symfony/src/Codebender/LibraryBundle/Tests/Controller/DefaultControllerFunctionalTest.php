@@ -274,6 +274,46 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertEquals('hidden_files_example.ino', $response['files'][0]['filename']);
     }
 
+    public function testInvalidEncodingLibrary()
+    {
+        $client = static::createClient();
+
+        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries') . '/Encode/';
+        $headerFile = file_get_contents($encodeLibraryPath . 'Encode.h');
+        $exampleFile = file_get_contents($encodeLibraryPath . 'examples/encoded_example/encoded_example.ino');
+        $malformedJson = json_encode(['header' => $headerFile, 'example' => $exampleFile]);
+
+        /*
+         * PHP's json_encode expects its argument to be encoded using UTF-8.
+         * Otherwise, it fails. The assertions below demonstrate how the original files
+         * uploaded to the library manager will fail to encode, unless properly handled.
+         */
+        $this->assertFalse($malformedJson);
+        $this->assertEquals('Malformed UTF-8 characters, possibly incorrectly encoded', json_last_error_msg());
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"Encode"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        /*
+         * A successful response means the content of the library was properly handled.
+         * However, any characters in the library files that (due to data loss) cannot
+         * be converted to UTF-8 will be represented by irrelevant UTF-8 characters.
+         */
+        $this->assertTrue($response['success']);
+        $this->assertContains('åëëçíéêÜ', $response['files'][0]['content']); // misinterpreted characters
+        $this->assertContains('This file uses Greek (ISO 8859-7)', $response['files'][0]['content']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExampleCode","library":"Encode","example":"encoded_example"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        /*
+         * The same applies to the example code fetching
+         */
+        $this->assertTrue($response['success']);
+        $this->assertContains('åëëçíéêÜ', $response['files'][0]['code']); // misinterpreted characters
+        $this->assertContains('using Greek (ISO 8859-7) encoding', $response['files'][0]['code']);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *

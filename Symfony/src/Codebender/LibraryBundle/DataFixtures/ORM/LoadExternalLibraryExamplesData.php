@@ -93,6 +93,18 @@ class LoadExternalLibraryExamplesData extends AbstractFixture implements Ordered
         // Persist the new example
         $objectManager->persist($hiddenFilesExample);
 
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $encodeLibrary */
+        $encodeLibrary = $this->getReference('EncodeLibrary');
+
+        $encodeLibraryExample = new Example();
+        $encodeLibraryExample->setName('encoded_example');
+        $encodeLibraryExample->setLibrary($encodeLibrary);
+        $encodeLibraryExample->setPath('Encode/examples/encoded_example/encoded_example.ino');
+        $encodeLibraryExample->setBoards(null);
+
+        // Persist the new example
+        $objectManager->persist($encodeLibraryExample);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
