@@ -156,6 +156,7 @@
         $("#newLibrary_GitBranch").attr("disabled", "disabled");
         $("#newLibrary_GitPath").attr("disabled", "disabled");
         $("#newLibrary_Zip").removeAttr("disabled");
+        $("#newLibrary_Zip").show();
         $("#newLibrary_Url").removeAttr("disabled");
         selectStep(3);
         $('#step3, #step3 #form').show();
@@ -168,6 +169,7 @@
         $("#newLibrary_GitBranch").removeAttr("disabled");
         $("#newLibrary_GitPath").removeAttr("disabled");
         $("#newLibrary_Zip").attr("disabled", "disabled");
+        $("#newLibrary_Zip").hide();
         $('#newLibrary_Zip').val('');
         var $url = $("#githubUrl").val();
         $("#newLibrary_Url").val($url);
