@@ -314,6 +314,22 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertContains('using Greek (ISO 8859-7) encoding', $response['files'][0]['code']);
     }
 
+    public function testHtmlLibraryContents()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"HtmlLib"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        /*
+         * HTML contents successfully JSON encoded-decoded
+         * Won't verify their content
+         */
+        $this->assertTrue($response['success']);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *

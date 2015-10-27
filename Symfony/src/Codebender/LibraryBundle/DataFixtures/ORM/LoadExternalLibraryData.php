@@ -111,9 +111,21 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $invalidEncodingLibrary->setUrl('https://some/url.com');
         $invalidEncodingLibrary->setSourceUrl('https://some/source/url.com');
 
-        // Reference to Hidden library
+        // Reference to Encode library
         $this->setReference('EncodeLibrary', $invalidEncodingLibrary);
         $objectManager->persist($invalidEncodingLibrary);
+
+        // A fake library with HTML doc files.
+        $htmlLibrary = new ExternalLibrary();
+        $htmlLibrary->setHumanName('HTML content Library');
+        $htmlLibrary->setMachineName('HtmlLib');
+        $htmlLibrary->setActive(true);
+        $htmlLibrary->setVerified(false);
+        $htmlLibrary->setDescription('A library containing HTML in its files');
+        $htmlLibrary->setUrl('https://some/url.com');
+        $htmlLibrary->setSourceUrl('https://some/source/url.com');
+
+        $objectManager->persist($htmlLibrary);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
