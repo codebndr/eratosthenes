@@ -390,4 +390,70 @@ class ViewsControllerFunctionalTest extends WebTestCase
             $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("' . $file . '")')->count());
         }
     }
+
+    public function testAddGitLibraryFromSubfolder()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/new');
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        /*
+         * Fill in the form values and submit the form
+         */
+        $form = $crawler->selectButton('Go')->form();
+        $values = [
+            'newLibrary[GitOwner]' => 'codebendercc',
+            'newLibrary[GitRepo]' => 'arduino-library-files',
+            'newLibrary[GitBranch]' => 'testing',
+            'newLibrary[GitPath]' => 'arduino-library-files/libraries/EEPROM2',
+            'newLibrary[HumanName]' => 'EEPROM2 Arduino Library',
+            'newLibrary[MachineName]' => 'EEPROM2',
+            'newLibrary[Description]' => 'arduino files for use both by the compiler and the main symfony project',
+            'newLibrary[Url]' => 'https://github.com/codebendercc/arduino-library-files',
+            'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/arduino-library-files/archive/testing.zip',
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
+
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $libraryEntity */
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findOneBy(['machineName' => 'EEPROM2']);
+
+        /*
+         * Make sure the library metadata has correclty been stored in the database
+         */
+        $this->assertEquals('codebendercc', $libraryEntity->getOwner());
+        $this->assertEquals('EEPROM2 Arduino Library', $libraryEntity->getHumanName());
+        $this->assertEquals('testing', $libraryEntity->getBranch());
+        $this->assertEquals('EEPROM2', $libraryEntity->getMachineName());
+        $this->assertEquals('libraries/EEPROM2', $libraryEntity->getInRepoPath());
+        $this->assertEquals('https://github.com/codebendercc/arduino-library-files', $libraryEntity->getUrl());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals(
+            'https://github.com/codebendercc/arduino-library-files/archive/testing.zip',
+            $libraryEntity->getSourceUrl()
+        );
+        $this->assertEquals(
+            'arduino files for use both by the compiler and the main symfony project',
+            $libraryEntity->getDescription()
+        );
+        $this->assertEquals('arduino-library-files', $libraryEntity->getRepo());
+        $this->assertEquals('', $libraryEntity->getNotes());
+        $this->assertEquals('c5e3ae9847f77cdad9d1353b2ff838b09d0f5e66', $libraryEntity->getLastCommit());
+
+        /*
+         * The same applies to the library example
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Example $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Example')
+            ->findOneBy(['library' => $libraryEntity]);
+        $this->assertEquals('EEPROM2/examples/eeprom2_clear/eeprom2_clear.ino', $example->getPath());
+    }
 }
