@@ -32,6 +32,7 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $defaultLibrary->setVerified(false);
         $defaultLibrary->setDescription('The default Arduino library (in fact it\'s Adafruit\'s GPS library)');
         $defaultLibrary->setNotes('No notes provided for this library');
+        $defaultLibrary->setUrl('http://localhost/library/url');
 
         /*
          * Set a reference for the library and add it to the database using
@@ -65,7 +66,6 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $multiIno->setActive(true);
         $multiIno->setVerified(false);
         $multiIno->setDescription('A library containing multi-ino examples which should be correctly fetched');
-        $multiIno->setUrl('https://some/url.com');
         $multiIno->setSourceUrl('https://some/source/url.com');
 
         // Reference to MultiIno library

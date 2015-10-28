@@ -62,7 +62,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $basicExamples = $categories['Examples']['01.Basics']['examples'];
 
-        $this->assertArrayNotHasKey('url', $categories['External Libraries']['default']);
+        $this->assertArrayNotHasKey('url', $categories['External Libraries']['MultiIno']);
         $this->assertArrayHasKey('url', $categories['External Libraries']['DynamicArrayHelper']);
 
         // Check for a specific, known example
