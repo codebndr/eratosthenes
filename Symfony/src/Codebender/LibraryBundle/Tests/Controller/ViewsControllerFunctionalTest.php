@@ -262,4 +262,31 @@ class ViewsControllerFunctionalTest extends WebTestCase
         $this->assertTrue(file_exists($externalLibrariesPath . 'EMIC2/examples/SpeakMessage/SpeakMessage.ino'));
         $this->assertTrue(file_exists($externalLibrariesPath . 'EMIC2/examples/SpeakMsgFromSD/SpeakMsgFromSD.ino'));
     }
+
+    public function testViewBuiltinExample()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/view?library=EEPROM');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("EEPROM")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: EEPROM.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/download/EEPROM"]:contains("Download from Eratosthenes")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("EEPROM.h")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("EEPROM.cpp")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("keywords.txt")')->count());
+
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("examples/eeprom_clear/eeprom_clear.ino")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("examples/eeprom_read/eeprom_read.ino")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("examples/eeprom_write/eeprom_write.ino")')->count());
+
+    }
 }
