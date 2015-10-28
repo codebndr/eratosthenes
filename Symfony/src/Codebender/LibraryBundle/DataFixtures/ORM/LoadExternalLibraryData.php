@@ -127,6 +127,19 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
 
         $objectManager->persist($htmlLibrary);
 
+        // A fake library with non-text contents.
+        $binaryLbrary = new ExternalLibrary();
+        $binaryLbrary->setHumanName('Binary content Library');
+        $binaryLbrary->setMachineName('Binary');
+        $binaryLbrary->setActive(true);
+        $binaryLbrary->setVerified(false);
+        $binaryLbrary->setDescription('A library containing non-text files');
+        $binaryLbrary->setUrl('https://some/url.com');
+        $binaryLbrary->setSourceUrl('https://some/source/url.com');
+
+        // Persist the new library
+        $objectManager->persist($binaryLbrary);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager

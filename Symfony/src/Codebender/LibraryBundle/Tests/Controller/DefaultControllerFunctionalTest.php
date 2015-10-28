@@ -330,6 +330,42 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertTrue($response['success']);
     }
 
+    public function testLibraryWithNonTextFiles()
+    {
+        /*
+         * Demonstrates how non-text library files are replaced by a comment
+         */
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"Binary"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        /*
+         * This library contains several non-text files such as .exe and .zip files
+         */
+        $this->assertTrue($response['success']);
+
+        $filenames = array_column($response['files'], 'filename');
+
+        $this->assertContains('file.zip', $filenames);
+        $this->assertContains('icon48.png', $filenames);
+        $this->assertContains('windows_executable.exe', $filenames);
+
+        foreach ($response['files'] as $file) {
+            if (in_array($file['filename'], ['file.zip', 'icon48.png', 'windows_executable.exe'])) {
+                $this->assertContains('Such files are currently not supported', $file['content']);
+            }
+        }
+
+    }
+
+    public function testLibraryExamplesWithNonTextFiles()
+    {
+        $this->markTestIncomplete('Not implemented yet. Non-text files of examples are not handled properly');
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *
