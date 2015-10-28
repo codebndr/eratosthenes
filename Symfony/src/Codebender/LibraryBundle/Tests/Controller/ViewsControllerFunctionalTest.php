@@ -322,6 +322,8 @@ class ViewsControllerFunctionalTest extends WebTestCase
 
         $this->assertEquals(1, $crawler->filter('span:contains("Not a Github library (might need manual update)")')->count());
 
+        $this->assertEquals(1, $crawler->filter('div[class="well"]:contains("An Arduino library for interfacing with Emic 2 Text-to-Speech modules.")')->count());
+
         $filesAndExamples = [
             'EMIC2.cpp',
             'EMIC2.h',
@@ -357,7 +359,13 @@ class ViewsControllerFunctionalTest extends WebTestCase
         $this->assertEquals(
             1,
             $crawler->filter(
-                'a[href="https://github.com/pAIgn10/EMIC2"]:contains("Github Repository")'
+                'a[href="https://github.com/codebendercc/webserial"]:contains("Github Repository")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="https://github.com/codebendercc/WebSerial/archive/master.zip"]:contains("WebSerial Arduino Library source code")'
             )->count());
 
         $this->assertEquals(
@@ -366,15 +374,16 @@ class ViewsControllerFunctionalTest extends WebTestCase
                 'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
             )->count());
 
-        $this->assertEquals(1, $crawler->filter('span:contains("Not a Github library (might need manual update)")')->count());
+        $this->assertEquals(1, $crawler->filter('span:contains("In sync with master branch.")')->count());
+
+        $this->assertEquals(1, $crawler->filter('div[class="well"]:contains("Arduino WebSerial Library")')->count());
 
         $filesAndExamples = [
-            'EMIC2.cpp',
-            'EMIC2.h',
-            'keywords.txt',
+            'WebSerial.cpp',
+            'WebSerial.h',
             'README.md',
-            'examples/SpeakMessage/SpeakMessage.ino',
-            'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino '
+            'examples/WebASCIITable/WebASCIITable.ino',
+            'examples/WebSerialEcho/WebSerialEcho.ino '
         ];
 
         foreach ($filesAndExamples as $file) {
