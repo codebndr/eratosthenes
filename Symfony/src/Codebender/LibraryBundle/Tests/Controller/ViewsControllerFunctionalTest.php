@@ -93,7 +93,7 @@ class ViewsControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $crawler = $client->request('POST', '/' . $authorizationKey . '/new');
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/new');
         /*
          * Need to get the CSRF token from the crawler and submit it with the form,
          * otherwise the form might be invalid.
@@ -186,7 +186,7 @@ class ViewsControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $crawler = $client->request('POST', '/' . $authorizationKey . '/new');
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/new');
         $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
 
         $form = $crawler->selectButton('Go')->form();
