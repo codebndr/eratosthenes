@@ -289,4 +289,96 @@ class ViewsControllerFunctionalTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("examples/eeprom_write/eeprom_write.ino")')->count());
 
     }
+
+    public function testViewExternalZipLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // Using `disabled` flag because the library was not activated on upload
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/view?library=EMIC2&disabled=1');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("EMIC2 Arduino Library")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: EMIC2.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/download/EMIC2"]:contains("Download from Eratosthenes")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="https://github.com/pAIgn10/EMIC2"]:contains("EMIC2 Arduino Library is hosted here")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('span:contains("Not a Github library (might need manual update)")')->count());
+
+        $filesAndExamples = [
+            'EMIC2.cpp',
+            'EMIC2.h',
+            'keywords.txt',
+            'README.md',
+            'examples/SpeakMessage/SpeakMessage.ino',
+            'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino '
+        ];
+
+        foreach ($filesAndExamples as $file) {
+            $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("' . $file . '")')->count());
+        }
+    }
+
+    public function testViewExternalGitLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // Using `disabled` flag because the library was not activated on upload
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/view?library=WebSerial&disabled=1');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("WebSerial Arduino Library")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: WebSerial.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/download/WebSerial"]:contains("Download from Eratosthenes")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="https://github.com/pAIgn10/EMIC2"]:contains("Github Repository")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('span:contains("Not a Github library (might need manual update)")')->count());
+
+        $filesAndExamples = [
+            'EMIC2.cpp',
+            'EMIC2.h',
+            'keywords.txt',
+            'README.md',
+            'examples/SpeakMessage/SpeakMessage.ino',
+            'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino '
+        ];
+
+        foreach ($filesAndExamples as $file) {
+            $this->assertEquals(1, $crawler->filter('a[class="accordion-toggle"]:contains("' . $file . '")')->count());
+        }
+    }
 }
