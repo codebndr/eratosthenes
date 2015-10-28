@@ -62,6 +62,8 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $basicExamples = $categories['Examples']['01.Basics']['examples'];
 
+        $this->assertArrayNotHasKey('url', $categories['External Libraries']['default']);
+        $this->assertArrayHasKey('url', $categories['External Libraries']['DynamicArrayHelper']);
 
         // Check for a specific, known example
         $foundExample = array_filter($basicExamples, function($element) {
@@ -93,6 +95,9 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $this->assertContains('default.cpp', $filenames);
         $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('hpp_file.hpp', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
 
         $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files/default');
 
