@@ -26,21 +26,25 @@
     <div class="span1"></div>
     <div class="span10"></div>
         <div style="text-align: left;">
-            <h2>{{ meta.humanName }}</h2>
+            {% if meta.humanName is defined %}
+                <h2>{{ meta.humanName }}</h2>
+            {% else %}
+                <h2>{{ library }}</h2>
+            {% endif %}
             <h3>(main header: {{ library }}.h)</h3>
-                {% if meta %}
-                    {% if meta.verified %}
-                        <span class="label label-success" title="This is a Verified Library."><label class="icon-ok"></label> This is a Verified Library.</span>
-                    {% else %}
-                        <span class="label label-warning" title="Not Verified. Use at your own risk."><label class="icon-warning-sign"></label> Not Verified. Use at your own risk.</span>
-                    {% endif %}
-                    <br/><br/>
-                    {% if meta.active == true %}
-                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
-                    {% else %}
-                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
-                    {% endif %}
-                    <br/><br/>
+            {% if meta is not empty %}
+                {% if meta.verified %}
+                    <span class="label label-success" title="This is a Verified Library."><label class="icon-ok"></label> This is a Verified Library.</span>
+                {% else %}
+                    <span class="label label-warning" title="Not Verified. Use at your own risk."><label class="icon-warning-sign"></label> Not Verified. Use at your own risk.</span>
+                {% endif %}
+                <br/><br/>
+                {% if meta.active == true %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
+                {% else %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
+                {% endif %}
+                <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
                     {% if meta.gitInRepoPath %}
                         <label>You will find the files in the "<strong>{{ meta.gitInRepoPath }}</strong>" directory of the Github repository </label><br/>
@@ -65,6 +69,12 @@
                 {% else %}
                     <span>Not a Github library (might need manual update)</span>
                 {% endif %}
+            {% else %}
+                {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+                <a id="download" class="btn btn-success" target="_blank"
+                   href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                <br/><br/>
+                <span>This is a <strong>builtin</strong> library</span>
             {% endif %}
         </div>
         {% if meta %}

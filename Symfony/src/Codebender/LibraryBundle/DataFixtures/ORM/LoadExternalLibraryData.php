@@ -55,8 +55,89 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $dahLibrary->setRepo('DynamicArrayHelper-Arduino-Library');
         $dahLibrary->setLastCommit('72b8865ee53b3edf159f22f5ff6f9a6dafa7ee1b'); // This is not the last commit of the branch
 
+        // Reference to DynamicArrayHelper library
         $this->setReference('dynamicArrayHelperLibrary', $dahLibrary);
         $objectManager->persist($dahLibrary);
+
+        // A fake library with multi-ino examples
+        $multiIno = new ExternalLibrary();
+        $multiIno->setHumanName('MultiIno Arduino Library');
+        $multiIno->setMachineName('MultiIno');
+        $multiIno->setActive(true);
+        $multiIno->setVerified(false);
+        $multiIno->setDescription('A library containing multi-ino examples which should be correctly fetched');
+        $multiIno->setSourceUrl('https://some/source/url.com');
+
+        // Reference to MultiIno library
+        $this->setReference('MultiInoLibrary', $multiIno);
+        $objectManager->persist($multiIno);
+
+        // A fake library with examples contained in subcategories
+        $subcategLibrary = new ExternalLibrary();
+        $subcategLibrary->setHumanName('SubCategories Arduino Library');
+        $subcategLibrary->setMachineName('SubCateg');
+        $subcategLibrary->setActive(true);
+        $subcategLibrary->setVerified(false);
+        $subcategLibrary->setDescription('A library containing examples sorted in categories');
+        $subcategLibrary->setUrl('https://some/url.com');
+        $subcategLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to SubCateg library
+        $this->setReference('SubCategLibrary', $subcategLibrary);
+        $objectManager->persist($subcategLibrary);
+
+        // A fake library containing hidden files
+        $hiddenFilesLibrary = new ExternalLibrary();
+        $hiddenFilesLibrary->setHumanName('Hidden');
+        $hiddenFilesLibrary->setMachineName('Hidden');
+        $hiddenFilesLibrary->setActive(true);
+        $hiddenFilesLibrary->setVerified(false);
+        $hiddenFilesLibrary->setDescription('A library containing hidden files and directories in its code & examples');
+        $hiddenFilesLibrary->setUrl('https://some/url.com');
+        $hiddenFilesLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to Hidden library
+        $this->setReference('HiddenLibrary', $hiddenFilesLibrary);
+        $objectManager->persist($hiddenFilesLibrary);
+
+        // A fake library with non UTF-8 encoded content.
+        $invalidEncodingLibrary = new ExternalLibrary();
+        $invalidEncodingLibrary->setHumanName('Invalid Encoding Library');
+        $invalidEncodingLibrary->setMachineName('Encode');
+        $invalidEncodingLibrary->setActive(true);
+        $invalidEncodingLibrary->setVerified(false);
+        $invalidEncodingLibrary->setDescription('A library containing characters with invalid encoding in it code & examples');
+        $invalidEncodingLibrary->setUrl('https://some/url.com');
+        $invalidEncodingLibrary->setSourceUrl('https://some/source/url.com');
+
+        // Reference to Encode library
+        $this->setReference('EncodeLibrary', $invalidEncodingLibrary);
+        $objectManager->persist($invalidEncodingLibrary);
+
+        // A fake library with HTML doc files.
+        $htmlLibrary = new ExternalLibrary();
+        $htmlLibrary->setHumanName('HTML content Library');
+        $htmlLibrary->setMachineName('HtmlLib');
+        $htmlLibrary->setActive(true);
+        $htmlLibrary->setVerified(false);
+        $htmlLibrary->setDescription('A library containing HTML in its files');
+        $htmlLibrary->setUrl('https://some/url.com');
+        $htmlLibrary->setSourceUrl('https://some/source/url.com');
+
+        $objectManager->persist($htmlLibrary);
+
+        // A fake library with non-text contents.
+        $binaryLbrary = new ExternalLibrary();
+        $binaryLbrary->setHumanName('Binary content Library');
+        $binaryLbrary->setMachineName('Binary');
+        $binaryLbrary->setActive(true);
+        $binaryLbrary->setVerified(false);
+        $binaryLbrary->setDescription('A library containing non-text files');
+        $binaryLbrary->setUrl('https://some/url.com');
+        $binaryLbrary->setSourceUrl('https://some/source/url.com');
+
+        // Persist the new library
+        $objectManager->persist($binaryLbrary);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
