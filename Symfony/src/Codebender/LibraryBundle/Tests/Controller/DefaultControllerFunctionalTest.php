@@ -244,7 +244,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
          * The keys of examples contained in subcategories should contain the name
          * of the subcategory each example belongs to (nesting level > 1 supported)
          */
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"Subcateg"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"SubCateg"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
