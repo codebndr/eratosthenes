@@ -456,4 +456,73 @@ class ViewsControllerFunctionalTest extends WebTestCase
             ->findOneBy(['library' => $libraryEntity]);
         $this->assertEquals('EEPROM2/examples/eeprom2_clear/eeprom2_clear.ino', $example->getPath());
     }
+
+    public function testLibraryWithFilesBiggerThanOneMegaByte()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/new');
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        /*
+         * Fill in the form values and submit the form
+         */
+        $form = $crawler->selectButton('Go')->form();
+        $values = [
+            'newLibrary[GitOwner]' => 'codebendercc',
+            'newLibrary[GitRepo]' => 'maxFileSize',
+            'newLibrary[GitBranch]' => 'master',
+            'newLibrary[GitPath]' => 'maxFileSize',
+            'newLibrary[HumanName]' => 'Library with big files',
+            'newLibrary[MachineName]' => 'max_size',
+            'newLibrary[Description]' => 'A repo used for testing fetching files with size > 1MB from Github API',
+            'newLibrary[Url]' => 'https://github.com/codebendercc/maxFileSize',
+            'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/maxFileSize/archive/master.zip',
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
+
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $libraryEntity */
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findOneBy(['machineName' => 'max_size']);
+
+        /*
+         * Make sure the library metadata has correclty been stored in the database
+         */
+        $this->assertEquals('codebendercc', $libraryEntity->getOwner());
+        $this->assertEquals('Library with big files', $libraryEntity->getHumanName());
+        $this->assertEquals('master', $libraryEntity->getBranch());
+        $this->assertEquals('max_size', $libraryEntity->getMachineName());
+        $this->assertEquals('', $libraryEntity->getInRepoPath());
+        $this->assertEquals('https://github.com/codebendercc/maxFileSize', $libraryEntity->getUrl());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals(
+            'https://github.com/codebendercc/maxFileSize/archive/master.zip',
+            $libraryEntity->getSourceUrl()
+        );
+        $this->assertEquals(
+            'A repo used for testing fetching files with size > 1MB from Github API',
+            $libraryEntity->getDescription()
+        );
+        $this->assertEquals('maxFileSize', $libraryEntity->getRepo());
+        $this->assertEquals('', $libraryEntity->getNotes());
+        $this->assertEquals('4f8ca699e3be8d013a189fcbb79f1ceebc1b22ba', $libraryEntity->getLastCommit());
+
+        $filesAndExamples = [
+            'code.cpp',
+            'README.md',
+            'logfile.log',
+            'max_size.h'
+        ];
+
+        $libraryPath = $client->getContainer()->getParameter('external_libraries') . '/max_size/';
+        foreach ($filesAndExamples as $file) {
+            $this->assertTrue(file_exists($libraryPath . $file));
+        }
+    }
 }
