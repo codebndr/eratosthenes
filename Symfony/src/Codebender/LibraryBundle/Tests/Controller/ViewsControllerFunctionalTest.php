@@ -383,7 +383,7 @@ class ViewsControllerFunctionalTest extends WebTestCase
             'WebSerial.h',
             'README.md',
             'examples/WebASCIITable/WebASCIITable.ino',
-            'examples/WebSerialEcho/WebSerialEcho.ino '
+            'examples/WebSerialEcho/WebSerialEcho.ino'
         ];
 
         foreach ($filesAndExamples as $file) {
