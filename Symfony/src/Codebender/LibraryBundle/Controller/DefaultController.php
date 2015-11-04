@@ -26,16 +26,11 @@ class DefaultController extends Controller
      * Checks the autorization credentials and the validity of the request.
      * Can handle several types of requests, like code fetching, examples fetching, etc.
      *
-     * @param $authorizationKey
      * @param $version
      * @return Response
      */
-    public function apiHandlerAction($authorizationKey, $version)
+    public function apiHandlerAction($version)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid library manager authorization key.")));
-        }
-
         if ($version != "v1") {
             return new Response(json_encode(array("success" => false, "message" => "Invalid library manager API version.")));
         }
@@ -150,12 +145,8 @@ class DefaultController extends Controller
         return new Response($example, 200, array('content-type' => 'application/json'));
     }
 
-    public function getLibraryGitBranchesAction($authorizationKey)
+    public function getLibraryGitBranchesAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
-        }
-
         $handler = $this->get('codebender_library.handler');
 
         $githubUrl = $this->getRequest()->request->get('githubUrl');
@@ -180,12 +171,8 @@ class DefaultController extends Controller
         return $response;
     }
 
-    public function getRepoGitTreeAndMetaAction($authorizationKey)
+    public function getRepoGitTreeAndMetaAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array('success' => false, 'step' => 0, 'message' => 'Invalid authorization key.')));
-        }
-
         $handler = $this->get('codebender_library.handler');
 
         $githubUrl = $this->getRequest()->request->get('githubUrl');

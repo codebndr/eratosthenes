@@ -20,6 +20,13 @@ framework:
     session:         ~
     fragments:       ~
 
+services:
+    kernel.listener.auth_listener:
+        class: Codebender\LibraryBundle\EventListener\AuthenticationListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+        arguments: [ %authorizationKey% ]
+
 # Twig Configuration
 twig:
     debug:            %kernel.debug%

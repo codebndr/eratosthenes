@@ -26,15 +26,11 @@ class ViewsController extends Controller
      * error upon failure. Will redirect to the newly created view page of the library
      * upon success.
      *
-     * @param $authorizationKey
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newLibraryAction($authorizationKey)
+    public function newLibraryAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-        }
-
+        $authorizationKey = $this->container->getParameter('authorizationKey');
         $form = $this->createForm(new NewLibraryForm());
 
         $form->handleRequest($this->getRequest());
@@ -48,13 +44,14 @@ class ViewsController extends Controller
                 $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
                 $form = $this->createForm(new NewLibraryForm());
 
-                return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+                return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', [
                     'authorizationKey' => $authorizationKey,
                     'form' => $form->createView()
-                ));
+                ]);
             }
 
-            return $this->redirect($this->generateUrl('codebender_library_view_library', array("authorizationKey" => $this->container->getParameter('authorizationKey'), "library" => $formData["MachineName"], "disabled" => 1)));
+            return $this->redirect($this->generateUrl('codebender_library_view_library',
+                ['authorizationKey' => $authorizationKey, 'library' => $formData['MachineName'], 'disabled' => 1]));
         }
         return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
             'authorizationKey' => $authorizationKey,
@@ -199,12 +196,8 @@ class ViewsController extends Controller
         return $files;
     }
 
-    public function viewLibraryAction($authorizationKey)
+    public function viewLibraryAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
-        }
-
         $handler = $this->get('codebender_library.handler');
 
         $request = $this->getRequest();
@@ -238,12 +231,8 @@ class ViewsController extends Controller
         ));
     }
 
-    public function gitUpdatesAction($authorizationKey)
+    public function gitUpdatesAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
-        }
-
         $handler = $this->get('codebender_library.handler');
 
         $handlerResponse = $handler->checkGithubUpdates();
@@ -256,12 +245,8 @@ class ViewsController extends Controller
         return $handlerResponse;
     }
 
-    public function searchAction($authorizationKey)
+    public function searchAction()
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
-        }
-
         $request = $this->getRequest();
         $query = $request->query->get('q');
         $json = $request->query->get('json');
@@ -270,7 +255,8 @@ class ViewsController extends Controller
         if ($query !== null && $query != "") {
             $em = $this->getDoctrine()->getManager();
             $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
-            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
+            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')
+                ->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
 
 
             foreach ($libraries as $lib) {
@@ -278,18 +264,15 @@ class ViewsController extends Controller
                     $names[] = $lib->getMachineName();
             }
         }
-        if ($json !== null && $json = true)
-            return new Response(json_encode(array("success" => true, "libs" => $names)));
-        else
-            return $this->render('CodebenderLibraryBundle:Default:search.html.twig', array("authorizationKey" => $authorizationKey, "libs" => $names));
+        if ($json !== null && $json = true) {
+            return new Response(json_encode(['success' => true, 'libs' => $names]));
+        }
+        return $this->render('CodebenderLibraryBundle:Default:search.html.twig',
+            ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]);
     }
 
-    public function changeLibraryStatusAction($authorizationKey, $library)
+    public function changeLibraryStatusAction($library)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
-        }
-
         if ($this->getRequest()->getMethod() != 'POST') {
             return new Response(json_encode(array("success" => false, "message" => "POST should be used.")));
         }
@@ -313,12 +296,8 @@ class ViewsController extends Controller
         return new Response(json_encode(array("success" => true)));
     }
 
-    public function downloadAction($authorizationKey, $library)
+    public function downloadAction($library)
     {
-        if ($authorizationKey !== $this->container->getParameter('authorizationKey')) {
-            return new Response(json_encode(array("success" => false, "step" => 0, "message" => "Invalid authorization key.")));
-        }
-
         $htmlcode = 200;
         $value = "";
 
