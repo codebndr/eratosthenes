@@ -506,8 +506,24 @@ class DefaultHandler
          * Remember that files are listed as `blobs` and directories are listed as `trees`
          * array_values is used to re-index the two arrays
          */
-        $subtreeNodes = array_values(array_filter($repoTree, function($element) { if ($element['type'] == 'tree') { return true; } return false; }));
-        $files = array_values(array_filter($repoTree, function($element) { if ($element['type'] == 'blob') { return true; } return false; }));
+        $subtreeNodes = array_values(array_filter(
+            $repoTree,
+            function($element) {
+                if ($element['type'] == 'tree') {
+                    return true;
+                }
+                return false;
+            })
+        );
+        $files = array_values(array_filter(
+            $repoTree,
+            function($element) {
+                if ($element['type'] == 'blob') {
+                    return true;
+                }
+                return false;
+            })
+        );
 
         foreach ($files as $file) {
             if (pathinfo($file['path'], PATHINFO_DIRNAME) != $path) {
