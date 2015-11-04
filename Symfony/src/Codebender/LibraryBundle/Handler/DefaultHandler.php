@@ -429,9 +429,17 @@ class DefaultHandler
             $requestUrl = $url . $queryParams . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
         }
         /*
-         * Note: Not sure if setting the User-Agent is necessary
+         * Note: The user-agent MUST be set to a valid value, otherwise the request will be rejected. One of the
+         * suggested values is the application name.
+         * One more thing that must be set on the headers, is the version of the API, which will offer stability
+         * to the application, in case of future Github API updates.
          */
-        $jsonDecodedContent = json_decode($this->curlRequest($requestUrl, null, array('User-Agent: ' . $githubAppName)), true);
+        $jsonDecodedContent = json_decode(
+            $this->curlRequest(
+                $requestUrl,
+                null,
+                ['User-Agent: ' . $githubAppName, 'Accept: ' . 'application/vnd.github.v3.raw+json']
+            ), true);
 
         return  $jsonDecodedContent;
     }
