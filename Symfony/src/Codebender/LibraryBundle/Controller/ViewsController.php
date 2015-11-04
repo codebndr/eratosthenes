@@ -301,16 +301,12 @@ class ViewsController extends Controller
     public function downloadAction($library)
     {
         $htmlcode = 200;
-        $value = "";
-
         $builtinLibraryFilesPath = $this->container->getParameter('builtin_libraries') . "/";
         $externalLibraryFilesPath = $this->container->getParameter('external_libraries') . "/";
         $finder = new Finder();
         $exampleFinder = new Finder();
 
         $filename = $library;
-
-        $directory = "";
 
         $last_slash = strrpos($library, "/");
         if ($last_slash !== false) {
@@ -460,72 +456,81 @@ class ViewsController extends Controller
             $this->destroy_dir('/tmp/lib');
         $zip = new \ZipArchive;
         $opened = $zip->open($file);
-        if ($opened === TRUE) {
+
+        if ($opened === true) {
             $handler = $this->get('codebender_library.handler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
 
-            if (!$dir['success'])
+            if (!$dir['success']) {
                 return json_encode($dir);
-            else
-                $dir = $dir['directory'];
-            $baseDir = json_decode($handler->findBaseDir($dir), true);
-            if (!$baseDir['success'])
-                return json_encode($baseDir);
-            else
-                $baseDir = $baseDir['directory'];
+            }
 
-            return json_encode(array("success" => true, "library" => $baseDir));
+            $dir = $dir['directory'];
+            $baseDir = json_decode($handler->findBaseDir($dir), true);
+            if ($baseDir['success'] !== true) {
+                return json_encode($baseDir);
+            }
+
+            $baseDir = $baseDir['directory'];
+
+            return json_encode(['success' => true, 'library' => $baseDir]);
         } else {
-            return json_encode(array("success" => false, "message" => "Could not unzip Archive. Code: " . $opened));
+            return json_encode(['success' => false, 'message' => 'Could not unzip Archive. Code: ' . $opened]);
         }
     }
 
     private function processZipDir($path)
     {
-        $files = array();
+        $files = [];
         $dir = preg_grep('/^([^.])/', scandir($path));
         foreach ($dir as $file) {
-            if ($file === "__MACOSX")
+            if ($file == "__MACOSX") {
                 continue;
+            }
 
             if (is_dir($path . '/' . $file)) {
                 $subdir = json_decode($this->processZipDir($path . '/' . $file), true);
-                if ($subdir['success'])
-                    array_push($files, $subdir['directory']);
-                else
+                if ($subdir['success'] !== true) {
                     return json_encode($subdir);
+                }
+                array_push($files, $subdir['directory']);
             } else {
                 $file = json_decode($this->processZipFile($path . '/' . $file), true);
-                if ($file['success'])
+                if ($file['success'] !== true) {
                     array_push($files, $file['file']);
-                else if ($file['message'] != "Bad Encoding")
+                } else if ($file['message'] != "Bad Encoding") {
                     return json_encode($file);
+                }
             }
         }
-        return json_encode(array("success" => true, "directory" => array("name" => substr($path, 9), "type" => "dir", "contents" => $files)));
+        return json_encode(
+            ['success' => true, 'directory' => ['name' => substr($path, 9), 'type' => 'dir', 'contents' => $files]]
+        );
     }
 
     private function processZipFile($path)
     {
         $contents = file_get_contents($path);
 
-        if ($contents === null)
-            return json_encode(array("success" => false, "message" => "Could not read file " . basename($path)));
+        if ($contents === null) {
+            return json_encode(['success' => false, 'message' => 'Could not read file ' . basename($path)]);
+        }
 
-        return json_encode(array("success" => true, "file" => array("name" => basename($path), "type" => "file", "contents" => $contents)));
+        return json_encode(['success' => true, 'file' => ['name' => basename($path), 'type' => 'file', 'contents' => $contents]]);
     }
 
     private function destroy_dir($dir)
     {
-        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
         foreach (scandir($dir) as $file) {
-            if ($file == '.' || $file == '..') continue;
-            if (!$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) {
+            if ($file != '.' && $file != '..' && !$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) {
                 chmod($dir . DIRECTORY_SEPARATOR . $file, 0777);
                 if (!$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) return false;
-            };
+            }
         }
         return rmdir($dir);
     }
