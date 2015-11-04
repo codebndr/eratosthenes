@@ -36,11 +36,11 @@ class DefaultHandler
         $finder = new Finder();
         $exampleFinder = new Finder();
 
-        if ($disabled != 1)
+        if ($disabled != 1) {
             $getDisabled = false;
-        else
+        } else {
             $getDisabled = true;
-
+        }
 
         $filename = $library;
         $directory = "";
@@ -64,7 +64,7 @@ class DefaultHandler
 
             if ($renderView) {
                 $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
-                $meta = array();
+                $meta = [];
             }
         } else {
             $response = json_decode($this->checkIfExternalExists($filename, $getDisabled), true);
@@ -81,7 +81,8 @@ class DefaultHandler
                 if ($renderView) {
                     $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
 
-                    $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(array('machineName' => $filename));
+                    $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+                        ->findOneBy(array('machineName' => $filename));
                     $filename = $externalLibrary->getMachineName();
                     $meta = $externalLibrary->getLiraryMeta();
                 }
