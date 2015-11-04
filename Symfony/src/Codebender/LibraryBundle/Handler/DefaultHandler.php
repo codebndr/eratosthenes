@@ -13,6 +13,7 @@ use Codebender\LibraryBundle\Entity\ExternalLibrary;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultHandler
@@ -68,11 +69,15 @@ class DefaultHandler
         } else {
             $response = json_decode($this->checkIfExternalExists($filename, $getDisabled), true);
             if (!$response['success']) {
-                return new Response(json_encode($response));
+                return new JsonResponse($response);
             } else {
                 $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename);
-                if (empty($response))
-                    return new Response(json_encode(array("success" => false, "message" => "No files for Library named " . $library . " found.")));
+                if (empty($response)) {
+                    return new JsonResponse(
+                        ['success' => false, 'message' => 'No files for Library named ' . $library . ' found.']
+                    );
+                }
+
                 if ($renderView) {
                     $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
 
@@ -82,18 +87,17 @@ class DefaultHandler
                 }
             }
         }
-        if (!$renderView)
-            return new Response(json_encode(array("success" => true, "message" => "Library found", "files" => $response)));
-        else {
-
-            return new Response(json_encode(array(
-                "success" => true,
-                "library" => $filename,
-                "files" => $response,
-                "examples" => $examples,
-                "meta" => $meta
-            )));
+        if (!$renderView) {
+            return new JsonResponse(['success' => true, 'message' => 'Library found', 'files' => $response]);
         }
+
+        return new JsonResponse([
+            'success' => true,
+            'library' => $filename,
+            'files' => $response,
+            'examples' => $examples,
+            'meta' => $meta
+        ]);
     }
 
     /**
@@ -141,11 +145,14 @@ class DefaultHandler
                 );
         }
         if (empty($needToUpdate)) {
-            return new Response(json_encode(array("success" => true, "message" => "No external libraries need to be updated")));
-
+            return new JsonResponse(['success' => true, 'message' => 'No external libraries need to be updated']);
         }
 
-        return new Response(json_encode(array("success" => true, "message" => count($needToUpdate) . " external libraries need to be updated", "libraries" => $needToUpdate)));
+        return new JsonResponse([
+            'success' => true,
+            'message' => count($needToUpdate) . " external libraries need to be updated",
+            'libraries' => $needToUpdate
+        ]);
     }
 
     public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
