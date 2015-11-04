@@ -158,7 +158,7 @@ class DefaultController extends Controller
 
         $repoBranches = $handler->fetchRepoRefsFromGit($processedGitUrl['owner'], $processedGitUrl['repo']);
 
-        if ($repoBranches['success'] != true) {
+        if ($repoBranches['success'] !== true) {
             return new Response(json_encode(array(
                         'success' => false,
                         'message' => 'Something went wrong while fetching the library. Please double check the Url you provided.'
