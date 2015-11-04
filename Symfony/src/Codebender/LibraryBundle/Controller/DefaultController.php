@@ -6,6 +6,7 @@ use Codebender\LibraryBundle\Entity\Example;
 use Codebender\LibraryBundle\Entity\ExternalLibrary;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,7 +19,7 @@ class DefaultController extends Controller
      */
     public function statusAction()
     {
-        return new Response(json_encode(array("success" => true, "status" => "OK")));
+        return new JsonResponse(['success' => true, 'status' => 'OK']);
     }
 
     /**
@@ -31,8 +32,8 @@ class DefaultController extends Controller
      */
     public function apiHandlerAction($version)
     {
-        if ($version != "v1") {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid library manager API version.")));
+        if ($version != 'v1') {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid library manager API version.']);
         }
 
         $request = $this->getRequest();
@@ -40,11 +41,11 @@ class DefaultController extends Controller
 
         $content = json_decode($content, true);
         if ($content === null) {
-            return new Response(json_encode(array("success" => false, "message" => "Wrong data")));
+            return new JsonResponse(['success' => false, 'message' => 'Wrong data']);
         }
 
         if ($this->isValid($content) === false) {
-            return new Response(json_encode(array("success" => false, "message" => "Incorrect request fields")));
+            return new JsonResponse(['success' => false, 'message' => 'Incorrect request fields']);
         }
 
         return $this->selectAction($content);
@@ -69,7 +70,7 @@ class DefaultController extends Controller
             case "getKeywords":
                 return $this->getKeywords($content["library"]);
             default:
-                return new Response(json_encode(array("success" => false, "message" => "No valid action requested")));
+                return new JsonResponse(['success' => false, 'message' => 'No valid action requested']);
         }
     }
 
@@ -107,16 +108,16 @@ class DefaultController extends Controller
         ksort($includedLibraries);
         ksort($externalLibraries);
 
-        return new Response(json_encode(
-                array(
-                    "success" => true,
-                    "text" => "Successful Request!",
-                    "categories" => array(
-                        "Examples" => $builtinExamples,
-                        "Builtin Libraries" => $includedLibraries,
-                        "External Libraries" => $externalLibraries)
-                )
-            )
+        return new JsonResponse(
+            [
+                'success' => true,
+                'text' => 'Successful Request!',
+                'categories' => [
+                    'Examples' => $builtinExamples,
+                    'Builtin Libraries' => $includedLibraries,
+                    'External Libraries' => $externalLibraries
+                ]
+            ]
         );
     }
 
@@ -124,8 +125,8 @@ class DefaultController extends Controller
     {
 
         $type = json_decode($this->getLibraryType($library), true);
-        if (!$type['success']) {
-            return new Response(json_encode($type));
+        if ($type['success'] !== true) {
+            return new JsonResponse($type);
         }
 
         switch ($type['type']) {
@@ -153,22 +154,19 @@ class DefaultController extends Controller
         $processedGitUrl = $handler->processGithubUrl($githubUrl);
 
         if ($processedGitUrl['success'] !== true) {
-            return new Response(json_encode(array('success' => false, 'message' => 'Could not process provided url')));
+            return new JsonResponse(['success' => false, 'message' => 'Could not process provided url']);
         }
 
         $repoBranches = $handler->fetchRepoRefsFromGit($processedGitUrl['owner'], $processedGitUrl['repo']);
 
         if ($repoBranches['success'] !== true) {
-            return new Response(json_encode(array(
-                        'success' => false,
-                        'message' => 'Something went wrong while fetching the library. Please double check the Url you provided.'
-                    )));
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Something went wrong while fetching the library. Please double check the Url you provided.'
+            ]);
         }
 
-        $response = new Response(json_encode(array('success' => true, 'branches' => $repoBranches['headRefs'])));
-
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        return new JsonResponse(['success' => true, 'branches' => $repoBranches['headRefs']]);
     }
 
     public function getRepoGitTreeAndMetaAction()
@@ -180,7 +178,7 @@ class DefaultController extends Controller
         $gitBranch = $this->getRequest()->request->get('githubBranch');
 
         if ($processedGitUrl['success'] !== true) {
-            return new Response(json_encode(array('success' => false, 'message' => 'Could not process provided url')));
+            return new JsonResponse(['success' => false, 'message' => 'Could not process provided url']);
         }
 
         $githubLibrary = json_decode(
@@ -194,25 +192,19 @@ class DefaultController extends Controller
         );
 
         if (!$githubLibrary['success']) {
-            $response = new Response(json_encode($githubLibrary));
-            $response->headers->set('Content-Type', 'application/json');
-            return $response;
+            return new JsonResponse($githubLibrary);
         }
 
         $description = $handler->getRepoDefaultDescription($processedGitUrl['owner'], $processedGitUrl['repo']);
 
-        $response = new Response(json_encode(
-            array(
-                'success' => true,
-                'files' => $githubLibrary['files'],
-                'owner' => $processedGitUrl['owner'],
-                'repo' => $processedGitUrl['repo'],
-                'branch' => $gitBranch,
-                'description' => $description
-                )
-        ));
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        return new JsonResponse([
+            'success' => true,
+            'files' => $githubLibrary['files'],
+            'owner' => $processedGitUrl['owner'],
+            'repo' => $processedGitUrl['repo'],
+            'branch' => $gitBranch,
+            'description' => $description
+        ]);
     }
 
     private function getLibraryExamples($library)
@@ -482,23 +474,20 @@ class DefaultController extends Controller
     private function getKeywords($library)
     {
         if ($library === null) {
-
-            return new Response(json_encode(array("success" => false)));
-
+            return new JsonResponse(['success' => false]);
         }
 
         $exists = json_decode($this->getLibraryType($library), true);
 
         if ($exists['success'] === false) {
-            return new Response(json_encode($exists));
+            return new JsonResponse($exists);
         }
 
-        $path = "";
         if ($exists['type'] == 'external') {
             $path = $this->container->getParameter('external_libraries') . '/' . $library;
         } else if ($exists['type'] = 'builtin') {
             $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
-        } else return new Response(json_encode(array("success" => false)));
+        } else return new JsonResponse(['success' => false]);
 
         $keywords = array();
 
@@ -535,7 +524,7 @@ class DefaultController extends Controller
             break;
         }
 
-        return new Response(json_encode(array('success' => true, 'keywords' => $keywords)));
+        return new JsonResponse(['success' => true, 'keywords' => $keywords]);
 
     }
 
