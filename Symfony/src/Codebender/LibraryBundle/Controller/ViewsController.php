@@ -9,6 +9,7 @@
 namespace Codebender\LibraryBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Finder\Finder;
 use Codebender\LibraryBundle\Entity\ExternalLibrary;
@@ -211,8 +212,9 @@ class ViewsController extends Controller
         $response = $handler->getLibraryCode($library, $disabled, true);
 
         $response = json_decode($response->getContent(), true);
-        if ($response["success"] === false)
-            return new Response(json_encode($response));
+        if ($response['success'] === false) {
+            return new JsonResponse($response);
+        }
 
         $inSync = $handler->isLibraryInSyncWithGit(
             $response['meta']['gitOwner'],
@@ -237,8 +239,8 @@ class ViewsController extends Controller
 
         $handlerResponse = $handler->checkGithubUpdates();
 
-        if ($handlerResponse["success"] === false) {
-            return new Response(json_encode(array("success" => false, "message" => "Invalid authorization key.")));
+        if ($handlerResponse['success'] !== true) {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid authorization key.']);
         }
 
         //TODO: create the twig and render it on return
@@ -265,7 +267,7 @@ class ViewsController extends Controller
             }
         }
         if ($json !== null && $json = true) {
-            return new Response(json_encode(['success' => true, 'libs' => $names]));
+            return new JsonResponse(['success' => true, 'libs' => $names]);
         }
         return $this->render('CodebenderLibraryBundle:Default:search.html.twig',
             ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]);
@@ -274,14 +276,14 @@ class ViewsController extends Controller
     public function changeLibraryStatusAction($library)
     {
         if ($this->getRequest()->getMethod() != 'POST') {
-            return new Response(json_encode(array("success" => false, "message" => "POST should be used.")));
+            return new JsonResponse(['success' => false, 'message' => 'POST method required']);
         }
 
         $handler = $this->get('codebender_library.handler');
         $exists = json_decode($handler->checkIfExternalExists($library, true), true);
 
         if ($exists['success'] === false) {
-            return new Response(json_encode(array("success" => false, "message" => "Library not found.")));
+            return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -293,7 +295,7 @@ class ViewsController extends Controller
         $em->persist($lib[0]);
         $em->flush();
 
-        return new Response(json_encode(array("success" => true)));
+        return new JsonResponse(['success' => true]);
     }
 
     public function downloadAction($library)
