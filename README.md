@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/codebendercc/eratosthenes.svg?branch=library-manager-updates-no-html-encode)](https://travis-ci.org/codebendercc/eratosthenes)
+[![Coverage Status](https://coveralls.io/repos/codebendercc/eratosthenes/badge.svg?branch=library-manager-updates-no-html-encode&service=github)](https://coveralls.io/github/codebendercc/eratosthenes?branch=library-manager-updates-no-html-encode)
 Arduino Library Management System
 ====
 
