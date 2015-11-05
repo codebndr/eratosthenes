@@ -126,7 +126,7 @@ class DefaultHandler
 
             $branch = $lib->getBranch();
             if ($branch === null){
-                $branch = 'master';
+                $branch = ''; // not providing any branch will make git return the commits of the default branch
             }
 
             $directoryInRepo = $lib->getInRepoPath();
@@ -160,6 +160,7 @@ class DefaultHandler
      * Fetches the last commit sha of a repo. `sha` parameter can either be the name of a branch, or a commit
      * sha. In the first case, the commit sha's of the branch are returned. In the second case, the commit sha's
      * of the default branch are returned, as long as the have been written after the provided commit.
+     * Not providing any sha/branch will make Git API return the list of commits for the default branch.
      * The API can also use a path parameter, in which case only commits that affect a specific directory are returned.
      *
      * @param $gitOwner
@@ -168,14 +169,16 @@ class DefaultHandler
      * @param string $path
      * @return mixed
      */
-    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
+    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = '', $path = '')
     {
         /*
          * See the docs here https://developer.github.com/v3/repos/commits/
          * for more info on the json returned.
          */
         $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
-        $queryParams = "?sha=". $sha;
+        if ($path != '') {
+            $queryParams = "?sha=" . $sha;
+        }
         if ($path != '') {
             $queryParams .= "&path=$path";
         }
