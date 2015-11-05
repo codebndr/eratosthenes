@@ -36,28 +36,28 @@ class ViewsController extends Controller
 
         $form->handleRequest($this->getRequest());
 
-        if ($form->isValid()) {
-            $formData = $form->getData();
-
-            $libraryAdded = $this->addLibrary($formData);
-            if ($libraryAdded['success'] != true){
-                $flashBag = $this->get('session')->getFlashBag();
-                $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
-                $form = $this->createForm(new NewLibraryForm());
-
-                return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', [
-                    'authorizationKey' => $authorizationKey,
-                    'form' => $form->createView()
-                ]);
-            }
-
-            return $this->redirect($this->generateUrl('codebender_library_view_library',
-                ['authorizationKey' => $authorizationKey, 'library' => $formData['MachineName'], 'disabled' => 1]));
+        if (!$form->isValid()) {
+            return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+                'authorizationKey' => $authorizationKey,
+                'form' => $form->createView()
+            ));
         }
-        return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
-            'authorizationKey' => $authorizationKey,
-            'form' => $form->createView()
-        ));
+        $formData = $form->getData();
+
+        $libraryAdded = $this->addLibrary($formData);
+        if ($libraryAdded['success'] !== true){
+            $flashBag = $this->get('session')->getFlashBag();
+            $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
+            $form = $this->createForm(new NewLibraryForm());
+
+            return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', [
+                'authorizationKey' => $authorizationKey,
+                'form' => $form->createView()
+            ]);
+        }
+
+        return $this->redirect($this->generateUrl('codebender_library_view_library',
+            ['authorizationKey' => $authorizationKey, 'library' => $formData['MachineName'], 'disabled' => 1]));
     }
 
     /**
