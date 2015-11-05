@@ -338,9 +338,7 @@ class ViewsController extends Controller
                 $htmlcode = 404;
             } else {
                 foreach ($files as $file) {
-                    /*
-                     * No special handling needed for binary files, since addFromString method is binary safe.
-                     */
+                    // No special handling needed for binary files, since addFromString method is binary safe.
                     $zip->addFromString($library . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
                 }
                 foreach ($examples as $file) {
