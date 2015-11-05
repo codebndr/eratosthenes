@@ -489,7 +489,7 @@ class ViewsController extends Controller
                 array_push($files, $subdir['directory']);
             } else {
                 $file = json_decode($this->processZipFile($path . '/' . $file), true);
-                if ($file['success'] !== true) {
+                if ($file['success'] === true) {
                     array_push($files, $file['file']);
                 } else if ($file['message'] != "Bad Encoding") {
                     return json_encode($file);
