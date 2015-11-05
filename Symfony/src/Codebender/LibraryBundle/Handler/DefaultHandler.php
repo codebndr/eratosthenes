@@ -265,6 +265,10 @@ class DefaultHandler
      */
     public function isLibraryInSyncWithGit($owner, $repo, $branch, $inRepoPath, $lastCommit)
     {
+        /*
+         * The values below are fetched fromt the database of the application. If any of them is not set
+         * in the database, the default (null) value will be returned.
+         */
         if ($owner === null || $repo === null || $branch === null || $lastCommit === null) {
             return false;
         }
