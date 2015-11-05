@@ -135,15 +135,16 @@ class DefaultHandler
             }
 
             $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
-            if ($lastCommitFromGithub !== $lib->getLastCommit())
-                $needToUpdate[] = array(
+            if ($lastCommitFromGithub !== $lib->getLastCommit()) {
+                $needToUpdate[] = [
                     'Machine Name' => $lib->getMachineName(),
                     'Human Name' => $lib->getHumanName(),
                     'Git Owner' => $lib->getOwner(),
                     'Git Repo' => $lib->getRepo(),
                     'Git Branch' => $lib->getBranch(),
                     'Path in Git Repo' => $lib->getInRepoPath()
-                );
+                ];
+            }
         }
         if (empty($needToUpdate)) {
             return new JsonResponse(['success' => true, 'message' => 'No external libraries need to be updated']);
