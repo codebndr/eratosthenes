@@ -342,13 +342,13 @@ class DefaultHandler
                     return $code;
                 }
                 $libraryContents['contents'][] = $code['file'];
-                continue;
+            } elseif ($element['type'] == 'dir') {
+                $directoryContents = $this->getGithubRepoCode($owner, $repo, $branch, $element['path']);
+                if ($directoryContents['success'] !== true) {
+                    return $directoryContents;
+                }
+                $libraryContents['contents'][] = $directoryContents['library'];
             }
-            $directoryContents = $this->getGithubRepoCode($owner, $repo, $branch, $element['path']);
-            if ($directoryContents['success'] !== true) {
-                return $directoryContents;
-            }
-            $libraryContents['contents'][] = $directoryContents['library'];
         }
 
         return array('success' => true, 'library' => $libraryContents);
