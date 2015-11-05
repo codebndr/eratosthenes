@@ -33,7 +33,6 @@ sudo apt-get install -y apache2 libapache2-mod-php5 php5-mysql php-pear php5-xde
 
 # Enable Apache configs
 sudo a2enmod rewrite
-sudo a2enmod alias
 
 # Restart Apache
 sudo service apache2 reload
