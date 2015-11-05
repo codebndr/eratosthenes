@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: fpapadopou
- * Date: 1/28/15
- * Time: 10:19 AM
- */
 
 namespace Codebender\LibraryBundle\Controller;
 
