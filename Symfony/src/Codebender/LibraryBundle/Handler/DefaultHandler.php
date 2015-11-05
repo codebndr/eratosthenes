@@ -464,7 +464,7 @@ class DefaultHandler
             $this->curlRequest(
                 $requestUrl,
                 null,
-                ['User-Agent: ' . $githubAppName, 'Accept: ' . 'application/vnd.github.v3.raw+json']
+                ['User-Agent: ' . $githubAppName, 'Accept: application/vnd.github.v3.json']
             ), true);
 
         return  $jsonDecodedContent;
