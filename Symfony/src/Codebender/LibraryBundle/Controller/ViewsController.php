@@ -183,10 +183,9 @@ class ViewsController extends Controller
         }
         $parentPath = $files['name'];
         foreach ($files['contents'] as &$element) {
-            if ($element['type'] != 'dir') {
-                continue;
+            if ($element['type'] == 'dir') {
+                $element = $this->fixGitPaths($element, $root, $parentPath);
             }
-            $element = $this->fixGitPaths($element, $root, $parentPath);
         }
         return $files;
     }
