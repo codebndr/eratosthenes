@@ -31,7 +31,10 @@ class AuthenticationListener
 
         $routeParameters = $request->attributes->get('_route_params');
 
-        if (array_key_exists('authorizationKey', $routeParameters) && $routeParameters['authorizationKey'] != $this->authorizationKey) {
+        if (!empty($routeParameters)
+            && array_key_exists('authorizationKey', $routeParameters)
+            && $routeParameters['authorizationKey'] != $this->authorizationKey
+        ) {
             $event->setResponse(new Response(
                 json_encode(['success' => false, 'message' => '[eratosthenes] Invalid authorization key.'])
             ));
