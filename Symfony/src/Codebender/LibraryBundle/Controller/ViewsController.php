@@ -205,17 +205,20 @@ class ViewsController extends Controller
         $response = $handler->getLibraryCode($library, $disabled, true);
 
         $response = json_decode($response->getContent(), true);
-        if ($response['success'] === false) {
+        if ($response['success'] !== true) {
             return new JsonResponse($response);
         }
 
-        $inSync = $handler->isLibraryInSyncWithGit(
-            $response['meta']['gitOwner'],
-            $response['meta']['gitRepo'],
-            $response['meta']['gitBranch'],
-            $response['meta']['gitInRepoPath'],
-            $response['meta']['gitLastCommit']
-        );
+        $inSync = false;
+        if (!empty($response['meta'])) {
+            $inSync = $handler->isLibraryInSyncWithGit(
+                $response['meta']['gitOwner'],
+                $response['meta']['gitRepo'],
+                $response['meta']['gitBranch'],
+                $response['meta']['gitInRepoPath'],
+                $response['meta']['gitLastCommit']
+            );
+        }
 
         return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
             'library' => $response['library'],
