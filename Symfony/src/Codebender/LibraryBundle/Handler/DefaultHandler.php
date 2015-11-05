@@ -305,8 +305,10 @@ class DefaultHandler
          */
         $contents = $this->curlGitRequest($url, $queryParams);
 
+        // When something goes wrong during a Git API request, a `message` key exists in the response.
+        // Thus we have to return `success => false`.
         if (array_key_exists('message', $contents)) {
-            return array('success' => false, 'message' => $contents['message']);
+            return ['success' => false, 'message' => $contents['message']];
         }
 
         if ($path == '') {
