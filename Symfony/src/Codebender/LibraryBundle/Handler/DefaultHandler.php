@@ -156,6 +156,18 @@ class DefaultHandler
         ]);
     }
 
+    /**
+     * Fetches the last commit sha of a repo. `sha` parameter can either be the name of a branch, or a commit
+     * sha. In the first case, the commit sha's of the branch are returned. In the second case, the commit sha's
+     * of the default branch are returned, as long as the have been written after the provided commit.
+     * The API can also use a path parameter, in which case only commits that affect a specific directory are returned.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param string $sha
+     * @param string $path
+     * @return mixed
+     */
     public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = 'master', $path = '')
     {
         /*
