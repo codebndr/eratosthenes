@@ -597,34 +597,46 @@ class DefaultHandler
         return $machineNames;
     }
 
+    /**
+     * Iterates over a generated JS-tree structure and finds the selected node (and
+     * its selected sub-nodes and so on) based on the provided path. Each node can either
+     * be of type `blob` (file) or type `tree` (directory).
+     * The method will recursively be called until all the nodes of the path are marked as
+     * `selected`.
+     *
+     * @param string $path
+     * @param array $files
+     * @return array
+     */
     private function findSelectedNode($path, $files)
     {
-        /*
-         * Remove trailing slashes
-         */
-        if (substr($path, -1) == '/') {
-            $path = substr($path, 0, strlen($path) - 1);
-        }
+         // Remove trailing slashes
+        $path = rtrim($path, '/');
+        // Then split the provided path in slashes
         $path = explode('/', $path);
 
-        $files['state'] = array('opened' => true);
+        $files['state'] = ['opened' => true];
         if (count($path) == 1) {
-            $files['state'] = array('opened' => true, 'selected' => true);
+            $files['state'] += ['selected' => true];
             return $files;
         }
 
+        // Since the current node ($path[0]) is marked as selected, remove it from the path
+        // and call the method again providing the rest of the path
         unset($path[0]);
         $path = array_values($path);
         if (count($path) == 0) {
+            // Getting here means we've reached the final selection node in the tree structure
             return $files;
         }
 
-        foreach ($files['children'] as &$child) {
-            if ($child['type'] != 'tree' || !array_key_exists('children', $child) || $child['text'] != $path[0]) {
-                continue;
+        // Find the next directory node that mathes the provided path, repeat the process,
+        // marking its sub-nodes as selected.
+        foreach ($files['children'] as $key => $childNode) {
+            if ($childNode['type'] == 'tree' && array_key_exists('children', $childNode) && $childNode['text'] == $path[0]) {
+                $files['children'][$key] = $this->findSelectedNode(implode('/', $path), $childNode);
+                break;
             }
-            $child = $this->findSelectedNode(implode('/', $path), $child);
-            break;
         }
 
         return $files;
