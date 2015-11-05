@@ -177,6 +177,7 @@ class DefaultHandler
          * for more info on the json returned.
          */
         $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
+        $queryParams = '';
         if ($path != '') {
             $queryParams = "?sha=" . $sha;
         }
