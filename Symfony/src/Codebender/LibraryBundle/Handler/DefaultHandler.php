@@ -178,7 +178,7 @@ class DefaultHandler
          */
         $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
         $queryParams = '';
-        if ($path != '') {
+        if ($sha != '') {
             $queryParams = "?sha=" . $sha;
         }
         if ($path != '') {
