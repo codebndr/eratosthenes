@@ -7,34 +7,40 @@
         var $branch = $("#gitBranches").val();
         $.post( "{{ path('codebender_library_get_repo_tree_meta', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, githubBranch : $branch })
             .done(function( data ) {
-                if(data.success)
-                {
-                    if (data.files) {
-                        $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Select Directory');
-                        $('#steps .active').removeClass('active');
-                        $('.step2').show().addClass('active');
-
-                        $('#jstreeDiv').show();
-
-                        $('#jstreeDiv').jstree(true).settings.core.data = data.files;
-                        $('#jstreeDiv').jstree(true).refresh(false, true);
-                        $('#step1').hide();
-                        $('#step2').show();
-                        $('#step3').show();
-                    } else {
-                        $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to get the repository file tree. Please try again.');
-                    }
-                    if (data.owner && data.repo && data.branch && data.description) {
-                        update_git(data.owner, data.repo, data.branch, data.description)
-                    } else {
-                        $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
-                    }
-                }
-                else
-                {
+                if(!data.success) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> There is no such library');
+                    return;
                 }
+
+                if (!data.files) {
+                    $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to get the repository file tree. Please try again.');
+                    return;
+                }
+
+                $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Select Directory');
+                $('#steps .active').removeClass('active');
+                $('.step2').show().addClass('active');
+
+                $('#jstreeDiv').show();
+
+                updateJsTreeData(data.files);
+
+                $('#step1').hide();
+                $('#step2').show();
+                $('#step3').show();
+
+                if (!data.owner || !data.repo || !data.branch || !data.description) {
+                    $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
+                    return;
+                }
+                update_git(data.owner, data.repo, data.branch, data.description)
             });
+    }
+
+    function updateJsTreeData(data)
+    {
+        $('#jstreeDiv').jstree(true).settings.core.data = data;
+        $('#jstreeDiv').jstree(true).refresh(false, true);
     }
 
     function get_github_branches()
