@@ -345,7 +345,11 @@ class DefaultHandler
          */
         $jsonDecodedContent = $this->curlGitRequest($url);
 
-        if (json_last_error() == JSON_ERROR_NONE && array_key_exists('message', $jsonDecodedContent)) {
+        if (json_last_error() != JSON_ERROR_NONE) {
+            return ['success' => false, 'message' => 'Invalid Git API response (cannot decode)'];
+        }
+
+        if (array_key_exists('message', $jsonDecodedContent)) {
             return array('success' => false, 'message' => $jsonDecodedContent['message']);
         }
 
