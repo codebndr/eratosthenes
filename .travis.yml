@@ -1,8 +1,5 @@
 sudo: required
 dist: trusty
-language: php
-php:
-  - 5.5.9
 
 # Add encrypted env variables, used for setting up the test environment
 env:
