@@ -1,0 +1,40 @@
+.title { font-size: 30px; line-height: 32px; color: #4D4D4D; text-shadow: 1px 1px 0 #DADADA; padding: 0 0 15px 0; border-bottom: 1px solid #DADADA; margin: 0 0 30px; }
+.title span { color: #BBB; font-size: 30px; }
+
+#newLibMessage { font-size: 22px; line-height: 24px; color: #777; font-weight: normal; padding: 10px 15px; text-shadow: 1px 1px 0 #fff; border: 1px dashed #DADADA; border-radius: 5px; margin: 0; }
+#newLibMessage span { color: #000; }
+
+#step2 { border: 1px dashed #DADADA; padding: 20px 0 0; -webkit-border-radius: 4px; border-radius: 4px; }
+
+.box { padding: 20px; background: #F1F1F1; -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid #DADADA; margin: 0 0 30px 0; }
+
+.labelcontent { font-size: 16px; line-height: 18px; font-weight: normal; color: #4D4D4D; margin: 15px 0; text-shadow: 1px 1px 0 #fff; }
+.labelcontent:first-child, .labelcontent:last-child { margin: 0; }
+.labelcontent > span { font-weight: bold; font-style: normal; }
+.labelcontent i { color: #000; font-weight: normal; }
+.labelcontent input { display: block; margin: 8px 0 0; width: 96%; }
+.bootstrap-tagsinput input { display: inline-block; }
+
+#orDiv.labelcontent { color: #313131; text-align: center;}
+
+#step2 ul { list-style-type: none; }
+#step2 ul li { line-height: 25px; }
+#step2 ul li a, #step2 ul li span { text-shadow: 1px 1px 0 #FFF; font-size: 15px; line-height: 17px; color: #777; }
+#step2 ul li a { cursor: pointer; text-decoration: none; font-weight: bold; color: #4d4d4d; }
+#step2 ul li a:hover { color: #bbb; }
+#step2 ul li span:before { font-family: 'FontAwesome'; margin:0 5px 0 -15px; color: #dadada; text-shadow: 1px 1px 0 #FFF; }
+#step2 ul li .folder:before { content: '\f07c';  }
+#step2 ul li .file:before { content: '\f0f6'; color: #bbb; }
+
+#steps { text-align: center; margin: 20px 0; }
+#steps ol { display: inline-block; width: auto; margin: 0 auto; padding: 0; text-align: center; list-style-type: none; }
+#steps li { display: inline-block; width: auto; margin: 0 3px; }
+#steps li a { display: inline-block; cursor: default; width: auto; height: auto; font-size: 15px; line-height: 24px; color: #777; padding: 0 8px; background: #dadada; -webkit-border-radius: 50%; border-radius: 50%; }
+#steps li a:hover { color: #fff; background: #bbb; text-decoration: none;  }
+#steps li .active, #steps li .active:hover { cursor: default; color: #fff; background: #777; text-decoration: none; }
+
+#step2, #step2 #dirStructure, #step2 #dirSelection { max-height: 400px; overflow: hidden; display: none; }
+
+#step3, #step3 #form, #step3 #verify { display: none; }
+
+input[type="file"] { width: 175px; }

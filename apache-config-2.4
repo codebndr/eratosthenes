@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    DocumentRoot /opt/codebender/eratosthenes/Symfony/web
+    DirectoryIndex app.php
+    SetEnv APPLICATION_ENV "production"
+    <Directory /opt/codebender/eratosthenes/Symfony/web>
+        Options -Indexes +FollowSymLinks +MultiViews
+        Require all granted
+        AllowOverride All
+    </Directory>
+</VirtualHost>

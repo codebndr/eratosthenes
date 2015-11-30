@@ -84,7 +84,7 @@ class Example
      * Set library
      *
      * @param ExternalLibrary $library
-     * @return ExternalLibrary
+     * @return Example
      */
     public function setLibrary($library)
     {

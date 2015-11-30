@@ -2,6 +2,7 @@ language: php
 php:
   - 5.5.9
 
+# Add encrypted env variables, used for setting up the test environment
 env:
   global:
     # Encrypted env variable $GIT_LIBMGR_APP_NAME, wil be used to set up the Github client app name for tests
@@ -12,18 +13,24 @@ env:
     - secure: "DxJuGHfobvQNpNxbAiXbbzjo8KuSBk56GXHpXJzoBaVgHE9bwqXDoAblf4JlGq0HHxcrdiyBV/axFk0Xg7m9gui3t9+YUV9tT21Hl+dSfdjT1ygrlP6vd+G6l0kAbOAuYypkAg3cIDNvDsN9tsVJvQ195OkIWCGGvKd6fA6aPio="
 
 before_script:
+  # Change the default user-password pair for mysql (pre-installed on Travis CI)
   - mysql -u root -e "UPDATE user SET Password=PASSWORD('hello') WHERE User='root';FLUSH PRIVILEGES;" mysql
   - sudo service mysql restart
+  # Install our app
   - scripts/travis_install.sh
   - cd /opt/codebender/eratosthenes/Symfony
   - sudo chmod -R 777 app/cache app/logs
+  # Set error reporting to "ALL". Thus, we'll be notified of warnings too
   - echo 'error_reporting =  E_ALL' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
 script:
+  # Run the tests
   - sudo mkdir -p build/logs
   - sudo chmod -R 777 build/logs
-  - scripts/run_tests.sh
+  - ../scripts/configure_system.sh
+  - ../scripts/run_tests.sh
 
 after_script:
+  # Generate coverage
   - php composer.phar install --dev
   - php bin/coveralls -v
