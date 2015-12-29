@@ -56,6 +56,9 @@ class DefaultHandler
             $filename = "Robot_Control";
         else if ($filename == "ArduinoRobotMotorBoard")
             $filename = "Robot_Motor";
+        if ($filename == 'BlynkSimpleSerial') {
+            $filename = 'BlynkSimpleEthernet';
+        }
 
         $exists = json_decode($this->checkIfBuiltInExists($filename), true);
 
