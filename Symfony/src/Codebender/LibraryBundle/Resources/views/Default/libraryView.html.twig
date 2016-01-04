@@ -147,7 +147,7 @@
         var route = "{{ path('codebender_library_status_change', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
         $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
-                var response = jQuery.parseJSON(data);
+                var response = data;
                 if(response.success)
                 {
                     $("#statusbutton").toggleClass("btn-success");
