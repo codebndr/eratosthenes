@@ -72,13 +72,11 @@ class DefaultHandler
         } else {
             $response = json_decode($this->checkIfExternalExists($filename, $getDisabled), true);
             if (!$response['success']) {
-                return new JsonResponse($response);
+                return $response;
             } else {
                 $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename);
                 if (empty($response)) {
-                    return new JsonResponse(
-                        ['success' => false, 'message' => 'No files for Library named ' . $library . ' found.']
-                    );
+                    return ['success' => false, 'message' => 'No files for Library named ' . $library . ' found.'];
                 }
 
                 if ($renderView) {
@@ -92,16 +90,16 @@ class DefaultHandler
             }
         }
         if (!$renderView) {
-            return new JsonResponse(['success' => true, 'message' => 'Library found', 'files' => $response]);
+            return ['success' => true, 'message' => 'Library found', 'files' => $response];
         }
 
-        return new JsonResponse([
+        return [
             'success' => true,
             'library' => $filename,
             'files' => $response,
             'examples' => $examples,
             'meta' => $meta
-        ]);
+        ];
     }
 
     /**
@@ -112,7 +110,7 @@ class DefaultHandler
      * last commit fetching, that is, the last commit for the root directory of the repo is fethced.
      * TODO: Enchance the method, making it able to auto-update any outdated libraries.
      *
-     * @return Response
+     * @return array
      */
     public function checkGithubUpdates()
     {
@@ -150,14 +148,14 @@ class DefaultHandler
             }
         }
         if (empty($needToUpdate)) {
-            return new JsonResponse(['success' => true, 'message' => 'No external libraries need to be updated']);
+            return ['success' => true, 'message' => 'No external libraries need to be updated'];
         }
 
-        return new JsonResponse([
+        return [
             'success' => true,
             'message' => count($needToUpdate) . " external libraries need to be updated",
             'libraries' => $needToUpdate
-        ]);
+        ];
     }
 
     /**

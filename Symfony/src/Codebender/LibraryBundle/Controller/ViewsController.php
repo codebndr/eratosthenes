@@ -204,7 +204,6 @@ class ViewsController extends Controller
 
         $response = $handler->getLibraryCode($library, $disabled, true);
 
-        $response = json_decode($response->getContent(), true);
         if ($response['success'] !== true) {
             return new JsonResponse($response);
         }
@@ -240,7 +239,7 @@ class ViewsController extends Controller
         }
 
         //TODO: create the twig and render it on return
-        return $handlerResponse;
+        return new JsonResponse($handlerResponse);
     }
 
     public function searchAction()

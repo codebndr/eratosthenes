@@ -27,8 +27,9 @@ class DefaultController extends Controller
      * Checks the autorization credentials and the validity of the request.
      * Can handle several types of requests, like code fetching, examples fetching, etc.
      *
+     * TODO: need to refactor how this work, JsonResponse objects are returned from all over the place inconsistently
      * @param $version
-     * @return Response
+     * @return JsonResponse
      */
     public function apiHandlerAction($version)
     {
@@ -48,19 +49,25 @@ class DefaultController extends Controller
             return new JsonResponse(['success' => false, 'message' => 'Incorrect request fields']);
         }
 
-        return $this->selectAction($content);
+        return new JsonResponse($this->selectAction($content));
     }
 
+    /**
+     * Decides which operation should be excuted based on the `type` parameter of
+     * the request. Returns an array with the results.
+     *
+     * @param $content
+     * @return array
+     */
     private function selectAction($content)
     {
-
         switch ($content["type"]) {
             case "list":
                 return $this->listAll();
             case "getExampleCode":
                 return $this->getExampleCode($content["library"], $content["example"]);
             case "getExamples":
-                return new Response($this->getLibraryExamples($content["library"]));
+                return $this->getLibraryExamples($content["library"]);
             case "fetch":
                 $handler = $this->get('codebender_library.handler');
                 return $handler->getLibraryCode($content["library"], 0);
@@ -70,7 +77,7 @@ class DefaultController extends Controller
             case "getKeywords":
                 return $this->getKeywords($content["library"]);
             default:
-                return new JsonResponse(['success' => false, 'message' => 'No valid action requested']);
+                return ['success' => false, 'message' => 'No valid action requested'];
         }
     }
 
@@ -108,25 +115,28 @@ class DefaultController extends Controller
         ksort($includedLibraries);
         ksort($externalLibraries);
 
-        return new JsonResponse(
-            [
-                'success' => true,
-                'text' => 'Successful Request!',
-                'categories' => [
-                    'Examples' => $builtinExamples,
-                    'Builtin Libraries' => $includedLibraries,
-                    'External Libraries' => $externalLibraries
-                ]
+        return [
+            'success' => true,
+            'text' => 'Successful Request!',
+            'categories' => [
+                'Examples' => $builtinExamples,
+                'Builtin Libraries' => $includedLibraries,
+                'External Libraries' => $externalLibraries
             ]
-        );
+        ];
     }
 
+    /**
+     * @param $library
+     * @param $example
+     * @return mixed|string
+     */
     private function getExampleCode($library, $example)
     {
 
-        $type = json_decode($this->getLibraryType($library), true);
+        $type = $this->getLibraryType($library);
         if ($type['success'] !== true) {
-            return new JsonResponse($type);
+            return $type;
         }
 
         switch ($type['type']) {
@@ -143,7 +153,7 @@ class DefaultController extends Controller
                 break;
         }
 
-        return new Response($example, 200, array('content-type' => 'application/json'));
+        return $example;
     }
 
     public function getLibraryGitBranchesAction()
@@ -209,9 +219,9 @@ class DefaultController extends Controller
 
     private function getLibraryExamples($library)
     {
-        $exists = json_decode($this->getLibraryType($library), true);
-        if ($exists['success'] === false) {
-            return json_encode($exists);
+        $exists = $this->getLibraryType($library);
+        if ($exists['success'] !== true) {
+            return $exists;
         }
         $examples = array();
         $path = "";
@@ -259,7 +269,7 @@ class DefaultController extends Controller
 
             $examples[$dir . $pathInfo['filename']] = $files;
         }
-        return json_encode(array('success' => true, 'examples' => $examples));
+        return ['success' => true, 'examples' => $examples];
     }
 
     private function getLibraryType($library)
@@ -271,7 +281,7 @@ class DefaultController extends Controller
          */
         $isExternal = json_decode($handler->checkIfExternalExists($library), true);
         if ($isExternal['success']) {
-            return json_encode(array('success' => true, 'type' => 'external'));
+            return ['success' => true, 'type' => 'external'];
         }
 
         /*
@@ -279,7 +289,7 @@ class DefaultController extends Controller
          */
         $isBuiltIn = json_decode($handler->checkIfBuiltInExists($library), true);
         if ($isBuiltIn['success']) {
-            return json_encode(array('success' => true, 'type' => 'builtin'));
+            return ['success' => true, 'type' => 'builtin'];
         }
 
         /*
@@ -287,11 +297,11 @@ class DefaultController extends Controller
          */
         $isExample = json_decode($this->checkIfBuiltInExampleFolderExists($library), true);
         if ($isExample['success']) {
-            return json_encode(array('success' => true, 'type' => 'example'));
+            return ['success' => true, 'type' => 'example'];
         }
 
         // Library was not found, return proper message
-        return json_encode(array('success' => false, 'message' => 'Library named ' . $library . ' not found.'));
+        return ['success' => false, 'message' => 'Library named ' . $library . ' not found.'];
     }
 
     private function getExternalExampleCode($library, $example)
@@ -314,10 +324,10 @@ class DefaultController extends Controller
                     }
                 }
                 if (!$meta) {
-                    return json_encode(array('success' => false));
+                    return ['success' => false];
                 }
             } else if (count($exampleMeta) == 0) {
-                return json_encode(array('success' => false));
+                return ['success' => false];
             } else {
                 $meta = $exampleMeta[0];
             }
@@ -352,10 +362,10 @@ class DefaultController extends Controller
                     }
                 }
                 if (!$filesPath) {
-                    return json_encode(array('success' => false));
+                    return ['success' => false];
                 }
             } else if (iterator_count($finder) == 0) {
-                return json_encode(array('success' => false));
+                return ['success' => false];
             } else {
                 $filesPathIterator = iterator_to_array($finder, false);
                 $filesPath = $filesPathIterator[0]->getPath();
@@ -386,7 +396,7 @@ class DefaultController extends Controller
 
         }
 
-        return json_encode(array('success' => true, "files" => $files));
+        return ['success' => true, "files" => $files];
     }
 
     private function checkIfBuiltInExampleFolderExists($library)
@@ -474,20 +484,22 @@ class DefaultController extends Controller
     private function getKeywords($library)
     {
         if ($library === null) {
-            return new JsonResponse(['success' => false]);
+            return ['success' => false];
         }
 
-        $exists = json_decode($this->getLibraryType($library), true);
+        $exists = $this->getLibraryType($library);
 
-        if ($exists['success'] === false) {
-            return new JsonResponse($exists);
+        if ($exists['success'] !== true) {
+            return $exists;
         }
 
         if ($exists['type'] == 'external') {
             $path = $this->container->getParameter('external_libraries') . '/' . $library;
         } else if ($exists['type'] = 'builtin') {
             $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
-        } else return new JsonResponse(['success' => false]);
+        } else {
+            return ['success' => false];
+        }
 
         $keywords = array();
 
@@ -524,7 +536,7 @@ class DefaultController extends Controller
             break;
         }
 
-        return new JsonResponse(['success' => true, 'keywords' => $keywords]);
+        return ['success' => true, 'keywords' => $keywords];
 
     }
 
