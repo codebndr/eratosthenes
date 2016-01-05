@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManager;
 
 class DefaultController extends Controller
 {
@@ -76,6 +76,8 @@ class DefaultController extends Controller
                 return $handler->checkGithubUpdates();
             case "getKeywords":
                 return $this->getKeywords($content["library"]);
+            case 'deleteLibrary':
+                return $this->deleteLibrary($content['library']);
             default:
                 return ['success' => false, 'message' => 'No valid action requested'];
         }
@@ -83,15 +85,16 @@ class DefaultController extends Controller
 
     private function isValid($requestContent)
     {
-        if (!array_key_exists("type", $requestContent)) {
+        if (!array_key_exists('type', $requestContent)) {
             return false;
         }
 
-        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords")) && !array_key_exists("library", $requestContent)) {
+        if (in_array($requestContent['type'], ['getExampleCode', 'getExamples', 'fetch', 'getKeywords', 'deleteLibrary'])
+            && !array_key_exists('library', $requestContent)) {
             return false;
         }
 
-        if ($requestContent["type"] == "getExampleCode" && !array_key_exists("example", $requestContent)) {
+        if ($requestContent['type'] == 'getExampleCode' && !array_key_exists('example', $requestContent)) {
             return false;
         }
 
@@ -215,6 +218,68 @@ class DefaultController extends Controller
             'branch' => $gitBranch,
             'description' => $description
         ]);
+    }
+
+    /**
+     * Deletes a library based on the provided.
+     *
+     * @param string $machineName
+     * @return array
+     */
+    public function deleteLibrary($machineName)
+    {
+        $exists = $this->getLibraryType($machineName);
+        if ($exists['success'] !== true) {
+            return ['success' => false, 'error' => $exists['message']];
+        }
+        if ($exists['type'] != 'external') {
+            return ['success' => false, 'error' => 'Library ' . $machineName . ' is not an external library.'];
+        }
+        $storagePath = $this->container->getParameter('external_libraries') . '/' . $machineName;
+        if (!file_exists($storagePath)) {
+            return ['success' => false, 'error' => 'Library ' . $machineName . ' does not exist in filesystem.'];
+        }
+
+        $this->removeLibraryExamplesEntities($machineName);
+        $this->removeLibraryEntity($machineName);
+
+        /* @var \Codebender\LibraryBundle\Handler\DefaultHandler $handler */
+        $handler = $this->get('codebender_library.handler');
+
+        $handler->removeDirectory($storagePath);
+
+        return ['success' => true, 'message' => 'Library ' . $machineName . ' deleted successfully.'];
+    }
+
+    private function removeLibraryEntity($machineName)
+    {
+        /* @var EntityManager $entityManager */
+        $entityManager = $this->container->get('doctrine')->getManager();
+
+        /* @var ExternalLibrary $libraryEntity */
+        $libraryEntity = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findOneBy(['machineName' => $machineName]);
+
+        $entityManager->remove($libraryEntity);
+        $entityManager->flush();
+    }
+
+    private function removeLibraryExamplesEntities($machineName)
+    {
+        /* @var EntityManager $entityManager */
+        $entityManager = $this->container->get('doctrine')->getManager();
+
+        /* @var ExternalLibrary $libraryEntity */
+        $libraryEntity = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findOneBy(['machineName' => $machineName]);
+
+        $libraryExamples = $entityManager->getRepository('CodebenderLibraryBundle:Example')
+            ->findBy(['library' => $libraryEntity->getId()]);
+        foreach ($libraryExamples as $example) {
+            /* @var Example $example */
+            $entityManager->remove($example);
+        }
+        $entityManager->flush();
     }
 
     private function getLibraryExamples($library)

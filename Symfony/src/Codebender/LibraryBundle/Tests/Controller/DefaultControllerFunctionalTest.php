@@ -366,6 +366,52 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
     }
 
+    /**
+     * EratosthenesAPI::deleteLibrary test
+     * Test cases:
+     * - Delete non-existent library (must fail)
+     * - Delete builtin library (must fail)
+     * - Delete existent library (must succeed)
+     */
+    public function testDeleteLibrary()
+    {
+        $client = static::createClient();
+
+        $libraryEntity = $client->getContainer()->get('doctrine')->getManager()
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findOneBy(['machineName' => 'SubCateg']);
+        $libraryId = $libraryEntity->getId();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // non-existent library can't be deleted
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"helloThere"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Library named helloThere not found.', $response['error']);
+
+        // builtin and example libraries can't be deleted
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"EEPROM"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Library EEPROM is not an external library.', $response['error']);
+
+        // an existent library on the other hand should be deleted successfully
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"SubCateg"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library SubCateg deleted successfully.', $response['message']);
+
+        // the library directory must have been deleted
+        $this->assertFalse(file_exists($client->getContainer()->getParameter('external_libraries') . '/SubCateg'));
+        // as well as the library metadata from the database
+        $libraryEntity = $client->getContainer()->get('doctrine')->getManager()
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(['machineName' => 'SubCateg']);
+        $this->assertEmpty($libraryEntity);
+        // and the metadata of the library's 2 examples
+        $libraryExamples = $client->getContainer()->get('doctrine')->getManager()
+            ->getRepository('CodebenderLibraryBundle:Example')->findBy(['library' => $libraryId]);
+        $this->assertEmpty($libraryExamples);
+    }
+
     public function testLibraryExamplesWithNonTextFiles()
     {
         $this->markTestIncomplete('Not implemented yet. Non-text files of examples are not handled properly');
