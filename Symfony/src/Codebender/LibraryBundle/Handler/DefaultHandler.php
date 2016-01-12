@@ -56,7 +56,7 @@ class DefaultHandler
             $filename = "Robot_Control";
         else if ($filename == "ArduinoRobotMotorBoard")
             $filename = "Robot_Motor";
-        if ($filename == 'BlynkSimpleSerial') {
+        if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
             $filename = 'BlynkSimpleEthernet';
         }
 
