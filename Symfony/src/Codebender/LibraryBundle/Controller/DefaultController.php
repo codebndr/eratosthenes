@@ -228,7 +228,7 @@ class DefaultController extends Controller
      */
     public function deleteLibrary($machineName)
     {
-        $exists = $this->getLibraryType($machineName);
+        $exists = $this->getLibraryType($machineName, true);
         if ($exists['success'] !== true) {
             return ['success' => false, 'error' => $exists['message']];
         }
@@ -337,14 +337,14 @@ class DefaultController extends Controller
         return ['success' => true, 'examples' => $examples];
     }
 
-    private function getLibraryType($library)
+    private function getLibraryType($library, $checkDisabledToo = false)
     {
         $handler = $this->get('codebender_library.handler');
 
         /*
          * Each library's type can be either external () ..
          */
-        $isExternal = json_decode($handler->checkIfExternalExists($library), true);
+        $isExternal = json_decode($handler->checkIfExternalExists($library, $checkDisabledToo), true);
         if ($isExternal['success']) {
             return ['success' => true, 'type' => 'external'];
         }
