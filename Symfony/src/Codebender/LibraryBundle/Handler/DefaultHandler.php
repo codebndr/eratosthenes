@@ -52,10 +52,11 @@ class DefaultHandler
         }
 
         //TODO handle the case of different .h filenames and folder names
-        if ($filename == "ArduinoRobot")
+        if ($filename == "ArduinoRobot") {
             $filename = "Robot_Control";
-        else if ($filename == "ArduinoRobotMotorBoard")
+        } elseif ($filename == "ArduinoRobotMotorBoard") {
             $filename = "Robot_Motor";
+        }
         if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
             $filename = 'BlynkSimpleEthernet';
         }
@@ -126,12 +127,12 @@ class DefaultHandler
             }
 
             $branch = $lib->getBranch();
-            if ($branch === null){
+            if ($branch === null) {
                 $branch = ''; // not providing any branch will make git return the commits of the default branch
             }
 
             $directoryInRepo = $lib->getInRepoPath();
-            if ($directoryInRepo === null){
+            if ($directoryInRepo === null) {
                 $directoryInRepo = '';
             }
 
@@ -194,10 +195,11 @@ class DefaultHandler
     public function checkIfBuiltInExists($library)
     {
         $arduino_library_files = $this->container->getParameter('builtin_libraries') . "/";
-        if (is_dir($arduino_library_files . "/libraries/" . $library))
+        if (is_dir($arduino_library_files . "/libraries/" . $library)) {
             return json_encode(array("success" => true, "message" => "Library found"));
-        else
+        } else {
             return json_encode(array("success" => false, "message" => "No Library named " . $library . " found."));
+        }
     }
 
     public function checkIfExternalExists($library, $getDisabled = false)
@@ -208,7 +210,6 @@ class DefaultHandler
         } else {
             return json_encode(array("success" => true, "message" => "Library found"));
         }
-
     }
 
     public function fetchLibraryFiles($finder, $directory, $getContent = true)
@@ -228,13 +229,15 @@ class DefaultHandler
         foreach ($finder as $file) {
             if ($getContent) {
                 $mimeType = finfo_file($finfo, $file);
-                if (strpos($mimeType, "text/") === false)
+                if (strpos($mimeType, "text/") === false) {
                     $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
-                else
+                } else {
                     $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
+                }
                 $response[] = array("filename" => $file->getRelativePathname(), "content" => $content);
-            } else
+            } else {
                 $response[] = array("filename" => $file->getRelativePathname());
+            }
         }
         return $response;
     }
@@ -385,9 +388,9 @@ class DefaultHandler
     public function findBaseDir($dir)
     {
         foreach ($dir['contents'] as $file) {
-            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
+            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
                 return json_encode(array('success' => true, 'directory' => $dir));
-
+            }
         }
 
         foreach ($dir['contents'] as $file) {
@@ -425,11 +428,13 @@ class DefaultHandler
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
         ));
-        if ($post_request_data !== null)
+        if ($post_request_data !== null) {
             curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
+        }
 
-        if ($http_header !== null)
+        if ($http_header !== null) {
             curl_setopt($curl_req, CURLOPT_HTTPHEADER, $http_header);
+        }
 
         $contents = curl_exec($curl_req);
 
@@ -467,9 +472,11 @@ class DefaultHandler
                 $requestUrl,
                 null,
                 ['User-Agent: ' . $githubAppName, 'Accept: application/vnd.github.v3.json']
-            ), true);
+            ),
+            true
+        );
 
-        return  $jsonDecodedContent;
+        return $jsonDecodedContent;
     }
 
     public function processGithubUrl($url)
@@ -534,23 +541,28 @@ class DefaultHandler
          * Remember that files are listed as `blobs` and directories are listed as `trees`
          * array_values is used to re-index the two arrays
          */
-        $subtreeNodes = array_values(array_filter(
-            $repoTree,
-            function($element) {
-                if ($element['type'] == 'tree') {
-                    return true;
+        $subtreeNodes = array_values(
+            array_filter(
+                $repoTree,
+                function ($element) {
+                    if ($element['type'] == 'tree') {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            })
+            )
         );
-        $files = array_values(array_filter(
-            $repoTree,
-            function($element) {
-                if ($element['type'] == 'blob') {
-                    return true;
+
+        $files = array_values(
+            array_filter(
+                $repoTree,
+                function ($element) {
+                    if ($element['type'] == 'blob') {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            })
+            )
         );
 
         foreach ($files as $file) {
@@ -559,7 +571,8 @@ class DefaultHandler
             }
             $fileStructure['children'][] = array_merge(
                 array('text' => pathinfo($file['path'], PATHINFO_BASENAME), 'icon' => 'fa fa-file', 'state' => array('disabled' => true)),
-                $file);
+                $file
+            );
         }
 
         foreach ($subtreeNodes as $directory) {
@@ -715,5 +728,4 @@ class DefaultHandler
 
         return $gitResponse['description'];
     }
-
 }
