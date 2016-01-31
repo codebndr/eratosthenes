@@ -54,7 +54,8 @@ class DefaultHandler
         //TODO handle the case of different .h filenames and folder names
         if ($filename == "ArduinoRobot") {
             $filename = "Robot_Control";
-        } elseif ($filename == "ArduinoRobotMotorBoard") {
+        }
+        if ($filename == "ArduinoRobotMotorBoard") {
             $filename = "Robot_Motor";
         }
         if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
@@ -197,19 +198,22 @@ class DefaultHandler
         $arduino_library_files = $this->container->getParameter('builtin_libraries') . "/";
         if (is_dir($arduino_library_files . "/libraries/" . $library)) {
             return json_encode(array("success" => true, "message" => "Library found"));
-        } else {
-            return json_encode(array("success" => false, "message" => "No Library named " . $library . " found."));
         }
+
+        return json_encode(array("success" => false, "message" => "No Library named " . $library . " found."));
     }
 
     public function checkIfExternalExists($library, $getDisabled = false)
     {
-        $lib = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+        $lib = $this->entityManager
+                    ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+                    ->findBy(array('machineName' => $library));
+
         if (empty($lib) || (!$getDisabled && !$lib[0]->getActive())) {
             return json_encode(array("success" => false, "message" => "No Library named " . $library . " found."));
-        } else {
-            return json_encode(array("success" => true, "message" => "Library found"));
         }
+
+        return json_encode(array("success" => true, "message" => "Library found"));
     }
 
     public function fetchLibraryFiles($finder, $directory, $getContent = true)
@@ -339,7 +343,11 @@ class DefaultHandler
         if ($path == '') {
             $path = $repo;
         }
-        $libraryContents = array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'dir', 'contents' => array());
+        $libraryContents = array(
+            'name' => pathinfo($path, PATHINFO_BASENAME),
+            'type' => 'dir',
+            'contents' => array()
+        );
         foreach ($contents as $element) {
             if ($element['type'] == 'file') {
                 $code = $this->getGithubFileCode($owner, $repo, $element['path'], $element['sha']);
@@ -371,7 +379,7 @@ class DefaultHandler
         $jsonDecodedContent = $this->curlGitRequest($url);
 
         if (json_last_error() != JSON_ERROR_NONE) {
-            return ['success' => false, 'message' => 'Invalid Git API response (cannot decode)'];
+            return array('success' => false, 'message' => 'Invalid Git API response (cannot decode)');
         }
 
         if (array_key_exists('message', $jsonDecodedContent)) {
