@@ -43,12 +43,10 @@ class DefaultHandler
         }
 
         $filename = $library;
-        $directory = "";
 
         $last_slash = strrpos($library, "/");
         if ($last_slash !== false) {
             $filename = substr($library, $last_slash + 1);
-            $vendor = substr($library, 0, $last_slash);
         }
 
         //TODO handle the case of different .h filenames and folder names
