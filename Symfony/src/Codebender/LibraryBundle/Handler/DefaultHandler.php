@@ -43,12 +43,10 @@ class DefaultHandler
         }
 
         $filename = $library;
-        $directory = "";
 
         $last_slash = strrpos($library, "/");
         if ($last_slash !== false) {
             $filename = substr($library, $last_slash + 1);
-            $vendor = substr($library, 0, $last_slash);
         }
 
         //TODO handle the case of different .h filenames and folder names
@@ -218,8 +216,6 @@ class DefaultHandler
         }
 
         $finder->in($directory)->exclude('examples')->exclude('Examples');
-        // Left this here, just in case we need it again.
-        // $finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.inc')->name('*.txt');
         $finder->name('*.*');
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
