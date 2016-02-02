@@ -5,15 +5,15 @@ namespace Codebender\LibraryBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CodeExample
+ * LibraryExample
  *
  * @ORM\Entity
  * @ORM\Table(
- *     name="CodeExample"
+ *     name="LibraryExample",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="version_idx", columns={"version_id"})}
  * )
  */
-class CodeExample
+class LibraryExample
 {
     /**
      * @var integer
@@ -66,7 +66,7 @@ class CodeExample
      * Set version_id
      *
      * @param string $version_id
-     * @return CodeExample
+     * @return LibraryExample
      */
     public function setVersionId($version_id)
     {
@@ -89,7 +89,7 @@ class CodeExample
      * Set name
      *
      * @param string $name
-     * @return CodeExample
+     * @return LibraryExample
      */
     public function setName($name)
     {
@@ -112,7 +112,7 @@ class CodeExample
      * Set path
      *
      * @param string $path
-     * @return CodeExample
+     * @return LibraryExample
      */
     public function setPath($path)
     {
@@ -135,7 +135,7 @@ class CodeExample
      * Set boards
      *
      * @param string $boards
-     * @return CodeExample
+     * @return LibraryExample
      */
     public function setBoards($boards)
     {
