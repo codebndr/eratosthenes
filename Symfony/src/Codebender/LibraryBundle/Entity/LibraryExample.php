@@ -25,11 +25,12 @@ class LibraryExample
     private $id;
 
     /**
-     * @var string
+     * @var Version
      *
-     * @ORM\Column(name="version_id", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="Version")
+     * @ORM\JoinColumn(name="version_id", referencedColumnName="id")
      */
-    private $version_id;
+    private $version;
 
     /**
      * @var string
@@ -52,6 +53,7 @@ class LibraryExample
      */
     private $boards;
 
+
     /**
      * Get id
      *
@@ -63,29 +65,6 @@ class LibraryExample
     }
 
     /**
-     * Set version_id
-     *
-     * @param string $version_id
-     * @return LibraryExample
-     */
-    public function setVersionId($version_id)
-    {
-        $this->version_id = $version_id;
-    
-        return $this;
-    }
-
-    /**
-     * Get version_id
-     *
-     * @return string 
-     */
-    public function getVersionId()
-    {
-        return $this->version_id;
-    }
-
-    /**
      * Set name
      *
      * @param string $name
@@ -94,7 +73,7 @@ class LibraryExample
     public function setName($name)
     {
         $this->name = $name;
-    
+
         return $this;
     }
 
@@ -117,7 +96,7 @@ class LibraryExample
     public function setPath($path)
     {
         $this->path = $path;
-    
+
         return $this;
     }
 
@@ -140,7 +119,7 @@ class LibraryExample
     public function setBoards($boards)
     {
         $this->boards = $boards;
-    
+
         return $this;
     }
 
@@ -154,4 +133,26 @@ class LibraryExample
         return $this->boards;
     }
 
+    /**
+     * Set version
+     *
+     * @param \Codebender\LibraryBundle\Entity\Version $version
+     * @return LibraryExample
+     */
+    public function setVersion(\Codebender\LibraryBundle\Entity\Version $version = null)
+    {
+        $this->version = $version;
+
+        return $this;
+    }
+
+    /**
+     * Get version
+     *
+     * @return \Codebender\LibraryBundle\Entity\Version 
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
 }

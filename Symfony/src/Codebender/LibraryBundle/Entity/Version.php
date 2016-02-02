@@ -90,6 +90,19 @@ class Version
     private $folderName;
 
     /**
+     * @ORM\OneToMany(targetEntity="LibraryExample", mappedBy="version")
+     */
+    private $libraryExamples;
+    
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->libraryExamples = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
      * Get id
      *
      * @return integer 
@@ -304,5 +317,38 @@ class Version
     public function getLibrary()
     {
         return $this->library;
+    }
+
+    /**
+     * Add libraryExamples
+     *
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     * @return Version
+     */
+    public function addLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    {
+        $this->libraryExamples[] = $libraryExamples;
+
+        return $this;
+    }
+
+    /**
+     * Remove libraryExamples
+     *
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     */
+    public function removeLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    {
+        $this->libraryExamples->removeElement($libraryExamples);
+    }
+
+    /**
+     * Get libraryExamples
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getLibraryExamples()
+    {
+        return $this->libraryExamples;
     }
 }
