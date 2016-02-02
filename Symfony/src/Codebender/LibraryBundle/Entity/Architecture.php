@@ -45,7 +45,7 @@ class Architecture
      * Set name
      *
      * @param string $name
-     * @return Example
+     * @return Architecture
      */
     public function setName($name)
     {
