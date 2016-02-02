@@ -104,6 +104,11 @@ class Library
     private $url;
 
     /**
+     * @ORM\OneToMany(targetEntity="Version", mappedBy="library")
+     */
+    private $versions;
+
+    /**
      * Get id
      *
      * @return integer
@@ -364,5 +369,45 @@ class Library
     public function getUrl()
     {
         return $this->url;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->versions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add versions
+     *
+     * @param \Codebender\LibraryBundle\Entity\Version $versions
+     * @return Library
+     */
+    public function addVersion(\Codebender\LibraryBundle\Entity\Version $versions)
+    {
+        $this->versions[] = $versions;
+
+        return $this;
+    }
+
+    /**
+     * Remove versions
+     *
+     * @param \Codebender\LibraryBundle\Entity\Version $versions
+     */
+    public function removeVersion(\Codebender\LibraryBundle\Entity\Version $versions)
+    {
+        $this->versions->removeElement($versions);
+    }
+
+    /**
+     * Get versions
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getVersions()
+    {
+        return $this->versions;
     }
 }

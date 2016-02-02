@@ -39,6 +39,11 @@ class Partner
     private $auth_key;
 
     /**
+     * @ORM\OneToMany(targetEntity="Preference", mappedBy="partner")
+     */
+    private $preferences;
+
+    /**
      * Get id
      *
      * @return integer
@@ -92,5 +97,46 @@ class Partner
     public function getAuthKey()
     {
         return $this->auth_key;
+    }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->preferences = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add preferences
+     *
+     * @param \Codebender\LibraryBundle\Entity\Preference $preferences
+     * @return Partner
+     */
+    public function addPreference(\Codebender\LibraryBundle\Entity\Preference $preferences)
+    {
+        $this->preferences[] = $preferences;
+
+        return $this;
+    }
+
+    /**
+     * Remove preferences
+     *
+     * @param \Codebender\LibraryBundle\Entity\Preference $preferences
+     */
+    public function removePreference(\Codebender\LibraryBundle\Entity\Preference $preferences)
+    {
+        $this->preferences->removeElement($preferences);
+    }
+
+    /**
+     * Get preferences
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPreferences()
+    {
+        return $this->preferences;
     }
 }
