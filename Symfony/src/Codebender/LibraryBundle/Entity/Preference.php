@@ -25,9 +25,9 @@ class Preference
     private $id;
 
     /**
-     * @var ExternalLibrary
+     * @var Library
      *
-     * @ORM\ManyToOne(targetEntity="ExternalLibrary")
+     * @ORM\ManyToOne(targetEntity="Library")
      * @ORM\JoinColumn(name="library_id", referencedColumnName="id")
      */
     private $library;
@@ -61,10 +61,10 @@ class Preference
     /**
      * Set library
      *
-     * @param \Codebender\LibraryBundle\Entity\ExternalLibrary $library
+     * @param \Codebender\LibraryBundle\Entity\Library $library
      * @return Preference
      */
-    public function setLibrary(\Codebender\LibraryBundle\Entity\ExternalLibrary $library = null)
+    public function setLibrary(\Codebender\LibraryBundle\Entity\Library $library = null)
     {
         $this->library = $library;
 
@@ -74,7 +74,7 @@ class Preference
     /**
      * Get library
      *
-     * @return \Codebender\LibraryBundle\Entity\ExternalLibrary
+     * @return \Codebender\LibraryBundle\Entity\Library 
      */
     public function getLibrary()
     {

@@ -26,9 +26,9 @@ class Version
     private $id;
 
     /**
-     * @var ExternalLibrary
+     * @var Library
      *
-     * @ORM\ManyToOne(targetEntity="ExternalLibrary", inversedBy="versions")
+     * @ORM\ManyToOne(targetEntity="Library", inversedBy="versions")
      * @ORM\JoinColumn(name="library_id", referencedColumnName="id")
      */
     private $library;
@@ -286,10 +286,10 @@ class Version
     /**
      * Set library
      *
-     * @param \Codebender\LibraryBundle\Entity\ExternalLibrary $library
+     * @param \Codebender\LibraryBundle\Entity\Library $library
      * @return Version
      */
-    public function setLibrary(\Codebender\LibraryBundle\Entity\ExternalLibrary $library = null)
+    public function setLibrary(\Codebender\LibraryBundle\Entity\Library $library = null)
     {
         $this->library = $library;
 
@@ -299,7 +299,7 @@ class Version
     /**
      * Get library
      *
-     * @return \Codebender\LibraryBundle\Entity\ExternalLibrary 
+     * @return \Codebender\LibraryBundle\Entity\Library 
      */
     public function getLibrary()
     {
