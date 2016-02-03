@@ -93,13 +93,23 @@ class Version
      * @ORM\OneToMany(targetEntity="LibraryExample", mappedBy="version")
      */
     private $libraryExamples;
-    
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Architecture")
+     * @ORM\JoinTable(name="Architecture_Version",
+     *      joinColumns={@ORM\JoinColumn(name="version_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="architecture_id", referencedColumnName="id")}
+     *      )
+     */
+    private $architectures;
     /**
      * Constructor
      */
+
     public function __construct()
     {
         $this->libraryExamples = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->architectures = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -350,5 +360,38 @@ class Version
     public function getLibraryExamples()
     {
         return $this->libraryExamples;
+    }
+
+    /**
+     * Add architectures
+     *
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     * @return Version
+     */
+    public function addArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    {
+        $this->architectures[] = $architectures;
+
+        return $this;
+    }
+
+    /**
+     * Remove architectures
+     *
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     */
+    public function removeArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    {
+        $this->architectures->removeElement($architectures);
+    }
+
+    /**
+     * Get architectures
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getArchitectures()
+    {
+        return $this->architectures;
     }
 }
