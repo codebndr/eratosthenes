@@ -26,22 +26,47 @@ class LoadArchitectureData extends AbstractFixture implements OrderedFixtureInte
         $avrArchitecture = new Architecture();
         $avrArchitecture->setName('AVR');
 
+        /*
+         * Set a reference for each architecture and add it to the database using
+         * the object manager interface
+         */
+        $this->setReference('AvrArchitecture', $avrArchitecture);
+
         $objectManager->persist($avrArchitecture);
 
         $esp8266Architecture = new Architecture();
         $esp8266Architecture->setName('ESP8266');
+
+        /*
+         * Set a reference for each architecture and add it to the database using
+         * the object manager interface
+         */
+        $this->setReference('ESP8266Architecture', $esp8266Architecture);
 
         $objectManager->persist($esp8266Architecture);
 
         $edisonArchitecture = new Architecture();
         $edisonArchitecture->setName('Intel Edison');
 
+        /*
+         * Set a reference for each architecture and add it to the database using
+         * the object manager interface
+         */
+        $this->setReference('EdisonArchitecture', $edisonArchitecture);
+
         $objectManager->persist($edisonArchitecture);
 
         $teensyArchitecture = new Architecture();
         $teensyArchitecture->setName('Teensy');
 
+        /*
+         * Set a reference for each architecture and add it to the database using
+         * the object manager interface
+         */
+        $this->setReference('TeensyArchitecture', $teensyArchitecture);
+
         $objectManager->persist($teensyArchitecture);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
