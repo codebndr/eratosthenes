@@ -27,7 +27,7 @@ class LibraryExample
     /**
      * @var Version
      *
-     * @ORM\ManyToOne(targetEntity="Version")
+     * @ORM\ManyToOne(targetEntity="Version", inversedBy="libraryExamples")
      * @ORM\JoinColumn(name="version_id", referencedColumnName="id")
      */
     private $version;
