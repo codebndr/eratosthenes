@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(
  *     name="Version",
- *     uniqueConstraints={@ORM\UniqueConstraint(name="folders_idx", columns={"folder_name"})},
  *     indexes={@ORM\Index(name="libraries_idx", columns={"library_id"})}
  * )
  * @ORM\Entity
@@ -43,42 +42,42 @@ class Version
     /**
      * @var string
      *
-     * @ORM\Column(name="description", type="string", length=2048)
+     * @ORM\Column(name="description", type="string", length=2048, nullable = true)
      */
     private $description;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="notes", type="text")
+     * @ORM\Column(name="notes", type="text", nullable = true)
      */
     private $notes;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="source_url", type="string", length=512)
+     * @ORM\Column(name="source_url", type="string", length=512, nullable = true)
      */
     private $sourceUrl;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="release_commit", type="string", length=255)
+     * @ORM\Column(name="release_commit", type="string", length=255, nullable = true)
      */
     private $releaseCommit;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="in_repo_path", type="string", length=255)
+     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
      */
     private $inRepoPath;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="branch", type="string", length=255)
+     * @ORM\Column(name="branch", type="string", length=255, nullable = true)
      */
     private $branch;
 
