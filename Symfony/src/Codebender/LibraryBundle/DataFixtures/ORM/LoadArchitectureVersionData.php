@@ -137,6 +137,6 @@ class LoadArchitectureVersionData extends AbstractFixture implements OrderedFixt
      */
     public function getOrder()
     {
-        return 7;
+        return 8;
     }
 }
