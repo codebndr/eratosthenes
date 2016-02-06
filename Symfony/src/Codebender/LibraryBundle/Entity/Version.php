@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(
  *     name="Version",
+ *     uniqueConstraints={@ORM\UniqueConstraint(name="folders_idx", columns={"library_id", "folder_name"})},
  *     indexes={@ORM\Index(name="libraries_idx", columns={"library_id"})}
  * )
  * @ORM\Entity

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(
  *     name="LibraryExample",
- *     uniqueConstraints={@ORM\UniqueConstraint(name="version_idx", columns={"id", "version_id"})}
+ *     indexes={@ORM\Index(name="version_idx", columns={"version_id"})}
  * )
  */
 class LibraryExample
