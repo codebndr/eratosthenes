@@ -27,14 +27,14 @@ class LoadPartnerData extends AbstractFixture implements OrderedFixtureInterface
         $codebender = new Partner();
         $codebender->setName('codebender');
         $codebender->setAuthKey('youMustChangeThis');
-
+        $this->setReference('PartnerCodebender', $codebender);
         $objectManager->persist($codebender);
 
         // partner 2 : arduino.cc
         $arduinoCc = new Partner();
         $arduinoCc->setName('arduino.cc');
         $arduinoCc->setAuthKey('authKey');
-
+        $this->setReference('PartnerArduinoCc', $arduinoCc);
         $objectManager->persist($arduinoCc);
 
         /*
