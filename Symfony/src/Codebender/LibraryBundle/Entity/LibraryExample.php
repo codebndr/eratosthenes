@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(
  *     name="LibraryExample",
- *     uniqueConstraints={@ORM\UniqueConstraint(name="version_idx", columns={"version_id"})}
+ *     indexes={@ORM\Index(name="version_idx", columns={"version_id"})}
  * )
  */
 class LibraryExample
@@ -27,7 +27,7 @@ class LibraryExample
     /**
      * @var Version
      *
-     * @ORM\ManyToOne(targetEntity="Version")
+     * @ORM\ManyToOne(targetEntity="Version", inversedBy="libraryExamples")
      * @ORM\JoinColumn(name="version_id", referencedColumnName="id")
      */
     private $version;
