@@ -329,26 +329,26 @@ class Version
     }
 
     /**
-     * Add libraryExamples
+     * Add libraryExample
      *
-     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExample
      * @return Version
      */
-    public function addLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    public function addLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExample)
     {
-        $this->libraryExamples[] = $libraryExamples;
+        $this->libraryExamples[] = $libraryExample;
 
         return $this;
     }
 
     /**
-     * Remove libraryExamples
+     * Remove libraryExample
      *
-     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExample
      */
-    public function removeLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    public function removeLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExample)
     {
-        $this->libraryExamples->removeElement($libraryExamples);
+        $this->libraryExamples->removeElement($libraryExample);
     }
 
     /**
@@ -362,26 +362,26 @@ class Version
     }
 
     /**
-     * Add architectures
+     * Add architecture
      *
-     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architecture
      * @return Version
      */
-    public function addArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    public function addArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architecture)
     {
-        $this->architectures[] = $architectures;
+        $this->architectures[] = $architecture;
 
         return $this;
     }
 
     /**
-     * Remove architectures
+     * Remove architecture
      *
-     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architecture
      */
-    public function removeArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    public function removeArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architecture)
     {
-        $this->architectures->removeElement($architectures);
+        $this->architectures->removeElement($architecture);
     }
 
     /**
