@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
  * Library
  *
  * @ORM\Table(
- *     name="Library",
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(name="header_idx", columns={"default_header", "folder_name"})
  *     }

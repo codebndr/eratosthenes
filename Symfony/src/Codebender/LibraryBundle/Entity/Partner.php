@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  * @ORM\Table(
- *     name="Partner",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="auth_key_idx", columns={"auth_key"})}
  * )
  */

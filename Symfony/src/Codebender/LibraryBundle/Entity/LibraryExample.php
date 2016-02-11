@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  * @ORM\Table(
- *     name="LibraryExample",
  *     indexes={@ORM\Index(name="version_idx", columns={"version_id"})}
  * )
  */

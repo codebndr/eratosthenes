@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
  * Preference
  *
  * @ORM\Table(
- *     name="Preference",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="search_idx", columns={"library_id", "partner_id"})}
  * )
  * @ORM\Entity
