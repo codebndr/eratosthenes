@@ -95,7 +95,7 @@ class Version
 
     /**
      * @ORM\ManyToMany(targetEntity="Architecture")
-     * @ORM\JoinTable(name="Architecture_Version",
+     * @ORM\JoinTable(name="ArchitectureVersion",
      *      joinColumns={@ORM\JoinColumn(name="version_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="architecture_id", referencedColumnName="id")}
      *      )
