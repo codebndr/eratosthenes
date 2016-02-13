@@ -70,13 +70,6 @@ class Version
     /**
      * @var string
      *
-     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
-     */
-    private $inRepoPath;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="branch", type="string", length=255, nullable = true)
      */
     private $branch;
@@ -234,29 +227,6 @@ class Version
     public function getReleaseCommit()
     {
         return $this->releaseCommit;
-    }
-
-    /**
-     * Set inRepoPath
-     *
-     * @param string $inRepoPath
-     * @return Version
-     */
-    public function setInRepoPath($inRepoPath)
-    {
-        $this->inRepoPath = $inRepoPath;
-
-        return $this;
-    }
-
-    /**
-     * Get inRepoPath
-     *
-     * @return string 
-     */
-    public function getInRepoPath()
-    {
-        return $this->inRepoPath;
     }
 
     /**

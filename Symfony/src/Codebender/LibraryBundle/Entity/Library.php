@@ -70,6 +70,13 @@ class Library
     /**
      * @var string
      *
+     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
+     */
+    private $inRepoPath;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="notes", type="text", nullable = true)
      */
     private $notes;
@@ -253,6 +260,29 @@ class Library
     public function getRepo()
     {
         return $this->repo;
+    }
+
+    /**
+     * Set inRepoPath
+     *
+     * @param string $inRepoPath
+     * @return Version
+     */
+    public function setInRepoPath($inRepoPath)
+    {
+        $this->inRepoPath = $inRepoPath;
+
+        return $this;
+    }
+
+    /**
+     * Get inRepoPath
+     *
+     * @return string
+     */
+    public function getInRepoPath()
+    {
+        return $this->inRepoPath;
     }
 
     /**

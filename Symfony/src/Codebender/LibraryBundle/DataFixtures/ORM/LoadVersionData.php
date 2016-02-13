@@ -70,7 +70,6 @@ class LoadVersionData extends AbstractFixture implements OrderedFixtureInterface
         $dahLibraryVersion1->setDescription('Version 1.0.0');
         $dahLibraryVersion1->setFolderName('1.0.0');
         $dahLibraryVersion1->setBranch('1.0.x');
-        $dahLibraryVersion1->setInRepoPath('');
         $dahLibraryVersion1->setReleaseCommit('1751ccb9f8a1c5d9161fe18d97a03415e3517235');
         $dahLibraryVersion1->setSourceUrl('https://github.com/codebendercc/DynamicArrayHelper-Arduino-Library/archive/1.0.x.zip');
 
