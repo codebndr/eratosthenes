@@ -531,7 +531,7 @@ class DefaultController extends Controller
             return $exists;
         }
 
-        if ($exists['type'] == 'external') {
+        if ($exists['type'] === 'external') {
             $path = $this->container->getParameter('external_libraries') . '/' . $library;
         } elseif ($exists['type'] === 'builtin') {
             $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
