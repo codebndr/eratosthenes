@@ -8,8 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Version
  *
  * @ORM\Table(
- *     name="Version",
- *     uniqueConstraints={@ORM\UniqueConstraint(name="folders_idx", columns={"folder_name"})},
+ *     uniqueConstraints={@ORM\UniqueConstraint(name="folders_idx", columns={"library_id", "folder_name"})},
  *     indexes={@ORM\Index(name="libraries_idx", columns={"library_id"})}
  * )
  * @ORM\Entity
@@ -43,42 +42,42 @@ class Version
     /**
      * @var string
      *
-     * @ORM\Column(name="description", type="string", length=2048)
+     * @ORM\Column(name="description", type="string", length=2048, nullable = true)
      */
     private $description;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="notes", type="text")
+     * @ORM\Column(name="notes", type="text", nullable = true)
      */
     private $notes;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="source_url", type="string", length=512)
+     * @ORM\Column(name="source_url", type="string", length=512, nullable = true)
      */
     private $sourceUrl;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="release_commit", type="string", length=255)
+     * @ORM\Column(name="release_commit", type="string", length=255, nullable = true)
      */
     private $releaseCommit;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="in_repo_path", type="string", length=255)
+     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
      */
     private $inRepoPath;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="branch", type="string", length=255)
+     * @ORM\Column(name="branch", type="string", length=255, nullable = true)
      */
     private $branch;
 
@@ -96,7 +95,7 @@ class Version
 
     /**
      * @ORM\ManyToMany(targetEntity="Architecture")
-     * @ORM\JoinTable(name="Architecture_Version",
+     * @ORM\JoinTable(name="ArchitectureVersion",
      *      joinColumns={@ORM\JoinColumn(name="version_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="architecture_id", referencedColumnName="id")}
      *      )
@@ -330,26 +329,26 @@ class Version
     }
 
     /**
-     * Add libraryExamples
+     * Add libraryExample
      *
-     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExample
      * @return Version
      */
-    public function addLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    public function addLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExample)
     {
-        $this->libraryExamples[] = $libraryExamples;
+        $this->libraryExamples[] = $libraryExample;
 
         return $this;
     }
 
     /**
-     * Remove libraryExamples
+     * Remove libraryExample
      *
-     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples
+     * @param \Codebender\LibraryBundle\Entity\LibraryExample $libraryExample
      */
-    public function removeLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExamples)
+    public function removeLibraryExample(\Codebender\LibraryBundle\Entity\LibraryExample $libraryExample)
     {
-        $this->libraryExamples->removeElement($libraryExamples);
+        $this->libraryExamples->removeElement($libraryExample);
     }
 
     /**
@@ -363,26 +362,26 @@ class Version
     }
 
     /**
-     * Add architectures
+     * Add architecture
      *
-     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architecture
      * @return Version
      */
-    public function addArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    public function addArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architecture)
     {
-        $this->architectures[] = $architectures;
+        $this->architectures[] = $architecture;
 
         return $this;
     }
 
     /**
-     * Remove architectures
+     * Remove architecture
      *
-     * @param \Codebender\LibraryBundle\Entity\Architecture $architectures
+     * @param \Codebender\LibraryBundle\Entity\Architecture $architecture
      */
-    public function removeArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architectures)
+    public function removeArchitecture(\Codebender\LibraryBundle\Entity\Architecture $architecture)
     {
-        $this->architectures->removeElement($architectures);
+        $this->architectures->removeElement($architecture);
     }
 
     /**

@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
  * Library
  *
  * @ORM\Table(
- *     name="Library",
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(name="header_idx", columns={"default_header", "folder_name"})
  *     }
@@ -379,26 +378,26 @@ class Library
     }
 
     /**
-     * Add versions
+     * Add version
      *
-     * @param \Codebender\LibraryBundle\Entity\Version $versions
+     * @param \Codebender\LibraryBundle\Entity\Version $version
      * @return Library
      */
-    public function addVersion(\Codebender\LibraryBundle\Entity\Version $versions)
+    public function addVersion(\Codebender\LibraryBundle\Entity\Version $version)
     {
-        $this->versions[] = $versions;
+        $this->versions[] = $version;
 
         return $this;
     }
 
     /**
-     * Remove versions
+     * Remove version
      *
-     * @param \Codebender\LibraryBundle\Entity\Version $versions
+     * @param \Codebender\LibraryBundle\Entity\Version $version
      */
-    public function removeVersion(\Codebender\LibraryBundle\Entity\Version $versions)
+    public function removeVersion(\Codebender\LibraryBundle\Entity\Version $version)
     {
-        $this->versions->removeElement($versions);
+        $this->versions->removeElement($version);
     }
 
     /**

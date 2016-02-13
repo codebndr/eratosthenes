@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  * @ORM\Table(
- *     name="Partner",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="auth_key_idx", columns={"auth_key"})}
  * )
  */
@@ -108,26 +107,26 @@ class Partner
     }
 
     /**
-     * Add preferences
+     * Add preference
      *
-     * @param \Codebender\LibraryBundle\Entity\Preference $preferences
+     * @param \Codebender\LibraryBundle\Entity\Preference $preference
      * @return Partner
      */
-    public function addPreference(\Codebender\LibraryBundle\Entity\Preference $preferences)
+    public function addPreference(\Codebender\LibraryBundle\Entity\Preference $preference)
     {
-        $this->preferences[] = $preferences;
+        $this->preferences[] = $preference;
 
         return $this;
     }
 
     /**
-     * Remove preferences
+     * Remove preference
      *
-     * @param \Codebender\LibraryBundle\Entity\Preference $preferences
+     * @param \Codebender\LibraryBundle\Entity\Preference $preference
      */
-    public function removePreference(\Codebender\LibraryBundle\Entity\Preference $preferences)
+    public function removePreference(\Codebender\LibraryBundle\Entity\Preference $preference)
     {
-        $this->preferences->removeElement($preferences);
+        $this->preferences->removeElement($preference);
     }
 
     /**

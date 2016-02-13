@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  * @ORM\Table(
- *     name="Architecture",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"name"})}
  * )
  */
