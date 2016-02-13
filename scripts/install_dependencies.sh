@@ -12,4 +12,5 @@ sudo mkdir /opt/codebender/codebender-external-library-files
 # Give apache the correct permissions in order to write to the libraries directories
 sudo chown -R `whoami`:$HTTPDUSER /opt/codebender/codebender-arduino-library-files
 sudo chown -R `whoami`:$HTTPDUSER /opt/codebender/codebender-external-library-files
+sudo chown -R `whoami`:$HTTPDUSER /opt/codebender/codebender-external-library-files-new
 cd -
