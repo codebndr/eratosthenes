@@ -94,6 +94,8 @@ class ApiHandler
             return true;
         } elseif ($this->isBuiltInLibrary($defaultHeader)) {
             return true;
+        } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
+            return true;
         }
 
         return false;
