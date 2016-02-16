@@ -25,6 +25,24 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
+     * This method test the getKeywords API.
+     */
+    public function testGetKeywords()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+        $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
+        $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
+    }
+
+    /**
      * Use this method for library manager API requests with POST data
      *
      * @param Client $client
