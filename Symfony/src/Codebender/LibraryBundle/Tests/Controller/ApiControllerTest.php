@@ -27,9 +27,7 @@ class ApiControllerTest extends WebTestCase
     public function testFetchApiCommand()
     {
         $client = static::createClient();
-
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default","version":"1.1.0"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
