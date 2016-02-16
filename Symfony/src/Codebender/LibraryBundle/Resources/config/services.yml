@@ -1,6 +1,12 @@
 parameters:
 #    codebender_library.example.class: Codebender\LibraryBundle\Example
     codebender_library.handler.class: Codebender\LibraryBundle\Handler\DefaultHandler
+    codebender_library.apiHandler.class: Codebender\LibraryBundle\Handler\ApiHandler
+    codebender_library.apiCommandHandler.class: Codebender\LibraryBundle\Handler\ApiCommandHandler
+
+# Publicly accessible APIs
+    codebender_api.status.class: Codebender\LibraryBundle\Handler\ApiCommand\StatusCommand
+    codebender_api.invalidApi.class: Codebender\LibraryBundle\Handler\ApiCommand\InvalidApiCommand
 
 services:
 #    codebender_library.example:
@@ -12,3 +18,28 @@ services:
         arguments:
             entityManager: "@doctrine.orm.entity_manager"
             containerInterface: "@service_container"
+
+    codebender_library.apiHandler:
+            class:  %codebender_library.apiHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_library.apiCommandHandler:
+            class:  %codebender_library.apiCommandHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+# Publicly accessible services
+    codebender_api.status:
+            class:  %codebender_api.status.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.invalidApi:
+            class:  %codebender_api.invalidApi.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
