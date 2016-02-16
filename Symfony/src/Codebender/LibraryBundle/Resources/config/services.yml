@@ -7,6 +7,7 @@ parameters:
 # Publicly accessible APIs
     codebender_api.status.class: Codebender\LibraryBundle\Handler\ApiCommand\StatusCommand
     codebender_api.invalidApi.class: Codebender\LibraryBundle\Handler\ApiCommand\InvalidApiCommand
+    codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
 
 services:
 #    codebender_library.example:
@@ -43,3 +44,10 @@ services:
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
+
+    codebender_api.fetch:
+            class:  %codebender_api.fetch.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
