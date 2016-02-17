@@ -2,19 +2,15 @@
 
 namespace Codebender\LibraryBundle\Handler\ApiCommand;
 
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
 class FetchApiCommand extends AbstractApiCommand
 {
-    protected $library;
-    protected $version;
-    protected $renderView;
-
     public function execute($content)
     {
         $content = $this->setDefault($content);
+
+        $apiHandler = $this->container->get('codebender_library.apiHandler');
 
         $builtinLibrariesPath = $this->container->getParameter('builtin_libraries');
         $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
@@ -36,7 +32,7 @@ class FetchApiCommand extends AbstractApiCommand
             $filename = $reservedNames[$filename];
         }
 
-        if ($this->hasBuiltIn($filename)) {
+        if ($apiHandler->isBuiltInLibrary($filename)) {
             $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
 
             if ($content['renderView']) {
@@ -44,7 +40,7 @@ class FetchApiCommand extends AbstractApiCommand
                 $meta = [];
             }
         } else {
-            if (!$this->hasExternalLibrary($filename)) {
+            if (!$apiHandler->isExternalLibrary($filename)) {
                 return ["success" => false, "message" => "No Library named " . $filename . " found."];
             }
 
@@ -54,7 +50,7 @@ class FetchApiCommand extends AbstractApiCommand
             }
 
             if ($content['renderView']) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
+                $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
 
                 $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
                     ->findOneBy(array('machineName' => $filename));
@@ -81,20 +77,6 @@ class FetchApiCommand extends AbstractApiCommand
         $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
         $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
         return $content;
-    }
-
-    private function hasBuiltIn($filename)
-    {
-        $arduino_library_files = $this->container->getParameter('builtin_libraries') . "/";
-        return is_dir($arduino_library_files . "/libraries/" . $filename);
-    }
-
-    private function hasExternalLibrary($filename, $getDisabled = false)
-    {
-        $lib = $this->entityManager
-            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
-            ->findBy(array('machineName' => $filename));
-        return !(empty($lib) || (!$getDisabled && !$lib[0]->getActive()));
     }
 
     private function fetchLibraryFiles($finder, $directory, $getContent = true)
