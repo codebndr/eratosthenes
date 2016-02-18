@@ -62,7 +62,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $example);
 
-        if (count($exampleMeta) == 0) {
+        if (count($exampleMeta) === 0) {
             $example = str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
 
@@ -80,7 +80,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
                 if (!$meta) {
                     return ['success' => false, 'message' => 'Could not retrieve the requested example'];
                 }
-            } elseif (count($exampleMeta) == 0) {
+            } elseif (count($exampleMeta) === 0) {
                 return ['success' => false, 'message' => 'Could not retrieve the requested example'];
             } else {
                 $meta = $exampleMeta[0];
@@ -109,7 +109,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
         $finder->in($dir);
         $finder->name($example . ".ino", $example . ".pde");
 
-        if (iterator_count($finder) == 0) {
+        if (iterator_count($finder) === 0) {
             $example = str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
             $finder->name($filename . ".ino", $filename . ".pde");
@@ -125,7 +125,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
                 if (!$filesPath) {
                     return ['success' => false, 'message' => 'Could not retrieve the requested example'];
                 }
-            } elseif (iterator_count($finder) == 0) {
+            } elseif (iterator_count($finder) === 0) {
                 return ['success' => false, 'message' => 'Could not retrieve the requested example'];
             } else {
                 $filesPathIterator = iterator_to_array($finder, false);
@@ -153,7 +153,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $files = array();
         foreach ($filesFinder as $file) {
-            if ($file->getExtension() == "pde") {
+            if ($file->getExtension() === "pde") {
                 $name = $file->getBasename("pde") . "ino";
             } else {
                 $name = $file->getFilename();
