@@ -1,0 +1,49 @@
+<head>
+
+    {% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
+    <script>
+
+        function update_results(){
+            if($("#query").val().length>0)
+            {
+                window.history.replaceState(null, "Search",  "?q=" + $("#query").val());
+                $.getJSON( "{{ path('codebender_library_search' , { 'auth_key': auth_key }) }}" + "?json=true&q="+ $("#query").val())
+                        .done(function( data ) {
+                            if(data.success)
+                            {
+                                $( "#resultsDiv" ).empty();
+                                var resultsHTML = "";
+                                $.each(data.libs, function(k,v){
+                                    console.log(v );
+                                    resultsHTML += '<p><a href = "{{ path('codebender_library_view_library', {'authorizationKey': authorizationKey}) }}?library='+v+'">'+v+'</a></p>'
+                                });
+                                $( "#resultsDiv" ).html(resultsHTML);
+                            }
+                        });
+            }
+            else
+            {
+                window.history.replaceState(null, "Search", "search ");
+                $( "#resultsDiv" ).empty();
+            }
+        }
+
+
+        $(document).ready(function()
+        {
+            $( "#query" ).keyup(function() { update_results() });
+        });
+
+    </script>
+
+</head>
+<body>
+<div><input type="text" id="query" autocomplete="off" placeholder="Search libaries.."/></div>
+
+<div id="resultsDiv">
+    {%  for lib in libs %}
+        <p><a href = "{{ path('codebender_library_view_library', {'authorizationKey': authorizationKey}) }}?library={{ lib }}">{{ lib }}</a></p>
+    {% endfor %}
+</div>
+
+</body>

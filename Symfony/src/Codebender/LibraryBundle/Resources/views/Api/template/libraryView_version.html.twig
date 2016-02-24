@@ -1,0 +1,62 @@
+<div class="panel-group" id="versions_accordion" role="tablist" aria-multiselectable="true">
+    {% for version in versions %}
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab">
+                <h4 class="panel-title">
+                    <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#versions_accordion" href="#versions_collapse{{ loop.index }}">
+                        Version - {{ version }} <i class="fa fa-chevron-down"></i>
+                    </a>
+                </h4>
+            </div>
+            {% set versionId = loop.index %}
+            <div id="versions_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel">
+                <div class="panel-body">
+                    <h3>Files:</h3>
+                    <div class="panel-group" id="files_{{ versionId }}_accordion" role="tablist" aria-multiselectable="true">
+                        {% for file in attribute(files, version) %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab">
+                                    <h4 class="panel-title">
+                                        <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#files_{{ versionId }}_accordion" href="#file_{{ versionId }}_collapse{{ loop.index }}">
+                                            {{ file.filename }} <i class="fa fa-chevron-down"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="file_{{ versionId }}_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel">
+                                    <div class="panel-body">
+                                        <pre>{{ file.content }}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% set exampleCount = attribute(examples, version) | length %}
+                    <h3>Examples ({{ exampleCount }} found): </h3>
+                    <div class="panel-group" id="examples_{{ versionId }}_accordion" role="tablist" aria-multiselectable="true">
+                        {% if exampleCount == 0 %}
+                            <h2><small>The library contains no examples.</small></h2>
+                        {% else %}
+                            {% for file in attribute(examples, version) %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#examples_{{ versionId }}_accordion" href="#examples_{{ versionId }}_collapse{{ loop.index }}">
+                                                {{ file.filename }} <i class="fa fa-chevron-down"></i>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="examples_{{ versionId }}_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel">
+                                        <div class="panel-body">
+                                            <pre>{{ file.content }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

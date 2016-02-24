@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
+use Codebender\LibraryBundle\Handler\ApiCommand\GetVersionsCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ class ApiViewsController extends Controller
         $form->handleRequest($this->getRequest());
 
         if (!$form->isValid()) {
-            return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', array(
+            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', array(
                 'authorizationKey' => $authorizationKey,
                 'form' => $form->createView()
             ));
@@ -44,7 +45,7 @@ class ApiViewsController extends Controller
             $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
             $form = $this->createForm(new NewLibraryForm());
 
-            return $this->render('CodebenderLibraryBundle:Default:newLibForm.html.twig', [
+            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', [
                 'authorizationKey' => $authorizationKey,
                 'form' => $form->createView()
             ]);
@@ -192,17 +193,20 @@ class ApiViewsController extends Controller
 
     public function viewLibraryAction()
     {
-        $handler = $this->get('codebender_library.handler');
-
         $request = $this->getRequest();
         $library = $request->get('library');
-        $disabled = $request->get('disabled');
-        if ($disabled != 1)
-            $disabled = 0;
-        else
-            $disabled = 1;
+        $version = $request->get('version');
+        $disabled = $request->get('disabled') !== 1 ? false : true;
 
-        $response = $handler->getLibraryCode($library, $disabled, true);
+        $apiFetchCommand = $this->get('codebender_api.fetch');
+        $requestData = [
+            'type'=>'fetch',
+            'library' => $library,
+            'disabled' => $disabled,
+            'version' => $version,
+            'renderView' => 'true'
+        ];
+        $response = $apiFetchCommand->execute($requestData);
 
         if ($response['success'] !== true) {
             return new JsonResponse($response);
@@ -210,17 +214,13 @@ class ApiViewsController extends Controller
 
         $inSync = false;
         if (!empty($response['meta'])) {
-            $inSync = $handler->isLibraryInSyncWithGit(
-                $response['meta']['gitOwner'],
-                $response['meta']['gitRepo'],
-                $response['meta']['gitBranch'],
-                $response['meta']['gitInRepoPath'],
-                $response['meta']['gitLastCommit']
-            );
+            // TODO: check if the library is synced with Github
+            $inSync = false;
         }
 
-        return $this->render('CodebenderLibraryBundle:Default:libraryView.html.twig', array(
+        return $this->render('CodebenderLibraryBundle:Api:libraryView.html.twig', array(
             'library' => $response['library'],
+            'versions' => $response['versions'],
             'files' => $response['files'],
             'examples' => $response['examples'],
             'meta' => $response['meta'],
@@ -264,7 +264,7 @@ class ApiViewsController extends Controller
         if ($json !== null && $json = true) {
             return new JsonResponse(['success' => true, 'libs' => $names]);
         }
-        return $this->render('CodebenderLibraryBundle:Default:search.html.twig',
+        return $this->render('CodebenderLibraryBundle:Api:search.html.twig',
             ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]);
     }
 
