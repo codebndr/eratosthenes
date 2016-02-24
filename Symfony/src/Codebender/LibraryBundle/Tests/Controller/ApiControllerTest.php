@@ -369,7 +369,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
 
-        $filenames = array_column($response['files'], 'filename');
+        $this->assertArrayHasKey('1.1.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.1.0'], 'filename');
         $this->assertContains('default.cpp', $filenames);
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);

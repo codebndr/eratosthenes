@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Handler\ApiCommand;
 
+use Codebender\LibraryBundle\Entity\Version;
 use Symfony\Component\Finder\Finder;
 
 class FetchApiCommand extends AbstractApiCommand
@@ -11,9 +12,9 @@ class FetchApiCommand extends AbstractApiCommand
         $content = $this->setDefault($content);
         $filename = $content['library'];
 
-        $last_slash = strrpos($content['library'], "/");
+        $last_slash = strrpos($filename, "/");
         if ($last_slash !== false) {
-            $filename = substr($content['library'], $last_slash + 1);
+            $filename = substr($filename, $last_slash + 1);
         }
 
         $apiHandler = $this->container->get('codebender_library.apiHandler');
@@ -37,24 +38,66 @@ class FetchApiCommand extends AbstractApiCommand
             if ($content['renderView']) {
                 $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
                 $meta = [];
+                $versions = [];
             }
         } else {
             if (!$apiHandler->isExternalLibrary($filename, $content['disabled'])) {
                 return ["success" => false, "message" => "No Library named " . $filename . " found."];
             }
 
-            $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
-            if (empty($response)) {
-                return ['success' => false, 'message' => 'No files for Library named `' . $filename . '` with version `' . $content['version'] . '` found.'];
+            // check if requested (if any) version is valid
+            if ($content['version'] !== null && !$apiHandler->libraryVersionExists($filename, $content['version'])) {
+                return [
+                    'success' => false,
+                    'message' => 'No files for Library named `' . $filename . '` with version `' . $content['version'] . '` found.'
+                ];
+            }
+
+            $versionObjects = $apiHandler->getAllVersionsFromDefaultHeader($filename);
+
+            // use the requested version (if any) for fetching data
+            // else fetch data for all versions
+            $versions = $versionObjects->toArray();
+            if ($content['version'] !== null) {
+                $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
+                    return $version->getVersion() === $content['version'];
+                });
+                $versions = $versionsCollection->toArray();
+            }
+
+            // fetch library files for each version
+            $response = [];
+            $examples = [];
+            foreach ($versions as $version) {
+                /* @var Version $version */
+                $libraryPath = $externalLibrariesPath . "/" . $filename . "/" . $version->getFolderName();
+
+                // fetch library files for this version
+                $fetchResponse = $this->fetchLibraryFiles($finder->create(), $libraryPath);
+                if (!empty($fetchResponse)) {
+                    $response[$version->getVersion()] = $fetchResponse;
+                }
+
+                if ($content['renderView']) {
+                    // fetch example files for this version if it's rendering view
+                    $exampleResponse = $this->fetchLibraryExamples($exampleFinder->create(), $libraryPath);
+                    if (!empty($exampleResponse)) {
+                        $examples[$version->getVersion()] = $exampleResponse;
+                    }
+                }
             }
 
             if ($content['renderView']) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
-
-                $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
-                    ->findOneBy(array('machineName' => $filename));
-                $filename = $externalLibrary->getMachineName();
+                $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
+                    ->findOneBy(array('default_header' => $filename));
+                $filename = $externalLibrary->getDefaultHeader();
                 $meta = $externalLibrary->getLiraryMeta();
+                $versions = array_map(
+                    function ($version) {
+                        return $version->getVersion();
+                    },
+                    $versions
+                );
             }
         }
 
@@ -65,6 +108,7 @@ class FetchApiCommand extends AbstractApiCommand
         return [
             'success' => true,
             'library' => $filename,
+            'versions' => $versions,
             'files' => $response,
             'examples' => $examples,
             'meta' => $meta
@@ -84,9 +128,9 @@ class FetchApiCommand extends AbstractApiCommand
         if (!is_dir($directory)) {
             return array();
         }
-
         $finder->in($directory)->exclude('examples')->exclude('Examples');
         $finder->name('*.*');
+        $finder->files(); // fetch only files
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
 

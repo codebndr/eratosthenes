@@ -469,4 +469,26 @@ class Library
     {
         return $this->versions;
     }
+
+    /**
+     * Get the metadata of the library
+     *
+     * @return array
+     */
+    public function getLiraryMeta()
+    {
+        return array(
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'verified' => $this->getVerified(),
+            'gitOwner' => $this->getOwner(),
+            'gitRepo' => $this->getRepo(),
+            'url' => $this->getUrl(),
+            'active' => $this->getActive(),
+            'gitBranch' => $this->getBranch(),
+            'gitLastCommit' => $this->getLastCommit(),
+            'gitInRepoPath' => $this->getInRepoPath(),
+            'libraryNotes' => $this->getNotes()
+        );
+    }
 }
