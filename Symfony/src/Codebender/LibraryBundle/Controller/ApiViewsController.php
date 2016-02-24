@@ -230,9 +230,9 @@ class ApiViewsController extends Controller
 
     public function gitUpdatesAction()
     {
-        $handler = $this->get('codebender_library.handler');
+        $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
 
-        $handlerResponse = $handler->checkGithubUpdates();
+        $handlerResponse = $checkGithubUpdatesCommand->execute();
 
         if ($handlerResponse['success'] !== true) {
             return new JsonResponse(['success' => false, 'message' => 'Invalid authorization key.']);
@@ -274,21 +274,16 @@ class ApiViewsController extends Controller
             return new JsonResponse(['success' => false, 'message' => 'POST method required']);
         }
 
-        $handler = $this->get('codebender_library.handler');
-        $exists = json_decode($handler->checkIfExternalExists($library, true), true);
+        $apiHandler = $this->get('codebender_library.apiHandler');
+        $exists = $apiHandler->isExternalLibrary($library);
 
-        if ($exists['success'] === false) {
+        if (!$exists) {
             return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
-        if ($lib[0]->getActive())
-            $lib[0]->setActive(0);
-        else
-            $lib[0]->setActive(1);
-        $em->persist($lib[0]);
-        $em->flush();
+        $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
+
+        $checkGithubUpdatesCommand->toggleLibraryStatus($library);
 
         return new JsonResponse(['success' => true]);
     }
