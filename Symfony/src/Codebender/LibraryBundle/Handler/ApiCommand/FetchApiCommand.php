@@ -9,6 +9,12 @@ class FetchApiCommand extends AbstractApiCommand
     public function execute($content)
     {
         $content = $this->setDefault($content);
+        $filename = $content['library'];
+
+        $last_slash = strrpos($content['library'], "/");
+        if ($last_slash !== false) {
+            $filename = substr($content['library'], $last_slash + 1);
+        }
 
         $apiHandler = $this->container->get('codebender_library.apiHandler');
 
@@ -17,13 +23,6 @@ class FetchApiCommand extends AbstractApiCommand
 
         $finder = new Finder();
         $exampleFinder = new Finder();
-
-        $filename = $content['library'];
-
-        $last_slash = strrpos($content['library'], "/");
-        if ($last_slash !== false) {
-            $filename = substr($content['library'], $last_slash + 1);
-        }
 
         //TODO handle the case of different .h filenames and folder names
         $reservedNames = ["ArduinoRobot" => "Robot_Control", "ArduinoRobotMotorBoard" => "Robot_Motor",
@@ -40,7 +39,7 @@ class FetchApiCommand extends AbstractApiCommand
                 $meta = [];
             }
         } else {
-            if (!$apiHandler->isExternalLibrary($filename)) {
+            if (!$apiHandler->isExternalLibrary($filename, $content['disabled'])) {
                 return ["success" => false, "message" => "No Library named " . $filename . " found."];
             }
 
@@ -74,6 +73,7 @@ class FetchApiCommand extends AbstractApiCommand
 
     private function setDefault($content)
     {
+        $content['disabled'] = (array_key_exists('disabled', $content) ? $content['disabled'] : false);
         $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
         $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
         return $content;

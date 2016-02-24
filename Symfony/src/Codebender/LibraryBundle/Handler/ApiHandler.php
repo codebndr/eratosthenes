@@ -137,11 +137,14 @@ class ApiHandler
      * This method checks if a given external library exists in the database.
      *
      * @param $defaultHeader
+     * @param bool $getDisabled
      * @return bool
      */
-    public function isExternalLibrary($defaultHeader)
+    public function isExternalLibrary($defaultHeader, $getDisabled = false)
     {
-        return $this->getLibraryFromDefaultHeader($defaultHeader) !== null;
+        $library = $this->getLibraryFromDefaultHeader($defaultHeader);
+
+        return $getDisabled ? $library !== null : $library !== null && $library->getActive();
     }
 
     /**
