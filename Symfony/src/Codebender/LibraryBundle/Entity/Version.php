@@ -70,20 +70,6 @@ class Version
     /**
      * @var string
      *
-     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
-     */
-    private $inRepoPath;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="branch", type="string", length=255, nullable = true)
-     */
-    private $branch;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="folder_name", type="string", length=255)
      */
     private $folderName;
@@ -234,52 +220,6 @@ class Version
     public function getReleaseCommit()
     {
         return $this->releaseCommit;
-    }
-
-    /**
-     * Set inRepoPath
-     *
-     * @param string $inRepoPath
-     * @return Version
-     */
-    public function setInRepoPath($inRepoPath)
-    {
-        $this->inRepoPath = $inRepoPath;
-
-        return $this;
-    }
-
-    /**
-     * Get inRepoPath
-     *
-     * @return string 
-     */
-    public function getInRepoPath()
-    {
-        return $this->inRepoPath;
-    }
-
-    /**
-     * Set branch
-     *
-     * @param string $branch
-     * @return Version
-     */
-    public function setBranch($branch)
-    {
-        $this->branch = $branch;
-
-        return $this;
-    }
-
-    /**
-     * Get branch
-     *
-     * @return string 
-     */
-    public function getBranch()
-    {
-        return $this->branch;
     }
 
     /**

@@ -13,6 +13,7 @@ parameters:
     # Paths to libraries.
     builtin_libraries: /opt/codebender/codebender-arduino-library-files
     external_libraries: /opt/codebender/codebender-external-library-files
+    external_libraries_new: /opt/codebender/codebender-external-library-files-new
 
     authorizationKey: "youMustChangeThis"
 

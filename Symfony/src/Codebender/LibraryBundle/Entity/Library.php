@@ -70,6 +70,20 @@ class Library
     /**
      * @var string
      *
+     * @ORM\Column(name="branch", type="string", length=255, nullable = true)
+     */
+    private $branch;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="in_repo_path", type="string", length=255, nullable = true)
+     */
+    private $inRepoPath;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="notes", type="text", nullable = true)
      */
     private $notes;
@@ -253,6 +267,52 @@ class Library
     public function getRepo()
     {
         return $this->repo;
+    }
+
+    /**
+     * Set branch
+     *
+     * @param string $branch
+     * @return Version
+     */
+    public function setBranch($branch)
+    {
+        $this->branch = $branch;
+
+        return $this;
+    }
+
+    /**
+     * Get branch
+     *
+     * @return string
+     */
+    public function getBranch()
+    {
+        return $this->branch;
+    }
+
+    /**
+     * Set inRepoPath
+     *
+     * @param string $inRepoPath
+     * @return Version
+     */
+    public function setInRepoPath($inRepoPath)
+    {
+        $this->inRepoPath = $inRepoPath;
+
+        return $this;
+    }
+
+    /**
+     * Get inRepoPath
+     *
+     * @return string
+     */
+    public function getInRepoPath()
+    {
+        return $this->inRepoPath;
     }
 
     /**
