@@ -230,9 +230,9 @@ class ApiViewsController extends Controller
 
     public function gitUpdatesAction()
     {
-        $handler = $this->get('codebender_library.handler');
+        $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
 
-        $handlerResponse = $handler->checkGithubUpdates();
+        $handlerResponse = $checkGithubUpdatesCommand->execute();
 
         if ($handlerResponse['success'] !== true) {
             return new JsonResponse(['success' => false, 'message' => 'Invalid authorization key.']);
