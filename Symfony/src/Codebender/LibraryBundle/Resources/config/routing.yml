@@ -28,7 +28,7 @@ codebender_library_search_v2:
     defaults: { _controller: CodebenderLibraryBundle:ApiViews:search }
 
 codebender_library_status_change_v2:
-    pattern: /{authorizationKey}/v2/toggleStatus/{library}/{version}
+    pattern: /{authorizationKey}/v2/toggleStatus/{library}
     defaults: {_controller:CodebenderLibraryBundle:ApiViews:changeLibraryStatus}
     methods:  [POST]
 
