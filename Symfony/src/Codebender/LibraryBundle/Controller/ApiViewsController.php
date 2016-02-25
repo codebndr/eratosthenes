@@ -7,7 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Finder\Finder;
-use Codebender\LibraryBundle\Entity\ExternalLibrary;
+use Codebender\LibraryBundle\Entity\Library;
+use Codebender\LibraryBundle\Entity\Version;
 use Codebender\LibraryBundle\Entity\Example;
 use Codebender\LibraryBundle\Form\NewLibraryForm;
 use ZipArchive;
@@ -357,32 +358,47 @@ class ApiViewsController extends Controller
     private function saveNewLibrary($data)
     {
         $handler = $this->get('codebender_library.handler');
-        $exists = json_decode($handler->checkIfExternalExists($data['DefaultHeader']), true);
-        if ($exists['success'])
-            return json_encode(array("success" => false, "message" => "Library named " . $data['DefaultHeader'] . " already exists."));
+        $em = $this->getDoctrine()->getManager();
+//        $repository = $em->getRepository('CodebenderLibraryBundle:Library');
 
-        $create = json_decode($this->createLibFiles($data['DefaultHeader'], $data['LibraryStructure']), true);
+        $exists = json_decode($handler->checkIfExternalExists($data['DefaultHeader']), true);
+        if (!$exists['success']) {
+            $lib = new Library();
+            $lib->setName($data['Name']);
+            $lib->setDefaultHeader($data['DefaultHeader']);
+            $lib->setDescription($data['Description']);
+            $lib->setOwner($data['Owner']);
+            $lib->setRepo($data['Repo']);
+            $lib->setBranch($data['Branch']);
+            $lib->setInRepoPath($data['InRepoPath']);
+            $lib->setNotes($data['Notes']);
+            $lib->setVerified(false);
+            $lib->setActive(false);
+            $lib->setLastCommit($data['LastCommit']);
+            $lib->setUrl($data['Url']);
+
+            $create = json_decode($this->createLibaryFiles($data['DefaultHeader'], $data['LibraryStructure']), true);
+            if (!$create['success'])
+                return json_encode($create);
+        } else {
+            $query = $em->createQuery(
+                'SELECT p FROM CodebenderLibraryBundle:Library p WHERE p.default_header = :default_header'
+            )->setParameter('default_header', $data['DefaultHeader']);
+            $lib = $query->getOneOrNullResult();
+        }
+
+        $version = new Version();
+        $version->setSourceUrl($data['SourceUrl']);
+        $version->setNotes($data['Notes']);
+        $lib->addVersion($version);
+
+        $em->persist($lib);
+        $em->persist($version);
+        $em->flush();
+
+        $create = json_decode($this->createVersionFiles($data['DefaultHeader'], $data['LibraryStructure'], $data['Version']), true);
         if (!$create['success'])
             return json_encode($create);
-
-        $lib = new ExternalLibrary();
-        $lib->setHumanName($data['Name']);
-        $lib->setMachineName($data['DefaultHeader']);
-        $lib->setDescription($data['Description']);
-        $lib->setOwner($data['Owner']);
-        $lib->setRepo($data['Repo']);
-        $lib->setBranch($data['Branch']);
-        $lib->setInRepoPath($data['InRepoPath']);
-        $lib->setSourceUrl($data['SourceUrl']);
-        $lib->setNotes($data['Notes']);
-        $lib->setVerified(false);
-        $lib->setActive(false);
-        $lib->setLastCommit($data['LastCommit']);
-        $lib->setUrl($data['Url']);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($lib);
-        $em->flush();
 
         $externalLibrariesPath = $this->container->getParameter('external_libraries');
         $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $data['DefaultHeader']);
@@ -397,12 +413,20 @@ class ApiViewsController extends Controller
 
     }
 
-    private function createLibFiles($defaultHeader, $libraryStructure)
+    private function createLibaryFiles($defaultHeader, $libraryStructure)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . "/";
+        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . '/';
         return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
     }
 
+    private function createVersionFiles($defaultHeader, $libraryStructure, $version)
+    {
+        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . '/' . $version . '/';
+        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
+    }
+
+    // TO DO: see how it works
+    // if possible, break it down. it's doing two things under the same name!!
     private function createLibDirectory($base, $path, $files)
     {
 
