@@ -10,13 +10,13 @@ class NewLibraryForm extends AbstractType{
     {
 
         $builder
-            ->add('GitOwner', 'hidden')
-            ->add('GitRepo', 'hidden')
-            ->add('GitBranch', 'hidden')
-            ->add('GitPath', 'hidden')
+            ->add('Owner', 'hidden')
+            ->add('Repo', 'hidden')
+            ->add('Branch', 'hidden')
+            ->add('InRepoPath', 'hidden')
             ->add('Zip', 'file')
-            ->add('HumanName', 'text', array('label' => 'Human Name: '))
-            ->add('MachineName', 'hidden')
+            ->add('Name', 'text', array('label' => 'Human Name: '))
+            ->add('DefaultHeader', 'hidden')
             ->add('Version', 'text', array('label' => 'Version: '))
             ->add('Description', 'text', array('label' => 'Description: '))
             ->add('Url', 'text', array('label' => 'Info Url: ', 'required' => false, 'attr' => array('placeholder' => 'The url where you can find info about the library')))

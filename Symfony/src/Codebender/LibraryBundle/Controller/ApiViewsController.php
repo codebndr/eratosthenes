@@ -52,7 +52,7 @@ class ApiViewsController extends Controller
         }
 
         return $this->redirect($this->generateUrl('codebender_library_view_library',
-            ['authorizationKey' => $authorizationKey, 'library' => $formData['MachineName'], 'disabled' => 1]));
+            ['authorizationKey' => $authorizationKey, 'library' => $formData['DefaultHeader'], 'disabled' => 1]));
     }
 
     /**
@@ -83,9 +83,9 @@ class ApiViewsController extends Controller
         $lastCommit = null;
         switch ($uploadType['type']) {
             case 'git':
-                $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
-                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
-                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
+                $path = $this->getInRepoPath($data["Repo"], $data['InRepoPath']);
+                $libraryStructure = $handler->getGithubRepoCode($data["Owner"], $data["Repo"], $data['Branch'], $path);
+                $lastCommit = $handler->getLastCommitFromGithub($data['Owner'], $data['Repo'], $data['Branch'], $path);
                 break;
             case 'zip':
                 $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
@@ -111,10 +111,13 @@ class ApiViewsController extends Controller
          * create the new ExternalLibrary Entity that represents the uploaded library.
          * Remember onnly external libraries are uploaded through this process
          */
+        $data['LastCommit'] = $lastCommit;
+        $data['Path'] = $path;
+        $data['LibraryStructure'] = $data[$libraryStructure];
         $creationResponse = json_decode(
             $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
             $data['GitOwner'], $data['GitRepo'], $data['Description'],
-                $lastCommit, $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $path, $libraryStructure)
+                $data['LastCommit'], $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $data['Path'], $data['LibraryStructure'])
             , true);
         if ($creationResponse['success'] != true) {
             return array('success' => false, 'message' => $creationResponse['message']);
