@@ -17,6 +17,7 @@ class NewLibraryForm extends AbstractType{
             ->add('Zip', 'file')
             ->add('HumanName', 'text', array('label' => 'Human Name: '))
             ->add('MachineName', 'hidden')
+            ->add('Version', 'text', array('label' => 'Version: '))
             ->add('Description', 'text', array('label' => 'Description: '))
             ->add('Url', 'text', array('label' => 'Info Url: ', 'required' => false, 'attr' => array('placeholder' => 'The url where you can find info about the library')))
             ->add('SourceUrl', 'text', array('label' => 'Source Url: ', 'required' => false, 'attr' => array('placeholder' => 'A link to the actual code of the library (i.e. zip, etc)')))
