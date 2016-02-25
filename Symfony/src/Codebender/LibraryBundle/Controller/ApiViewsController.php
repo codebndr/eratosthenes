@@ -114,11 +114,9 @@ class ApiViewsController extends Controller
         $data['LastCommit'] = $lastCommit;
         $data['Path'] = $path;
         $data['LibraryStructure'] = $data[$libraryStructure];
-        $creationResponse = json_decode(
-            $this->saveNewLibrary($data['HumanName'], $data['MachineName'],
-            $data['GitOwner'], $data['GitRepo'], $data['Description'],
-                $data['LastCommit'], $data['Url'], $data['GitBranch'], $data['SourceUrl'], $data['Notes'], $data['Path'], $data['LibraryStructure'])
-            , true);
+
+        $creationResponse = json_decode($this->saveNewLibrary($data), true);
+
         if ($creationResponse['success'] != true) {
             return array('success' => false, 'message' => $creationResponse['message']);
         }
@@ -356,43 +354,42 @@ class ApiViewsController extends Controller
         return new Response($value, $htmlcode, $headers);
     }
 
-    private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $inRepoPath, $libfiles)
+    private function saveNewLibrary($data)
     {
         $handler = $this->get('codebender_library.handler');
-        $exists = json_decode($handler->checkIfExternalExists($machineName), true);
+        $exists = json_decode($handler->checkIfExternalExists($data['DefaultHeader']), true);
         if ($exists['success'])
-            return json_encode(array("success" => false, "message" => "Library named " . $machineName . " already exists."));
+            return json_encode(array("success" => false, "message" => "Library named " . $data['DefaultHeader'] . " already exists."));
 
-        $create = json_decode($this->createLibFiles($machineName, $libfiles), true);
+        $create = json_decode($this->createLibFiles($data['DefaultHeader'], $data['LibraryStructure']), true);
         if (!$create['success'])
             return json_encode($create);
 
         $lib = new ExternalLibrary();
-        $lib->setHumanName($humanName);
-        $lib->setMachineName($machineName);
-        $lib->setDescription($description);
-        $lib->setOwner($gitOwner);
-        $lib->setRepo($gitRepo);
-        $lib->setBranch($branch);
-        $lib->setInRepoPath($inRepoPath);
-        $lib->setSourceUrl($sourceUrl);
-        $lib->setNotes($notes);
+        $lib->setHumanName($data['Name']);
+        $lib->setMachineName($data['DefaultHeader']);
+        $lib->setDescription($data['Description']);
+        $lib->setOwner($data['Owner']);
+        $lib->setRepo($data['Repo']);
+        $lib->setBranch($data['Branch']);
+        $lib->setInRepoPath($data['InRepoPath']);
+        $lib->setSourceUrl($data['SourceUrl']);
+        $lib->setNotes($data['Notes']);
         $lib->setVerified(false);
         $lib->setActive(false);
-        $lib->setLastCommit($lastCommit);
-        $lib->setUrl($url);
+        $lib->setLastCommit($data['LastCommit']);
+        $lib->setUrl($data['Url']);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($lib);
         $em->flush();
 
         $externalLibrariesPath = $this->container->getParameter('external_libraries');
-        $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $machineName);
+        $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $data['DefaultHeader']);
 
         foreach ($examples as $example) {
-
             $path_parts = pathinfo($example['filename']);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $machineName . "/" . $example['filename'], null);
+            $this->saveExampleMeta($path_parts['filename'], $lib, $data['DefaultHeader'] . "/" . $example['filename'], null);
         }
 
 
@@ -400,10 +397,10 @@ class ApiViewsController extends Controller
 
     }
 
-    private function createLibFiles($machineName, $lib)
+    private function createLibFiles($defaultHeader, $libraryStructure)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $machineName . "/";
-        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $lib['contents']));
+        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . "/";
+        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
     }
 
     private function createLibDirectory($base, $path, $files)
