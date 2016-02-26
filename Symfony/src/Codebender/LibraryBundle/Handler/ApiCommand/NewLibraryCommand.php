@@ -7,7 +7,6 @@ use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\Version;
 use Codebender\LibraryBundle\Entity\Example;
 use Codebender\LibraryBundle\Form\NewLibraryForm;
-use Symfony\Component\Validator\Constraints\Null;
 
 class NewLibraryCommand extends AbstractApiCommand
 {
@@ -95,18 +94,17 @@ class NewLibraryCommand extends AbstractApiCommand
             $libraryStructure = $this->fixGitPaths($libraryStructure, $libraryStructure['name'], '');
         }
 
+        $data['LastCommit'] = $lastCommit;
+        $data['Path'] = $path;
+        $data['LibraryStructure'] = $libraryStructure;
+        $data['FolderName'] = $this->getFolderName($data['Name']);
+
         /*
-         * Save the library, that is write the files to the disk and
-         * create the new ExternalLibrary Entity that represents the uploaded library.
-         * Remember onnly external libraries are uploaded through this process
+         * It write the files to the disk and create the new Library and/or Version Entity
+         * that represents what's uploaded.
          */
         $lib = $this->getLibrary($data['DefaultHeader']);
         if ($lib === Null) {
-            $data['LastCommit'] = $lastCommit;
-            $data['Path'] = $path;
-            $data['LibraryStructure'] = $libraryStructure;
-            $data['FolderName'] = $this->getFolderName($data['Name']);
-
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
@@ -207,7 +205,7 @@ class NewLibraryCommand extends AbstractApiCommand
         $lib->setUrl($data['Url']);
         $lib->setFolderName($data['FolderName']);
 
-        $create = json_decode($this->createLibaryFiles($data['FolderName'], $data['LibraryStructure']), true);
+        $create = json_decode($this->createLibraryDirectory($data['FolderName'], $data['LibraryStructure']), true);
         if (!$create['success'])
             return json_encode($create);
 
@@ -230,7 +228,7 @@ class NewLibraryCommand extends AbstractApiCommand
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
-        $create = json_decode($this->createVersionFiles($data['FolderName'], $data['LibraryStructure'], $data['Version']), true);
+        $create = json_decode($this->createVersionDirectory($data['FolderName'], $data['LibraryStructure'], $data['Version']), true);
         if (!$create['success'])
             return json_encode($create);
 
@@ -240,6 +238,7 @@ class NewLibraryCommand extends AbstractApiCommand
         return json_encode(array("success" => true));
     }
 
+    // TODO: save Example entities
     private function saveExamples($data, $lib)
     {
         $handler = $this->get('codebender_library.handler');
@@ -253,21 +252,24 @@ class NewLibraryCommand extends AbstractApiCommand
         }
     }
 
-    private function createLibaryFiles($folderName, $libraryStructure)
+    private function createLibraryDirectory($folderName, $libraryStructure)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
-        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
+        $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
+        if (is_dir($path))
+            return json_encode(array("success" => false, "message" => "Library directory already exists"));
+        if (!mkdir($path))
+            return json_encode(array("success" => false, "message" => "Cannot Save Library"));
     }
 
-    private function createVersionFiles($folderName, $libraryStructure, $version)
+    private function createVersionDirectory($folderName, $libraryStructure, $version)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/' . $version . '/';
-        return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
+        $base = $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/' . $version . '/';
+        return ($this->createVersionDirectoryRecur($base, $path, $libraryStructure['contents']));
     }
 
     // TODO: see how it works
     // if possible, break it down. it's doing two things under the same name!!
-    private function createLibDirectory($base, $path, $files)
+    private function createVersionDirectoryRecur($base, $path, $files)
     {
         if (is_dir($path))
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
@@ -276,7 +278,7 @@ class NewLibraryCommand extends AbstractApiCommand
 
         foreach ($files as $file) {
             if ($file['type'] == 'dir') {
-                $create = json_decode($this->createLibDirectory($base, $base . $file['name'] . "/", $file['contents']), true);
+                $create = json_decode($this->createVersionDirectoryRecur($base, $base . $file['name'] . "/", $file['contents']), true);
                 if (!$create['success'])
                     return (json_encode($create));
             } else {
