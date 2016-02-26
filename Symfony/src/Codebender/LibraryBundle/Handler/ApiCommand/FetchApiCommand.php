@@ -123,7 +123,7 @@ class FetchApiCommand extends AbstractApiCommand
         return $content;
     }
 
-    private function fetchLibraryFiles($finder, $directory, $getContent = true)
+    public function fetchLibraryFiles($finder, $directory, $getContent = true)
     {
         if (!is_dir($directory)) {
             return array();
@@ -151,7 +151,7 @@ class FetchApiCommand extends AbstractApiCommand
         return $response;
     }
 
-    private function fetchLibraryExamples($finder, $directory)
+    public function fetchLibraryExamples($finder, $directory)
     {
         if (is_dir($directory)) {
             $finder->in($directory);
