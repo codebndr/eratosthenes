@@ -214,8 +214,14 @@ class ApiViewsController extends Controller
 
         $inSync = false;
         if (!empty($response['meta'])) {
-            // TODO: check if the library is synced with Github
-            $inSync = false;
+            $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
+            $inSync = $checkGithubUpdatesCommand->isLibraryInSyncWithGit(
+                $response['meta']['gitOwner'],
+                $response['meta']['gitRepo'],
+                $response['meta']['gitBranch'],
+                $response['meta']['gitInRepoPath'],
+                $response['meta']['gitLastCommit']
+            );
         }
 
         return $this->render('CodebenderLibraryBundle:Api:libraryView.html.twig', array(
@@ -275,7 +281,7 @@ class ApiViewsController extends Controller
         }
 
         $apiHandler = $this->get('codebender_library.apiHandler');
-        $exists = $apiHandler->isExternalLibrary($library);
+        $exists = $apiHandler->isExternalLibrary($library, true);
 
         if (!$exists) {
             return new JsonResponse(['success' => false, 'message' => 'Library not found.']);

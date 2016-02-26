@@ -69,6 +69,33 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     }
 
     /**
+     * This method checks if a library is in sync with its Github repository given its Github metadata.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param $gitBranch
+     * @param $gitInRepoPath
+     * @param $gitLastCommit
+     * @return bool
+     */
+    public function isLibraryInSyncWithGit($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath, $gitLastCommit)
+    {
+        /*
+         * The values below are fetched fromt the database of the application. If any of them is not set
+         * in the database, the default (null) value will be returned.
+         */
+        if ($gitOwner === null || $gitRepo === null || $gitBranch === null || $gitLastCommit === null) {
+            return false;
+        }
+
+        $gitBranch = $this->convertNullToEmptyString($gitBranch); // not providing any branch will make git return the commits of the default branch
+        $gitInRepoPath = $this->convertNullToEmptyString($gitInRepoPath);
+
+        $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath);
+        return $lastCommitFromGithub === $gitLastCommit;
+    }
+
+    /**
      * This method checks if a given library is updated or not.
      *
      * @param $library
@@ -76,17 +103,14 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
      */
     private function isUpdated($library)
     {
-        $gitOwner = $library->getOwner();
-        $gitRepo = $library->getRepo();
-
-        $branch = $library->getBranch();
-        $branch = $this->convertNullToEmptyString($branch); // not providing any branch will make git return the commits of the default branch
-
-        $directoryInRepo = $library->getInRepoPath();
-        $directoryInRepo = $this->convertNullToEmptyString($directoryInRepo);
-
-        $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
-        return $lastCommitFromGithub === $library->getLastCommit();
+        $metaData = $library->getLibraryMeta();
+        return $this->isLibraryInSyncWithGit(
+                $metaData['gitOwner'],
+                $metaData['gitRepo'],
+                $metaData['gitBranch'],
+                $metaData['gitInRepoPath'],
+                $metaData['gitLastCommit']
+        );
     }
 
     /**
