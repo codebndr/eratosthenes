@@ -257,14 +257,14 @@ class ApiViewsController extends Controller
 
         if ($query !== null && $query != "") {
             $em = $this->getDoctrine()->getManager();
-            $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
-            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')
+            $repository = $em->getRepository('CodebenderLibraryBundle:Library');
+            $libraries = $repository->createQueryBuilder('p')->where('p.default_header LIKE :token')
                 ->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
 
 
             foreach ($libraries as $lib) {
                 if ($lib->getActive())
-                    $names[] = $lib->getMachineName();
+                    $names[] = $lib->getDefaultHeader();
             }
         }
         if ($json !== null && $json = true) {
