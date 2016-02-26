@@ -2,7 +2,6 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
-use Codebender\LibraryBundle\Handler\ApiCommand\GetVersionsCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -294,39 +293,26 @@ class ApiViewsController extends Controller
         return new JsonResponse(['success' => true]);
     }
 
-    public function downloadAction($library)
+    public function downloadAction($defaultHeaderFile, $version)
     {
         $htmlcode = 200;
-        $builtinLibraryFilesPath = $this->container->getParameter('builtin_libraries') . "/";
-        $externalLibraryFilesPath = $this->container->getParameter('external_libraries') . "/";
         $finder = new Finder();
         $exampleFinder = new Finder();
 
-        $filename = $library;
+        $apiHandler = $this->get('codebender_library.apiHandler');
+        $isValidLibrary = $apiHandler->libraryVersionExists($defaultHeaderFile, $version);
 
-        $last_slash = strrpos($library, "/");
-        if ($last_slash !== false) {
-            $filename = substr($library, $last_slash + 1);
-            $vendor = substr($library, 0, $last_slash);
+        if (!$isValidLibrary) {
+            $value = "";
+            $htmlcode = 404;
+            return new Response($value, $htmlcode);
         }
 
-        $handler = $this->get('codebender_library.handler');
-        $isBuiltIn = json_decode($handler->checkIfBuiltInExists($filename), true);
-        if ($isBuiltIn["success"])
-            $path = $builtinLibraryFilesPath . "/libraries/" . $filename;
-        else {
-            $isExternal = json_decode($handler->checkIfExternalExists($filename), true);
-            if ($isExternal["success"]) {
-                $path = $externalLibraryFilesPath . '/' . $filename;
-            } else {
-                $value = "";
-                $htmlcode = 404;
-                return new Response($value, $htmlcode);
-            }
-        }
+        $path = $apiHandler->getExternalLibraryPath($defaultHeaderFile, $version);
 
-        $files = $handler->fetchLibraryFiles($finder, $path, false);
-        $examples = $handler->fetchLibraryExamples($exampleFinder, $path);
+        $fetchCommand = $this->get('codebender_api.fetch');
+        $files = $fetchCommand->fetchLibraryFiles($finder, $path, false);
+        $examples = $fetchCommand->fetchLibraryExamples($exampleFinder, $path);
 
         $zipname = "/tmp/asd.zip";
 
@@ -336,16 +322,16 @@ class ApiViewsController extends Controller
             $value = "";
             $htmlcode = 404;
         } else {
-            if ($zip->addEmptyDir($filename) !== true) {
+            if ($zip->addEmptyDir($defaultHeaderFile) !== true) {
                 $value = "";
                 $htmlcode = 404;
             } else {
                 foreach ($files as $file) {
                     // No special handling needed for binary files, since addFromString method is binary safe.
-                    $zip->addFromString($library . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
+                    $zip->addFromString($defaultHeaderFile . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
                 }
                 foreach ($examples as $file) {
-                    $zip->addFromString($library . "/" . $file["filename"], $file["content"]);
+                    $zip->addFromString($defaultHeaderFile . "/" . $file["filename"], $file["content"]);
                 }
                 $zip->close();
                 $value = file_get_contents($zipname);
@@ -354,7 +340,7 @@ class ApiViewsController extends Controller
         }
 
         $headers = array('Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment;filename="' . $filename . '.zip"');
+            'Content-Disposition' => 'attachment;filename="' . $defaultHeaderFile . '.zip"');
 
         return new Response($value, $htmlcode, $headers);
     }
