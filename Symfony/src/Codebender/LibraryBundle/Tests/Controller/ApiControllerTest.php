@@ -22,6 +22,12 @@ class ApiControllerTest extends WebTestCase
 
         $response = $this->postApiType('98am(DW*340D(#*5$%');
         $this->assertFalse($response['success']);
+
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{}'); // no request data
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
     }
     
     public function testList()
@@ -94,12 +100,60 @@ class ApiControllerTest extends WebTestCase
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM"}');
-
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
         $this->assertArrayHasKey('keywords', $response);
         $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
         $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"default", "version" : "1.0.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+    }
+
+    /**
+     * This method test the failure cases of getKeywords API.
+     */
+    public function testGetKeywordsInvalidRequest()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // no library in the request
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Incorrect request fields', $response['message']);
+
+        // library version not found
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "noSuchLib", "version": "1.0.0"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Version 1.0.0 of library named noSuchLib not found.', $response['message']);
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "default", "version": "9.9.9"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Version 9.9.9 of library named default not found.', $response['message']);
+
+        // unsupported library
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "01.Basics"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
     }
 
     /**
