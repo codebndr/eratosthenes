@@ -401,7 +401,7 @@ class ApiControllerTest extends WebTestCase
         /*
          * Disabling the library should make it not be returned in the list.
          */
-        $handler = $this->getService('codebender_api.checkGithubUpdates');
+        $handler = $this->getService('codebender_library.apiHandler');
         $handler->toggleLibraryStatus('DynamicArrayHelper');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
 

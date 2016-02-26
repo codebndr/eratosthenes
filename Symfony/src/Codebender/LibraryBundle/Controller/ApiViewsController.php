@@ -213,8 +213,8 @@ class ApiViewsController extends Controller
 
         $inSync = false;
         if (!empty($response['meta'])) {
-            $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
-            $inSync = $checkGithubUpdatesCommand->isLibraryInSyncWithGit(
+            $apiHandler = $this->get('codebender_library.apiHandler');
+            $inSync = $apiHandler->isLibraryInSyncWithGit(
                 $response['meta']['gitOwner'],
                 $response['meta']['gitRepo'],
                 $response['meta']['gitBranch'],
@@ -286,9 +286,7 @@ class ApiViewsController extends Controller
             return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
         }
 
-        $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
-
-        $checkGithubUpdatesCommand->toggleLibraryStatus($library);
+        $apiHandler->toggleLibraryStatus($library);
 
         return new JsonResponse(['success' => true]);
     }
@@ -310,9 +308,8 @@ class ApiViewsController extends Controller
 
         $path = $apiHandler->getExternalLibraryPath($defaultHeaderFile, $version);
 
-        $fetchCommand = $this->get('codebender_api.fetch');
-        $files = $fetchCommand->fetchLibraryFiles($finder, $path, false);
-        $examples = $fetchCommand->fetchLibraryExamples($exampleFinder, $path);
+        $files = $apiHandler->fetchLibraryFiles($finder, $path, false);
+        $examples = $apiHandler->fetchLibraryExamples($exampleFinder, $path);
 
         $zipname = "/tmp/asd.zip";
 
