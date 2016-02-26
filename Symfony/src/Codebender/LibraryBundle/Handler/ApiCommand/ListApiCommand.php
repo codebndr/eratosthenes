@@ -108,22 +108,28 @@ class ListApiCommand extends AbstractApiCommand
                 fclose($log);
             }
 
-            $examples = $entityManager
-                ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            $versions = $entityManager
+                ->getRepository('CodebenderLibraryBundle:Version')
                 ->findBy(array('library' => $library));
 
-            $log = fopen('log.log', 'a');
-            fwrite($log, '      flag4' . "\n");
-            fclose($log);
+            foreach ($versions as $version) {
+                $examples = $entityManager
+                    ->getRepository('CodebenderLibraryBundle:LibraryExample')
+                    ->findBy(array('version' => $version));
 
-            foreach ($examples as $example) {
-                $names = $this
-                    ->getExampleAndLibNameFromRelativePath(
-                        pathinfo($example->getInRepoPath(), PATHINFO_DIRNAME),
-                        $example->getName()
-                    );
+                $log = fopen('log.log', 'a');
+                fwrite($log, '      flag4' . "\n");
+                fclose($log);
 
-                $libraries[$libraryDefaultHeader]['examples'][] = array('name' => $names['example_name']);
+                foreach ($examples as $example) {
+                    $names = $this
+                        ->getExampleAndLibNameFromRelativePath(
+                            pathinfo($example->getPath(), PATHINFO_DIRNAME),
+                            $example->getName()
+                        );
+
+                    $libraries[$libraryDefaultHeader]['examples'][] = array('name' => $names['example_name']);
+                }
             }
         }
 
