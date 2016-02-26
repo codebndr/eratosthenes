@@ -91,7 +91,7 @@ class FetchApiCommand extends AbstractApiCommand
                 $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
                     ->findOneBy(array('default_header' => $filename));
                 $filename = $externalLibrary->getDefaultHeader();
-                $meta = $externalLibrary->getLiraryMeta();
+                $meta = $externalLibrary->getLibraryMeta();
                 $versions = array_map(
                     function ($version) {
                         return $version->getVersion();
