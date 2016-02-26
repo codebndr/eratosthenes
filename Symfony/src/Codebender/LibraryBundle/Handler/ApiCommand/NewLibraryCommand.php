@@ -103,6 +103,7 @@ class NewLibraryCommand extends AbstractApiCommand
         $data['Path'] = $path;
         $data['LibraryStructure'] = $data[$libraryStructure];
 
+        // TODO: make a function for name conflict resolution
         $exists = json_decode($handler->checkIfExternalExists($data['DefaultHeader']), true);
         if (!$exists) {
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
