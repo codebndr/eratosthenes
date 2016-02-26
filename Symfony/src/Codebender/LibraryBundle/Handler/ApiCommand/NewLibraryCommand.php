@@ -7,6 +7,7 @@ use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\Version;
 use Codebender\LibraryBundle\Entity\Example;
 use Codebender\LibraryBundle\Form\NewLibraryForm;
+use Symfony\Component\Validator\Constraints\Null;
 
 class NewLibraryCommand extends AbstractApiCommand
 {
@@ -99,13 +100,13 @@ class NewLibraryCommand extends AbstractApiCommand
          * create the new ExternalLibrary Entity that represents the uploaded library.
          * Remember onnly external libraries are uploaded through this process
          */
-        $data['LastCommit'] = $lastCommit;
-        $data['Path'] = $path;
-        $data['LibraryStructure'] = $data[$libraryStructure];
+        $lib = $this->getLibrary($data['DefaultHeader']);
+        if ($lib === Null) {
+            $data['LastCommit'] = $lastCommit;
+            $data['Path'] = $path;
+            $data['LibraryStructure'] = $libraryStructure;
+            $data['FolderName'] = $this->getFolderName($data['Name']);
 
-        // TODO: make a function for name conflict resolution
-        $exists = json_decode($handler->checkIfExternalExists($data['DefaultHeader']), true);
-        if (!$exists) {
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
@@ -119,6 +120,7 @@ class NewLibraryCommand extends AbstractApiCommand
 
         return array('success' => true);
     }
+
 
     /**
      * Makes sure the received form does not contain Github data and
@@ -190,8 +192,6 @@ class NewLibraryCommand extends AbstractApiCommand
 
     private function saveNewLibrary($data)
     {
-        $em = $this->getDoctrine()->getManager();
-
         $lib = new Library();
         $lib->setName($data['Name']);
         $lib->setDefaultHeader($data['DefaultHeader']);
@@ -207,23 +207,18 @@ class NewLibraryCommand extends AbstractApiCommand
         $lib->setUrl($data['Url']);
         $lib->setFolderName($data['FolderName']);
 
-        $create = json_decode($this->createLibaryFiles($data['DefaultHeader'], $data['LibraryStructure']), true);
+        $create = json_decode($this->createLibaryFiles($data['FolderName'], $data['LibraryStructure']), true);
         if (!$create['success'])
             return json_encode($create);
 
-        $em->persist($lib);
-        $em->flush();
+        $this->saveEntities(array($lib));
 
         return json_encode(array("success" => true));
     }
 
     private function saveNewVersionAndExamples($data)
     {
-        $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT p FROM CodebenderLibraryBundle:Library p WHERE p.default_header = :default_header'
-        )->setParameter('default_header', $data['DefaultHeader']);
-        $lib = $query->getOneOrNullResult();
+        $lib = $this->getLibrary($data['DefaultHeader']);
 
         $version = new Version();
         $version->setLibrary($lib);
@@ -235,14 +230,11 @@ class NewLibraryCommand extends AbstractApiCommand
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
-        $create = json_decode($this->createVersionFiles($data['DefaultHeader'], $data['LibraryStructure'], $data['Version']), true);
+        $create = json_decode($this->createVersionFiles($data['FolderName'], $data['LibraryStructure'], $data['Version']), true);
         if (!$create['success'])
             return json_encode($create);
 
-        $em->persist($lib);
-        $em->persist($version);
-        $em->flush();
-
+        $this->saveEntities(array($lib, $version));
         $this->saveExamples($data, $lib);
 
         return json_encode(array("success" => true));
@@ -261,15 +253,15 @@ class NewLibraryCommand extends AbstractApiCommand
         }
     }
 
-    private function createLibaryFiles($defaultHeader, $libraryStructure)
+    private function createLibaryFiles($folderName, $libraryStructure)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . '/';
+        $libBaseDir = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
         return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
     }
 
-    private function createVersionFiles($defaultHeader, $libraryStructure, $version)
+    private function createVersionFiles($folderName, $libraryStructure, $version)
     {
-        $libBaseDir = $this->container->getParameter('external_libraries') . '/' . $defaultHeader . '/' . $version . '/';
+        $libBaseDir = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/' . $version . '/';
         return ($this->createLibDirectory($libBaseDir, $libBaseDir, $libraryStructure['contents']));
     }
 
@@ -303,9 +295,8 @@ class NewLibraryCommand extends AbstractApiCommand
         $example->setLibrary($lib);
         $example->setPath($path);
         $example->setBoards($boards);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($example);
-        $em->flush();
+
+        $this->saveEntities(array($example));
     }
 
 
@@ -392,5 +383,41 @@ class NewLibraryCommand extends AbstractApiCommand
             }
         }
         return rmdir($dir);
+    }
+
+    /**
+     * @param $defaultHeader
+     * @return Library entity or Null
+     */
+    private function getLibrary($defaultHeader)
+    {
+        return $this->entityManager
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findBy(array('default_header' => $defaultHeader))[0];
+    }
+
+    private function saveEntities($entities)
+    {
+        $em = $this->getDoctrine()->getManager();
+        foreach ($entities as $entity) {
+            $em->persist($entity);
+        }
+        $em->flush();
+    }
+
+    /**
+     * Make folder name based on the number of libraries with the same name.
+     * @param $name
+     * @return string
+     */
+    private function getFolderName($name) {
+        $count = sizeof($this->entityManager
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findBy(array('name' => $name)));
+
+        if ($count > 0) {
+            $name = $name . '_' . $count;
+        }
+        return $name;
     }
 }
