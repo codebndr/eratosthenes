@@ -14,6 +14,7 @@ parameters:
     codebender_api.list.class: Codebender\LibraryBundle\Handler\ApiCommand\ListApiCommand
     codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
     codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
+    codebender_api.newLibrary.class: Codebender\LibraryBundle\Handler\ApiCommand\NewLibraryCommand
 
 services:
 #    codebender_library.example:
@@ -92,3 +93,10 @@ services:
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
+
+    codebender_api.newLibrary:
+            class:  %codebender_api.newLibrary.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
