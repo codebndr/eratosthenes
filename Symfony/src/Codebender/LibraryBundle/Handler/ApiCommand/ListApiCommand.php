@@ -16,13 +16,7 @@ class ListApiCommand extends AbstractApiCommand
          * External libraries list is fetched from the database, because we need to list
          * active libraries only
          */
-        $log = fopen('log.log', 'w');
-        fwrite($log, 'start' . "\n");
-        fclose($log);
-        $externalLibraries = $this->getExternalLibrariesList();
-        $log = fopen('log.log', 'a');
-        fwrite($log, 'end' . "\n");
-        fclose($log);
+        $externalLibraries = $this->getLibraryList();
 
         ksort($builtinExamples);
         ksort($includedLibraries);
@@ -69,57 +63,38 @@ class ListApiCommand extends AbstractApiCommand
     /*
      * Copied from DefaultController.php
      */
-    private function getExternalLibrariesList()
+    private function getLibraryList()
     {
         $entityManager = $this->getDoctrine()->getManager();
         $externalMeta = $entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('active' => true));
 
-        $log = fopen('log.log', 'a');
-        fwrite($log, '  flag1' . "\n");
+        $log = fopen('log.log', 'w');
+        fwrite($log, 'start' . "\n");
         fclose($log);
 
         $libraries = array();
         foreach ($externalMeta as $library) {
-            $libraryDefaultHeader = $library->getDefaultHeader();
-            if (!isset($libraries[$libraryDefaultHeader])) {
-                $libraries[$libraryDefaultHeader] = array(
-                    "description" => $library->getDescription(),
-                    "humanName" => $library->getName(),
-                    "examples" => array()
-                );
+            $defaultHeader = $library->getDefaultHeader();
 
-                $log = fopen('log.log', 'a');
-                fwrite($log, '      flag2' . "\n");
-                fclose($log);
-
-                if ($library->getOwner() !== null && $library->getRepo() !== null) {
-                    $libraries[$libraryDefaultHeader] = array(
-                        "description" => $library->getDescription(),
-                        "humanName" => $library->getName(),
-                        "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
-                        "examples" => array()
-                    );
-                }
-
-                $log = fopen('log.log', 'a');
-                fwrite($log, '      flag3' . "\n");
-                fclose($log);
-            }
+            $libraries[$defaultHeader] = array();
 
             $versions = $entityManager
                 ->getRepository('CodebenderLibraryBundle:Version')
                 ->findBy(array('library' => $library));
 
             foreach ($versions as $version) {
+                $libraries[$defaultHeader][$version] = array(
+                    "description" => $library->getDescription(),
+                    "name" => $library->getName(),
+                    "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
+                    "examples" => array()
+                );
+
                 $examples = $entityManager
                     ->getRepository('CodebenderLibraryBundle:LibraryExample')
                     ->findBy(array('version' => $version));
-
-                $log = fopen('log.log', 'a');
-                fwrite($log, '      flag4' . "\n");
-                fclose($log);
 
                 foreach ($examples as $example) {
                     $names = $this
@@ -128,7 +103,7 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$libraryDefaultHeader]['examples'][] = array('name' => $names['example_name']);
+                    $libraries[$defaultHeader][$version]['examples'][] = array('name' => $names['example_name']);
                 }
             }
         }
