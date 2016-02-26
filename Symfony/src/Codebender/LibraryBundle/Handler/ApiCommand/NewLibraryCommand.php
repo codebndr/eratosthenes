@@ -42,7 +42,7 @@ class NewLibraryCommand extends AbstractApiCommand
     }
 
     /**
-     * Performs the actual addition of an external library, as well as
+     * Performs the actual addition of a library, as well as
      * input validation of the provided form data.
      *
      * @param array $data The data of the received form
@@ -225,9 +225,13 @@ class NewLibraryCommand extends AbstractApiCommand
         $lib = $query->getOneOrNullResult();
 
         $version = new Version();
-        
+        $version->setLibrary($lib);
+        $version->setFolderName($data['FolderName']);
+        $version->setDescription($data['Description']);
+        $version->setReleaseCommit($data['LastCommit']);
         $version->setSourceUrl($data['SourceUrl']);
         $version->setNotes($data['Notes']);
+        $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
         $create = json_decode($this->createVersionFiles($data['DefaultHeader'], $data['LibraryStructure'], $data['Version']), true);

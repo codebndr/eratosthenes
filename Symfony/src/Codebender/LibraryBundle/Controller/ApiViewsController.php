@@ -13,7 +13,7 @@ class ApiViewsController extends Controller
 {
 
     /**
-     * Creates and handles a form for adding external libraries to the
+     * Creates and handles a form for adding libraries to the
      * library management system. Will render the form page adding a flashbag
      * error upon failure. Will redirect to the newly created view page of the library
      * upon success.
