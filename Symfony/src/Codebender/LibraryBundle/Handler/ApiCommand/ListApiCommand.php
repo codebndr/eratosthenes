@@ -33,9 +33,6 @@ class ListApiCommand extends AbstractApiCommand
         ];
     }
 
-    /*
-     * Copied from DefaultController.php
-     */
     private function getLibariesListFromDir($path)
     {
 
@@ -60,9 +57,6 @@ class ListApiCommand extends AbstractApiCommand
         return $libraries;
     }
 
-    /*
-     * Copied from DefaultController.php
-     */
     private function getLibraryList()
     {
         $entityManager = $this->getDoctrine()->getManager();
@@ -80,12 +74,9 @@ class ListApiCommand extends AbstractApiCommand
 
             $libraries[$defaultHeader] = array();
 
-            $versions = $entityManager
-                ->getRepository('CodebenderLibraryBundle:Version')
-                ->findBy(array('library' => $library));
-
+            $versions = $library->getVersions();
             foreach ($versions as $version) {
-                $libraries[$defaultHeader][$version] = array(
+                $libraries[$defaultHeader][$version->getVersion()] = array(
                     "description" => $library->getDescription(),
                     "name" => $library->getName(),
                     "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
@@ -94,7 +85,7 @@ class ListApiCommand extends AbstractApiCommand
 
                 $examples = $entityManager
                     ->getRepository('CodebenderLibraryBundle:LibraryExample')
-                    ->findBy(array('version' => $version));
+                    ->findBy(array('version' => $version->getVersion()));
 
                 foreach ($examples as $example) {
                     $names = $this
@@ -103,7 +94,7 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$defaultHeader][$version]['examples'][] = array('name' => $names['example_name']);
+                    $libraries[$defaultHeader][$version->getVersion()]['examples'][] = array('name' => $names['example_name']);
                 }
             }
         }
