@@ -64,10 +64,6 @@ class ListApiCommand extends AbstractApiCommand
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('active' => true));
 
-        $log = fopen('log.log', 'w');
-        fwrite($log, 'start' . "\n");
-        fclose($log);
-
         $libraries = array();
         foreach ($externalMeta as $library) {
             $defaultHeader = $library->getDefaultHeader();
@@ -85,7 +81,7 @@ class ListApiCommand extends AbstractApiCommand
 
                 $examples = $entityManager
                     ->getRepository('CodebenderLibraryBundle:LibraryExample')
-                    ->findBy(array('version' => $version->getVersion()));
+                    ->findBy(array('version' => $version->getId()));
 
                 foreach ($examples as $example) {
                     $names = $this
@@ -94,7 +90,7 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$defaultHeader][$version->getVersion()]['examples'][] = array('name' => $names['example_name']);
+                    $libraries[$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
                 }
             }
         }
