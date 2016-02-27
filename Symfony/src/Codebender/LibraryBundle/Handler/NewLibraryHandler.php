@@ -76,7 +76,6 @@ class NewLibraryHandler
         $data['LastCommit'] = $lastCommit;
         $data['Path'] = $path;
         $data['LibraryStructure'] = $libraryStructure;
-        $data['FolderName'] = $this->getFolderName($data['Name']);
 
         /*
          * It write the files to the disk and create the new Library and/or Version Entity
@@ -84,10 +83,16 @@ class NewLibraryHandler
          */
         $lib = $this->getLibrary($data['DefaultHeader']);
         if ($lib === Null) {
+            $data['FolderName'] = $this->getFolderName($data['Name']);
+
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
             }
+        } else if ($lib->getName() !== $data['Name']) {
+            return array('success' => false, 'message' => "Library called '" . $lib->getName() . "' have the same header!");
+        } else {
+            $data['FolderName'] = $lib->getFolderName();
         }
 
         $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
@@ -207,6 +212,10 @@ class NewLibraryHandler
         $version->setNotes($data['Notes']);
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
+
+        $log = fopen('log.log', 'a');
+        fwrite($log, 'createVersionDirectory' . "\n");
+        fclose($log);
 
         $create = json_decode($this->createVersionDirectory($data['FolderName'], $data['LibraryStructure'], $data['Version']), true);
         if (!$create['success'])
