@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Controller;
 
+use Codebender\LibraryBundle\Form\NewLibraryFormV2;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,16 +23,35 @@ class ApiViewsController extends Controller
      */
     public function newLibraryAction()
     {
-        $newLibraryCommand = $this->get('codebender_api.newLibrary');
 
-        $handlerResponse = $newLibraryCommand->execute();
+        $authorizationKey = $this->container->getParameter('authorizationKey');
+        $form = $this->createForm(new NewLibraryFormV2());
 
-        if ($handlerResponse['success'] !== true) {
-            return new JsonResponse(['success' => false, 'message' => 'Invalid authorization key.']);
+        $form->handleRequest($this->getRequest());
+
+        if (!$form->isValid()) {
+            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', array(
+                'authorizationKey' => $authorizationKey,
+                'form' => $form->createView()
+            ));
         }
 
-        //TODO: create the twig and render it on return
-        return new JsonResponse($handlerResponse);
+        $formData = $form->getData();
+        $newLibraryHandler = $this->get('codebender_library.newLibraryHandler');
+        $libraryAdded = $newLibraryHandler->addLibrary($formData);
+        if ($libraryAdded['success'] !== true){
+            $flashBag = $this->get('session')->getFlashBag();
+            $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
+            $form = $this->createForm(new NewLibraryFormV2());
+
+            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', [
+                'authorizationKey' => $authorizationKey,
+                'form' => $form->createView()
+            ]);
+        }
+
+        return $this->redirect($this->generateUrl('codebender_library_view_library_v2',
+            ['authorizationKey' => $authorizationKey, 'library' => $formData['DefaultHeader'], 'disabled' => 1]));
     }
 
     public function viewLibraryAction()

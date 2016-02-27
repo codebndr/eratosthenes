@@ -10,9 +10,8 @@
 <body>
 
     <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span1"></div>
-            <div class="span10">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
                 <h2 class="title" style="text-align: center;">Let's add some libraries!</h2>
                 <br/>
                 <h3>
@@ -22,8 +21,8 @@
                 </h3>
                 <h3 id = "newLibMessage"></h3>
 
-                <div class="row-fluid">
-                    <div id="steps" class="span12 clearfix">
+                <div class="row">
+                    <div id="steps" class="col-md-12 clearfix">
                         <ol>
                             <li><a class="active step1" title="Select between Github or zip" onclick="selectStep(1)">1</a></li>
                             <li><a class="step2" title="Select directory (only applies to Github libraries)" onclick="selectStep(2)">2</a></li>
@@ -31,8 +30,8 @@
                         </ol>
                     </div>
                 </div>
-                <div class="row-fluid">
-                    <div class="span6">
+                <div class="row">
+                    <div class="col-md-6">
                         <div id="step1" class="box sourcediv">
                             <div id="gitHubDiv">
                                 <div class="row-fluid">
@@ -66,7 +65,7 @@
                             <div id="jstreeDiv"></div>
                         </div>
                     </div>
-                    <div class="span6">
+                    <div class="col-md-6">
                         <div id="step3" class="box metadiv">
                             <div id="verify">
                                 <h5 id="githubChangeInfo" class="labelcontent clearfix">
@@ -81,8 +80,8 @@
                                 {{ form_start(form) }}
                                 {{ form_errors(form) }}
                                 {{ form_widget(form.Zip) }}
-                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Human Name:</span> {{ form_widget(form.HumanName) }}</h3>
-                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Machine Name:</span> <select id="machineNames">Machine Names</select></h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Library Name:</span> {{ form_widget(form.Name) }}</h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Default Header File Name:</span> <select id="machineNames">Header Name</select></h3>
                                 <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Version:</span> {{ form_widget(form.Version) }}</h3>
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Description:</span> {{ form_widget(form.Description) }}</h3>
                                 <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Info Url:</span> {{ form_widget(form.Url) }}</h3>
@@ -93,7 +92,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="span1"></div>
             </div>
         </div>
     </div>

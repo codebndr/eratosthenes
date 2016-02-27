@@ -1,46 +1,14 @@
 <?php
 
-namespace Codebender\LibraryBundle\Handler\ApiCommand;
+namespace Codebender\LibraryBundle\Handler;
 
 use Symfony\Component\Finder\Finder;
 use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\Version;
 use Codebender\LibraryBundle\Entity\Example;
-use Codebender\LibraryBundle\Form\NewLibraryForm;
 
-class NewLibraryCommand extends AbstractApiCommand
+class NewLibraryHandler
 {
-    public function execute($content)
-    {
-        $authorizationKey = $this->container->getParameter('authorizationKey');
-        $form = $this->createForm(new NewLibraryForm());
-
-        $form->handleRequest($this->getRequest());
-
-        if (!$form->isValid()) {
-            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', array(
-                'authorizationKey' => $authorizationKey,
-                'form' => $form->createView()
-            ));
-        }
-        $formData = $form->getData();
-
-        $libraryAdded = $this->addLibrary($formData);
-        if ($libraryAdded['success'] !== true){
-            $flashBag = $this->get('session')->getFlashBag();
-            $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
-            $form = $this->createForm(new NewLibraryForm());
-
-            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', [
-                'authorizationKey' => $authorizationKey,
-                'form' => $form->createView()
-            ]);
-        }
-
-        return $this->redirect($this->generateUrl('codebender_library_view_library',
-            ['authorizationKey' => $authorizationKey, 'library' => $formData['DefaultHeader'], 'disabled' => 1]));
-    }
-
     /**
      * Performs the actual addition of a library, as well as
      * input validation of the provided form data.
@@ -48,7 +16,7 @@ class NewLibraryCommand extends AbstractApiCommand
      * @param array $data The data of the received form
      * @return array
      */
-    private function addLibrary($data)
+    public function addLibrary($data)
     {
         /*
          * Check whether the right combination of data was provided,
@@ -70,8 +38,8 @@ class NewLibraryCommand extends AbstractApiCommand
         switch ($uploadType['type']) {
             case 'git':
                 $path = $this->getInRepoPath($data["Repo"], $data['InRepoPath']);
-                $libraryStructure = $handler->getGithubRepoCode($data["Owner"], $data["Repo"], $data['Branch'], $path);
-                $lastCommit = $handler->getLastCommitFromGithub($data['Owner'], $data['Repo'], $data['Branch'], $path);
+                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
+                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
                 break;
             case 'zip':
                 $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
@@ -414,7 +382,7 @@ class NewLibraryCommand extends AbstractApiCommand
      */
     private function getFolderName($name) {
         $count = sizeof($this->entityManager
-            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('name' => $name)));
 
         if ($count > 0) {
