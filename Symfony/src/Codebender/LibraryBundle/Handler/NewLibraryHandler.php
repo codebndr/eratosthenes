@@ -2,6 +2,8 @@
 
 namespace Codebender\LibraryBundle\Handler;
 
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\Version;
@@ -9,6 +11,15 @@ use Codebender\LibraryBundle\Entity\Example;
 
 class NewLibraryHandler
 {
+    protected $entityManager;
+    protected $container;
+
+    function __construct(EntityManager $entityManager, ContainerInterface $containerInterface)
+    {
+        $this->entityManager = $entityManager;
+        $this->container = $containerInterface;
+    }
+
     /**
      * Performs the actual addition of a library, as well as
      * input validation of the provided form data.
@@ -32,7 +43,7 @@ class NewLibraryHandler
          * Then get the files of the library (either from extracting the zip,
          * or fetching them from Githib) and proceed
          */
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->container->get('codebender_library.handler');
         $path = '';
         $lastCommit = null;
         switch ($uploadType['type']) {
@@ -209,7 +220,7 @@ class NewLibraryHandler
     // TODO: save Example entities
     private function saveExamples($data, $lib)
     {
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->container->get('codebender_library.handler');
 
         $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
         $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $data['DefaultHeader'] . '/' . $data['Version']);
@@ -278,7 +289,7 @@ class NewLibraryHandler
         $opened = $zip->open($file);
 
         if ($opened === true) {
-            $handler = $this->get('codebender_library.handler');
+            $handler = $this->container->get('codebender_library.handler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
