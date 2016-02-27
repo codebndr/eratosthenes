@@ -48,7 +48,7 @@ class NewLibraryHandler
         $lastCommit = null;
         switch ($uploadType['type']) {
             case 'git':
-                $path = $this->getInRepoPath($data["Repo"], $data['InRepoPath']);
+                $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
                 $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
                 $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
                 break;
@@ -178,10 +178,10 @@ class NewLibraryHandler
         $lib->setName($data['Name']);
         $lib->setDefaultHeader($data['DefaultHeader']);
         $lib->setDescription($data['Description']);
-        $lib->setOwner($data['Owner']);
-        $lib->setRepo($data['Repo']);
-        $lib->setBranch($data['Branch']);
-        $lib->setInRepoPath($data['InRepoPath']);
+        $lib->setOwner($data['GitOwner']);
+        $lib->setRepo($data['GitRepo']);
+        $lib->setBranch($data['GitBranch']);
+        $lib->setInRepoPath($data['GitPath']);
         $lib->setNotes($data['Notes']);
         $lib->setVerified(false);
         $lib->setActive(false);
