@@ -185,6 +185,7 @@ class NewLibraryHandler
         $lib->setFolderName($data['FolderName']);
 
         $create = json_decode($this->createLibraryDirectory($data['FolderName'], $data['LibraryStructure']), true);
+
         if (!$create['success'])
             return json_encode($create);
 
@@ -238,6 +239,7 @@ class NewLibraryHandler
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
         if (!mkdir($path))
             return json_encode(array("success" => false, "message" => "Cannot Save Library"));
+        return json_encode(array("success" => true));
     }
 
     private function createVersionDirectory($folderName, $libraryStructure, $version)
