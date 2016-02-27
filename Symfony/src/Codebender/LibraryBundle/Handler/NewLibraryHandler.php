@@ -381,11 +381,10 @@ class NewLibraryHandler
 
     private function saveEntities($entities)
     {
-        $em = $this->getDoctrine()->getManager();
         foreach ($entities as $entity) {
-            $em->persist($entity);
+            $this->entityManager->persist($entity);
         }
-        $em->flush();
+        $this->entityManager->flush();
     }
 
     /**
@@ -397,7 +396,6 @@ class NewLibraryHandler
         $count = sizeof($this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('name' => $name)));
-
         if ($count > 0) {
             $name = $name . '_' . $count;
         }
