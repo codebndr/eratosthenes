@@ -85,7 +85,7 @@ class NewLibraryHandler
         // if same header name exists, add as a new version
         // otherwise, create the library first then add new version
         if ($lib === Null) {
-            $data['FolderName'] = $this->getFolderName($data['DefaultHeader']);
+            $data['FolderName'] = $this->getLibraryFolderName($data['DefaultHeader']);
 
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
             if ($creationResponse['success'] != true) {
@@ -211,7 +211,7 @@ class NewLibraryHandler
 
         $version = new Version();
         $version->setLibrary($lib);
-        $version->setFolderName($data['Version']);
+        $version->setFolderName($this->getVersionFolderName($lib, $data['Version']));
         $version->setDescription($data['VersionDescription']);
         $version->setReleaseCommit($data['LastCommit']);
         $version->setSourceUrl($data['SourceUrl']);
@@ -219,7 +219,7 @@ class NewLibraryHandler
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
-        $create = json_decode($this->createVersionDirectory($data['FolderName'], $data['LibraryStructure'], $data['Version']), true);
+        $create = json_decode($this->createVersionDirectory($data['FolderName'], $version->getFolderName(), $data['LibraryStructure']), true);
         if (!$create['success'])
             return json_encode($create);
 
@@ -258,9 +258,9 @@ class NewLibraryHandler
         return json_encode(array("success" => true));
     }
 
-    private function createVersionDirectory($folderName, $libraryStructure, $version)
+    private function createVersionDirectory($libraryFolderName, $versionFolderName, $libraryStructure)
     {
-        $base = $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/' . $version . '/';
+        $base = $path = $this->container->getParameter('external_libraries_new') . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
         return ($this->createVersionDirectoryRecur($base, $path, $libraryStructure['contents']));
     }
 
@@ -406,7 +406,9 @@ class NewLibraryHandler
      * @param $name header name
      * @return string
      */
-    private function getFolderName($name) {
+    private function getLibraryFolderName($name)
+    {
+        $name = $this->normalizeString($name);
         $count = sizeof($this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('default_header' => $name)));
@@ -414,5 +416,38 @@ class NewLibraryHandler
             $name = $name . '_' . $count;
         }
         return $name;
+    }
+
+    // TODO: better way of finding existing folder name. somehow could not use findBy multiple parameters
+    private function getVersionFolderName($lib, $version)
+    {
+        $name = $this->normalizeString($version);
+        $count = 0;
+        $versions = $this->entityManager
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findBy(array('library' => $lib));
+
+        while (!$this->hasVersionFolderName($versions, $name)) {
+            $count++;
+            $name = $name . '_' . $count;
+        }
+
+        return $name;
+    }
+
+    private function hasVersionFolderName($versions, $folderName)
+    {
+        foreach ($versions as $version) {
+            if ($version->getFolderName() === $folderName) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function normalizeString($str)
+    {
+        $str = preg_replace('/[^a-z0-9]/i', '_', $str);
+        return $str;
     }
 }
