@@ -106,4 +106,33 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals(2, $crawler->filter('h3:contains("Examples (1 found): ")')->count());
     }
 
+    public function testSearchExternalLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // Get HTML response
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/search?q=default');
+        $this->assertEquals(1, $crawler->filter('a:contains("default")')->count());
+
+        // Get JSON response
+        $client->request('GET', '/' . $authorizationKey . '/v2/search?q=default&json=true');
+        $this->assertEquals(
+            '{"success":true,"libs":["default"]}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testDownloadLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client->request('GET', '/' . $authorizationKey . '/v2/download/default/1.0.0');
+
+        $this->assertEquals($client->getResponse()->headers->get('content-type'), 'application/octet-stream');
+        $this->assertEquals($client->getResponse()->headers->get('content-disposition'), 'attachment;filename="default.zip"');
+    }
 }
