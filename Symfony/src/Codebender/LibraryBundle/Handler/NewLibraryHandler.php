@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\Version;
-use Codebender\LibraryBundle\Entity\Example;
+use Codebender\LibraryBundle\Entity\LibraryExample;
 
 class NewLibraryHandler
 {
@@ -82,6 +82,8 @@ class NewLibraryHandler
          * that represents what's uploaded.
          */
         $lib = $this->getLibrary($data['DefaultHeader']);
+        // if same header name exists, add as a new version
+        // otherwise, create the library first then add new version
         if ($lib === Null) {
             $data['FolderName'] = $this->getFolderName($data['DefaultHeader']);
 
@@ -89,8 +91,6 @@ class NewLibraryHandler
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
             }
-        } else if ($lib->getName() !== $data['Name']) {
-            return array('success' => false, 'message' => "Library called '" . $lib->getName() . "' have the same header!");
         } else {
             $data['FolderName'] = $lib->getFolderName();
         }
@@ -205,8 +205,8 @@ class NewLibraryHandler
 
         $version = new Version();
         $version->setLibrary($lib);
-        $version->setFolderName($data['FolderName']);
-        $version->setDescription($data['Description']);
+        $version->setFolderName($data['Version']);
+        $version->setDescription($data['VersionDescription']);
         $version->setReleaseCommit($data['LastCommit']);
         $version->setSourceUrl($data['SourceUrl']);
         $version->setNotes($data['Notes']);
@@ -218,22 +218,27 @@ class NewLibraryHandler
             return json_encode($create);
 
         $this->saveEntities(array($lib, $version));
-        $this->saveExamples($data, $lib);
+        $this->saveExamples($data, $lib, $version);
 
         return json_encode(array("success" => true));
     }
 
-    // TODO: save Example entities
-    private function saveExamples($data, $lib)
+    /**
+     * @param $data
+     * @param $lib Library
+     * @param $version Version
+     */
+    private function saveExamples($data, $lib, $version)
     {
         $handler = $this->container->get('codebender_library.handler');
 
         $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
-        $examples = $handler->fetchLibraryExamples(new Finder(), $externalLibrariesPath . '/' . $data['DefaultHeader'] . '/' . $data['Version']);
+        $versionPath = $externalLibrariesPath . '/' . $lib->getFolderName() . '/' . $version->getFolderName();
+        $examples = $handler->fetchLibraryExamples(new Finder(), $versionPath);
 
         foreach ($examples as $example) {
             $path_parts = pathinfo($example['filename']);
-            $this->saveExampleMeta($path_parts['filename'], $lib, $data['DefaultHeader'] . '/' . $data['Version'] . "/" . $example['filename'], null);
+            $this->saveExampleMeta($path_parts['filename'], $version, $example['filename'], null);
         }
     }
 
@@ -275,12 +280,12 @@ class NewLibraryHandler
         return json_encode(array('success' => true));
     }
 
-    private function saveExampleMeta($name, $lib, $path, $boards)
+    private function saveExampleMeta($name, $version, $path, $boards)
     {
         //TODO make it better. You know, return things and shit
-        $example = new Example();
+        $example = new LibraryExample();
         $example->setName($name);
-        $example->setLibrary($lib);
+        $example->setVersion($version);
         $example->setPath($path);
         $example->setBoards($boards);
 
@@ -381,7 +386,7 @@ class NewLibraryHandler
     {
         return $this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
-            ->findOneBy(array('default_header' => $defaultHeader));
+            ->findBy(array('default_header' => $defaultHeader))[0];
     }
 
     private function saveEntities($entities)

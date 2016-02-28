@@ -59,7 +59,7 @@ class ApiViewsController extends Controller
         $request = $this->getRequest();
         $library = $request->get('library');
         $version = $request->get('version');
-        $disabled = $request->get('disabled') !== 1 ? false : true;
+        $disabled = $request->get('disabled') === "1";
 
         $apiFetchCommand = $this->get('codebender_api.fetch');
         $requestData = [
