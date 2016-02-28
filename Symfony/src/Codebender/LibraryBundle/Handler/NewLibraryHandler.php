@@ -95,7 +95,7 @@ class NewLibraryHandler
             $data['FolderName'] = $lib->getFolderName();
         }
 
-        $creationResponse = json_decode($this->saveNewVersionAndExamples($data, $lib), true);
+        $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
         if ($creationResponse['success'] != true) {
             return array('success' => false, 'message' => $creationResponse['message']);
         }
@@ -199,8 +199,10 @@ class NewLibraryHandler
         return json_encode(array("success" => true));
     }
 
-    private function saveNewVersionAndExamples($data, \Codebender\LibraryBundle\Entity\Library $lib)
+    private function saveNewVersionAndExamples($data)
     {
+        $lib = $this->getLibrary($data['DefaultHeader']);
+
         $version = new Version();
         $version->setLibrary($lib);
         $version->setFolderName($data['FolderName']);
