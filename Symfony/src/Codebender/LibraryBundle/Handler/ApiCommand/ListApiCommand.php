@@ -16,7 +16,7 @@ class ListApiCommand extends AbstractApiCommand
          * External libraries list is fetched from the database, because we need to list
          * active libraries only
          */
-        $externalLibraries = $this->getExternalLibrariesList();
+        $externalLibraries = $this->getLibraryList();
 
         ksort($builtinExamples);
         ksort($includedLibraries);
@@ -33,9 +33,6 @@ class ListApiCommand extends AbstractApiCommand
         ];
     }
 
-    /*
-     * Copied from DefaultController.php
-     */
     private function getLibariesListFromDir($path)
     {
 
@@ -60,48 +57,41 @@ class ListApiCommand extends AbstractApiCommand
         return $libraries;
     }
 
-    /*
-     * Copied from DefaultController.php
-     */
-    private function getExternalLibrariesList()
+    private function getLibraryList()
     {
         $entityManager = $this->getDoctrine()->getManager();
         $externalMeta = $entityManager
-            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('active' => true));
 
         $libraries = array();
         foreach ($externalMeta as $library) {
-            $libraryMachineName = $library->getMachineName();
-            if (!isset($libraries[$libraryMachineName])) {
-                $libraries[$libraryMachineName] = array(
+            $defaultHeader = $library->getDefaultHeader();
+
+            $libraries[$defaultHeader] = array();
+
+            $versions = $library->getVersions();
+            foreach ($versions as $version) {
+                $libraries[$defaultHeader][$version->getVersion()] = array(
                     "description" => $library->getDescription(),
-                    "humanName" => $library->getHumanName(),
+                    "name" => $library->getName(),
+                    "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
                     "examples" => array()
                 );
 
-                if ($library->getOwner() !== null && $library->getRepo() !== null) {
-                    $libraries[$libraryMachineName] = array(
-                        "description" => $library->getDescription(),
-                        "humanName" => $library->getHumanName(),
-                        "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
-                        "examples" => array()
-                    );
+                $examples = $entityManager
+                    ->getRepository('CodebenderLibraryBundle:LibraryExample')
+                    ->findBy(array('version' => $version->getId()));
+
+                foreach ($examples as $example) {
+                    $names = $this
+                        ->getExampleAndLibNameFromRelativePath(
+                            pathinfo($example->getPath(), PATHINFO_DIRNAME),
+                            $example->getName()
+                        );
+
+                    $libraries[$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
                 }
-            }
-
-            $examples = $entityManager
-                ->getRepository('CodebenderLibraryBundle:Example')
-                ->findBy(array('library' => $library));
-
-            foreach ($examples as $example) {
-                $names = $this
-                    ->getExampleAndLibNameFromRelativePath(
-                        pathinfo($example->getPath(), PATHINFO_DIRNAME),
-                        $example->getName()
-                    );
-
-                $libraries[$libraryMachineName]['examples'][] = array('name' => $names['example_name']);
             }
         }
 
