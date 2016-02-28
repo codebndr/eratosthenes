@@ -95,9 +95,15 @@ class NewLibraryHandler
             $data['FolderName'] = $lib->getFolderName();
         }
 
-        $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
-        if ($creationResponse['success'] != true) {
-            return array('success' => false, 'message' => $creationResponse['message']);
+        $handler = $this->container->get('codebender_library.apiHandler');
+        $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
+        if ($version === Null) {
+            $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
+            if ($creationResponse['success'] != true) {
+                return array('success' => false, 'message' => $creationResponse['message']);
+            }
+        } else {
+            return array("success" => false, "message" => "Library '" . $data['DefaultHeader'] . "' already has version '" . $data['Version'] . "'");
         }
 
         return array('success' => true);
@@ -258,8 +264,6 @@ class NewLibraryHandler
         return ($this->createVersionDirectoryRecur($base, $path, $libraryStructure['contents']));
     }
 
-    // TODO: see how it works
-    // if possible, break it down. it's doing two things under the same name!!
     private function createVersionDirectoryRecur($base, $path, $files)
     {
         if (is_dir($path))
