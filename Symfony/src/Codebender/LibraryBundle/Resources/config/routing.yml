@@ -11,7 +11,7 @@ codebender_library_view_library_v2:
     defaults: { _controller: CodebenderLibraryBundle:ApiViews:viewLibrary }
 
 codebender_library_download_v2:
-    pattern: /{authorizationKey}/v2/download/{library}/{version}
+    pattern: /{authorizationKey}/v2/download/{defaultHeaderFile}/{version}
     defaults: { _controller: CodebenderLibraryBundle:ApiViews:download }
 
 codebender_library_new_external_v2:

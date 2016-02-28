@@ -475,7 +475,7 @@ class Library
      *
      * @return array
      */
-    public function getLiraryMeta()
+    public function getLibraryMeta()
     {
         return array(
             'name' => $this->getName(),

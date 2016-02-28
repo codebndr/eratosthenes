@@ -77,8 +77,14 @@ class ApiViewsController extends Controller
 
         $inSync = false;
         if (!empty($response['meta'])) {
-            // TODO: check if the library is synced with Github
-            $inSync = false;
+            $apiHandler = $this->get('codebender_library.apiHandler');
+            $inSync = $apiHandler->isLibraryInSyncWithGit(
+                $response['meta']['gitOwner'],
+                $response['meta']['gitRepo'],
+                $response['meta']['gitBranch'],
+                $response['meta']['gitInRepoPath'],
+                $response['meta']['gitLastCommit']
+            );
         }
 
         return $this->render('CodebenderLibraryBundle:Api:libraryView.html.twig', array(
@@ -114,14 +120,14 @@ class ApiViewsController extends Controller
 
         if ($query !== null && $query != "") {
             $em = $this->getDoctrine()->getManager();
-            $repository = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary');
-            $libraries = $repository->createQueryBuilder('p')->where('p.machineName LIKE :token')
+            $repository = $em->getRepository('CodebenderLibraryBundle:Library');
+            $libraries = $repository->createQueryBuilder('p')->where('p.default_header LIKE :token')
                 ->setParameter('token', "%" . $query . "%")->getQuery()->getResult();
 
 
             foreach ($libraries as $lib) {
                 if ($lib->getActive())
-                    $names[] = $lib->getMachineName();
+                    $names[] = $lib->getDefaultHeader();
             }
         }
         if ($json !== null && $json = true) {
@@ -138,52 +144,36 @@ class ApiViewsController extends Controller
         }
 
         $apiHandler = $this->get('codebender_library.apiHandler');
-        $exists = $apiHandler->isExternalLibrary($library);
+        $exists = $apiHandler->isExternalLibrary($library, true);
 
         if (!$exists) {
             return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
         }
 
-        $checkGithubUpdatesCommand = $this->get('codebender_api.checkGithubUpdates');
-
-        $checkGithubUpdatesCommand->toggleLibraryStatus($library);
+        $apiHandler->toggleLibraryStatus($library);
 
         return new JsonResponse(['success' => true]);
     }
 
-    public function downloadAction($library)
+    public function downloadAction($defaultHeaderFile, $version)
     {
         $htmlcode = 200;
-        $builtinLibraryFilesPath = $this->container->getParameter('builtin_libraries') . "/";
-        $externalLibraryFilesPath = $this->container->getParameter('external_libraries') . "/";
         $finder = new Finder();
         $exampleFinder = new Finder();
 
-        $filename = $library;
+        $apiHandler = $this->get('codebender_library.apiHandler');
+        $isValidLibrary = $apiHandler->libraryVersionExists($defaultHeaderFile, $version, true);
 
-        $last_slash = strrpos($library, "/");
-        if ($last_slash !== false) {
-            $filename = substr($library, $last_slash + 1);
-            $vendor = substr($library, 0, $last_slash);
+        if (!$isValidLibrary) {
+            $value = "";
+            $htmlcode = 404;
+            return new Response($value, $htmlcode);
         }
 
-        $handler = $this->get('codebender_library.handler');
-        $isBuiltIn = json_decode($handler->checkIfBuiltInExists($filename), true);
-        if ($isBuiltIn["success"])
-            $path = $builtinLibraryFilesPath . "/libraries/" . $filename;
-        else {
-            $isExternal = json_decode($handler->checkIfExternalExists($filename), true);
-            if ($isExternal["success"]) {
-                $path = $externalLibraryFilesPath . '/' . $filename;
-            } else {
-                $value = "";
-                $htmlcode = 404;
-                return new Response($value, $htmlcode);
-            }
-        }
+        $path = $apiHandler->getExternalLibraryPath($defaultHeaderFile, $version);
 
-        $files = $handler->fetchLibraryFiles($finder, $path, false);
-        $examples = $handler->fetchLibraryExamples($exampleFinder, $path);
+        $files = $apiHandler->fetchLibraryFiles($finder, $path, false);
+        $examples = $apiHandler->fetchLibraryExamples($exampleFinder, $path);
 
         $zipname = "/tmp/asd.zip";
 
@@ -193,16 +183,16 @@ class ApiViewsController extends Controller
             $value = "";
             $htmlcode = 404;
         } else {
-            if ($zip->addEmptyDir($filename) !== true) {
+            if ($zip->addEmptyDir($defaultHeaderFile) !== true) {
                 $value = "";
                 $htmlcode = 404;
             } else {
                 foreach ($files as $file) {
                     // No special handling needed for binary files, since addFromString method is binary safe.
-                    $zip->addFromString($library . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
+                    $zip->addFromString($defaultHeaderFile . '/' . $file['filename'], file_get_contents($path . '/' . $file['filename']));
                 }
                 foreach ($examples as $file) {
-                    $zip->addFromString($library . "/" . $file["filename"], $file["content"]);
+                    $zip->addFromString($defaultHeaderFile . "/" . $file["filename"], $file["content"]);
                 }
                 $zip->close();
                 $value = file_get_contents($zipname);
@@ -211,7 +201,7 @@ class ApiViewsController extends Controller
         }
 
         $headers = array('Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment;filename="' . $filename . '.zip"');
+            'Content-Disposition' => 'attachment;filename="' . $defaultHeaderFile . '.zip"');
 
         return new Response($value, $htmlcode, $headers);
     }

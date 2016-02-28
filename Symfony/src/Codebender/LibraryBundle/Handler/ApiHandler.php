@@ -86,11 +86,12 @@ class ApiHandler
      *
      * @param $defaultHeader
      * @param $version
+     * @param bool $checkDisabled
      * @return bool
      */
-    public function libraryVersionExists($defaultHeader, $version)
+    public function libraryVersionExists($defaultHeader, $version, $checkDisabled = false)
     {
-        if ($this->isValidExternalLibraryVersion($defaultHeader, $version)) {
+        if ($this->isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled)) {
             return true;
         } elseif ($this->isBuiltInLibrary($defaultHeader)) {
             return true;
@@ -227,16 +228,130 @@ class ApiHandler
     }
 
     /**
+     * This method toggles the active status of a library.
+     *
+     * @param $defaultHeader
+     */
+    public function toggleLibraryStatus($defaultHeader)
+    {
+        $entityManager = $this->entityManager;
+        $library = $entityManager
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findBy(array('default_header' => $defaultHeader));
+
+        // Do nothing if the library does not exist
+        if (count($library) < 1) {
+            return;
+        }
+
+        $library = $library[0];
+        $currentStatus = $library->getActive();
+        $library->setActive(!$currentStatus);
+        $entityManager->persist($library);
+        $entityManager->flush();
+    }
+
+    /**
+     * This method checks if a library is in sync with its Github repository given its Github metadata.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param $gitBranch
+     * @param $gitInRepoPath
+     * @param $gitLastCommit
+     * @return bool
+     */
+    public function isLibraryInSyncWithGit($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath, $gitLastCommit)
+    {
+        /*
+         * The values below are fetched fromt the database of the application. If any of them is not set
+         * in the database, the default (null) value will be returned.
+         */
+        if ($gitOwner === null || $gitRepo === null || $gitBranch === null || $gitLastCommit === null) {
+            return false;
+        }
+
+        $gitBranch = $this->convertNullToEmptyString($gitBranch); // not providing any branch will make git return the commits of the default branch
+        $gitInRepoPath = $this->convertNullToEmptyString($gitInRepoPath);
+
+        $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath);
+        return $lastCommitFromGithub === $gitLastCommit;
+    }
+
+    public function fetchLibraryFiles($finder, $directory, $getContent = true)
+    {
+        if (!is_dir($directory)) {
+            return array();
+        }
+        $finder->in($directory)->exclude('examples')->exclude('Examples');
+        $finder->name('*.*');
+        $finder->files(); // fetch only files
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        $response = array();
+        foreach ($finder as $file) {
+            if ($getContent) {
+                $mimeType = finfo_file($finfo, $file);
+                if (strpos($mimeType, "text/") === false) {
+                    $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
+                } else {
+                    $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
+                }
+                $response[] = array("filename" => $file->getRelativePathname(), "content" => $content);
+            } else {
+                $response[] = array("filename" => $file->getRelativePathname());
+            }
+        }
+        return $response;
+    }
+
+    public function fetchLibraryExamples($finder, $directory)
+    {
+        if (is_dir($directory)) {
+            $finder->in($directory);
+            $finder->name('*.pde')->name('*.ino');
+
+            $response = array();
+            foreach ($finder as $file) {
+                $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
+            }
+
+            return $response;
+        }
+
+    }
+
+    /**
+     * This method takes in an object and returns and empty
+     * string if the object is null. Otherwise, the original
+     * object is returned.
+     *
+     * @param $object
+     * @return string an empty string if $object is null, otherwise
+     * $object is returned
+     */
+    private function convertNullToEmptyString($object)
+    {
+        if ($object === null) {
+            return '';
+        }
+
+        return $object;
+    }
+
+    /**
      * This method checks if the given version exists in the given library
      * specified by the $defaultHeader.
      *
      * @param $defaultHeader
      * @param $version
+     * @param bool $checkDisabled
      * @return bool
      */
-    private function isValidExternalLibraryVersion($defaultHeader, $version)
+    private function isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled = false)
     {
-        if (!$this->isExternalLibrary($defaultHeader)) {
+        if (!$this->isExternalLibrary($defaultHeader, $checkDisabled)) {
             return false;
         }
 
@@ -248,5 +363,99 @@ class ApiHandler
             );
 
         return !$versionsCollection->isEmpty();
+    }
+
+    /**
+     * Fetches the last commit sha of a repo. `sha` parameter can either be the name of a branch, or a commit
+     * sha. In the first case, the commit sha's of the branch are returned. In the second case, the commit sha's
+     * of the default branch are returned, as long as the have been written after the provided commit.
+     * Not providing any sha/branch will make Git API return the list of commits for the default branch.
+     * The API can also use a path parameter, in which case only commits that affect a specific directory are returned.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param string $sha
+     * @param string $path
+     * @return mixed
+     */
+    private function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = '', $path = '')
+    {
+        /*
+         * See the docs here https://developer.github.com/v3/repos/commits/
+         * for more info on the json returned.
+         */
+        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
+        $queryParams = '';
+        if ($sha != '') {
+            $queryParams = "?sha=" . $sha;
+        }
+        if ($path != '') {
+            $queryParams .= "&path=$path";
+        }
+
+        $lastCommitResponse = $this->curlGitRequest($url, $queryParams);
+
+        return $lastCommitResponse[0]['sha'];
+    }
+
+    private function curlRequest($url, $post_request_data = null, $http_header = null)
+    {
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array(
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ));
+        if ($post_request_data !== null) {
+            curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
+        }
+
+        if ($http_header !== null) {
+            curl_setopt($curl_req, CURLOPT_HTTPHEADER, $http_header);
+        }
+
+        $contents = curl_exec($curl_req);
+
+        curl_close($curl_req);
+        return $contents;
+    }
+
+    /**
+     * A wrapper for the curlRequest function which adds Github authentication
+     * to the Github API request
+     * Returns the json decoded Github response.
+     *
+     * @param string $url The requested url
+     * @param string $queryParams Additional query parameters to be added to the request url
+     * @return mixed
+     */
+    private function curlGitRequest($url, $queryParams = '')
+    {
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+        $githubAppName = $this->container->getParameter('github_app_name');
+
+        $requestUrl = $url . "?client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        if ($queryParams != '') {
+            $requestUrl = $url . $queryParams . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        }
+        /*
+         * Note: The user-agent MUST be set to a valid value, otherwise the request will be rejected. One of the
+         * suggested values is the application name.
+         * One more thing that must be set on the headers, is the version of the API, which will offer stability
+         * to the application, in case of future Github API updates.
+         */
+        $jsonDecodedContent = json_decode(
+            $this->curlRequest(
+                $requestUrl,
+                null,
+                ['User-Agent: ' . $githubAppName, 'Accept: application/vnd.github.v3.json']
+            ),
+            true
+        );
+
+        return $jsonDecodedContent;
     }
 }

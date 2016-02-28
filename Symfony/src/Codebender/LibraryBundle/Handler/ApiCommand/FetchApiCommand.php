@@ -33,10 +33,10 @@ class FetchApiCommand extends AbstractApiCommand
         }
 
         if ($apiHandler->isBuiltInLibrary($filename)) {
-            $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
+            $response = $apiHandler->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
 
             if ($content['renderView']) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
+                $examples = $apiHandler->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
                 $meta = [];
                 $versions = [];
             }
@@ -73,14 +73,14 @@ class FetchApiCommand extends AbstractApiCommand
                 $libraryPath = $externalLibrariesPath . "/" . $filename . "/" . $version->getFolderName();
 
                 // fetch library files for this version
-                $fetchResponse = $this->fetchLibraryFiles($finder->create(), $libraryPath);
+                $fetchResponse = $apiHandler->fetchLibraryFiles($finder->create(), $libraryPath);
                 if (!empty($fetchResponse)) {
                     $response[$version->getVersion()] = $fetchResponse;
                 }
 
                 if ($content['renderView']) {
                     // fetch example files for this version if it's rendering view
-                    $exampleResponse = $this->fetchLibraryExamples($exampleFinder->create(), $libraryPath);
+                    $exampleResponse = $apiHandler->fetchLibraryExamples($exampleFinder->create(), $libraryPath);
                     if (!empty($exampleResponse)) {
                         $examples[$version->getVersion()] = $exampleResponse;
                     }
@@ -91,7 +91,7 @@ class FetchApiCommand extends AbstractApiCommand
                 $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
                     ->findOneBy(array('default_header' => $filename));
                 $filename = $externalLibrary->getDefaultHeader();
-                $meta = $externalLibrary->getLiraryMeta();
+                $meta = $externalLibrary->getLibraryMeta();
                 $versions = array_map(
                     function ($version) {
                         return $version->getVersion();
@@ -121,49 +121,5 @@ class FetchApiCommand extends AbstractApiCommand
         $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
         $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
         return $content;
-    }
-
-    private function fetchLibraryFiles($finder, $directory, $getContent = true)
-    {
-        if (!is_dir($directory)) {
-            return array();
-        }
-        $finder->in($directory)->exclude('examples')->exclude('Examples');
-        $finder->name('*.*');
-        $finder->files(); // fetch only files
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-        $response = array();
-        foreach ($finder as $file) {
-            if ($getContent) {
-                $mimeType = finfo_file($finfo, $file);
-                if (strpos($mimeType, "text/") === false) {
-                    $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
-                } else {
-                    $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
-                }
-                $response[] = array("filename" => $file->getRelativePathname(), "content" => $content);
-            } else {
-                $response[] = array("filename" => $file->getRelativePathname());
-            }
-        }
-        return $response;
-    }
-
-    private function fetchLibraryExamples($finder, $directory)
-    {
-        if (is_dir($directory)) {
-            $finder->in($directory);
-            $finder->name('*.pde')->name('*.ino');
-
-            $response = array();
-            foreach ($finder as $file) {
-                $response[] = array("filename" => $file->getRelativePathname(), "content" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
-            }
-
-            return $response;
-        }
-
     }
 }
