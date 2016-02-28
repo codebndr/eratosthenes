@@ -74,7 +74,7 @@ class NewLibraryHandler
         }
 
         $data['LastCommit'] = $lastCommit;
-        $data['Path'] = $path;
+        $data['GitPath'] = $path;
         $data['LibraryStructure'] = $libraryStructure;
 
         /*

@@ -37,7 +37,7 @@
                     {% endif %}
                     <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Github repo hosting the library code">Github Repository</a>
                 {% elseif meta.url and meta.url != '' %}
-                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.humanName }} is hosted here</a>
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.name }} is hosted here</a>
                 {% endif %}
                 {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
                 <a id="download" class="btn btn-success" target="_blank"
