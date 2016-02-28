@@ -3,9 +3,11 @@
 <html>
 <head>
 {% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
-
-
-    <title></title>
+    {% if meta.name is defined %}
+        <title>{{ meta.name }}</title>
+    {% else %}
+        <title>{{ library }}</title>
+    {% endif %}
 </head>
 <body>
 <div class="container-fluid">
@@ -39,9 +41,23 @@
                 {% elseif meta.url and meta.url != '' %}
                     <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.humanName }} is hosted here</a>
                 {% endif %}
-                {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
-                <a id="download" class="btn btn-success" target="_blank"
-                   href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                {% if versions %}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Download from <strong>Eratosthenes</strong> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for version in versions %}
+                                {% set download_hash = { 'version' : (version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
+                                <li><a href="{{ path('codebender_library_download_v2', download_hash) }}">Version - {{ version }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+                    <a id="download" class="btn btn-success" target="_blank"
+                       href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                {% endif %}
                 <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
                     {% if inSyncWithGit == true %}
@@ -95,8 +111,7 @@
         var route = "{{ path('codebender_library_status_change_v2', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
         $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
-                var response = jQuery.parseJSON(data);
-                if(response.success)
+                if(data.success)
                 {
                     $("#statusbutton").toggleClass("btn-success");
                     $("#statusbutton").toggleClass("btn-danger");
@@ -110,7 +125,6 @@
                     }
 
                 }
-                console.log(data);
             });
     }
 

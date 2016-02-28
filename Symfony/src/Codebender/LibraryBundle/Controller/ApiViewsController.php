@@ -195,7 +195,7 @@ class ApiViewsController extends Controller
         $request = $this->getRequest();
         $library = $request->get('library');
         $version = $request->get('version');
-        $disabled = $request->get('disabled') !== 1 ? false : true;
+        $disabled = $request->get('disabled') === "1";
 
         $apiFetchCommand = $this->get('codebender_api.fetch');
         $requestData = [
@@ -298,7 +298,7 @@ class ApiViewsController extends Controller
         $exampleFinder = new Finder();
 
         $apiHandler = $this->get('codebender_library.apiHandler');
-        $isValidLibrary = $apiHandler->libraryVersionExists($defaultHeaderFile, $version);
+        $isValidLibrary = $apiHandler->libraryVersionExists($defaultHeaderFile, $version, true);
 
         if (!$isValidLibrary) {
             $value = "";

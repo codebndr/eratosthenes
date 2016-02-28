@@ -86,11 +86,12 @@ class ApiHandler
      *
      * @param $defaultHeader
      * @param $version
+     * @param bool $checkDisabled
      * @return bool
      */
-    public function libraryVersionExists($defaultHeader, $version)
+    public function libraryVersionExists($defaultHeader, $version, $checkDisabled = false)
     {
-        if ($this->isValidExternalLibraryVersion($defaultHeader, $version)) {
+        if ($this->isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled)) {
             return true;
         } elseif ($this->isBuiltInLibrary($defaultHeader)) {
             return true;
@@ -345,11 +346,12 @@ class ApiHandler
      *
      * @param $defaultHeader
      * @param $version
+     * @param bool $checkDisabled
      * @return bool
      */
-    private function isValidExternalLibraryVersion($defaultHeader, $version)
+    private function isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled = false)
     {
-        if (!$this->isExternalLibrary($defaultHeader)) {
+        if (!$this->isExternalLibrary($defaultHeader, $checkDisabled)) {
             return false;
         }
 
