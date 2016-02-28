@@ -83,7 +83,7 @@ class NewLibraryHandler
          */
         $lib = $this->getLibrary($data['DefaultHeader']);
         if ($lib === Null) {
-            $data['FolderName'] = $this->getFolderName($data['Name']);
+            $data['FolderName'] = $this->getFolderName($data['DefaultHeader']);
 
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
             if ($creationResponse['success'] != true) {
@@ -381,7 +381,7 @@ class NewLibraryHandler
     {
         return $this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
-            ->findBy(array('default_header' => $defaultHeader))[0];
+            ->findOneBy(array('default_header' => $defaultHeader));
     }
 
     private function saveEntities($entities)
@@ -394,13 +394,13 @@ class NewLibraryHandler
 
     /**
      * Make folder name based on the number of libraries with the same name.
-     * @param $name
+     * @param $name header name
      * @return string
      */
     private function getFolderName($name) {
         $count = sizeof($this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
-            ->findBy(array('name' => $name)));
+            ->findBy(array('default_header' => $name)));
         if ($count > 0) {
             $name = $name . '_' . $count;
         }
