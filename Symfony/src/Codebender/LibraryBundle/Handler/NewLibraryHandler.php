@@ -84,7 +84,7 @@ class NewLibraryHandler
         $lib = $this->getLibrary($data['DefaultHeader']);
         // if same header name exists, add as a new version
         // otherwise, create the library first then add new version
-        if ($lib === Null) {
+        if ($lib === null) {
             $data['FolderName'] = $this->getLibraryFolderName($data['DefaultHeader']);
 
             $creationResponse = json_decode($this->saveNewLibrary($data), true);
@@ -97,7 +97,7 @@ class NewLibraryHandler
 
         $handler = $this->container->get('codebender_library.apiHandler');
         $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
-        if ($version === Null) {
+        if ($version === null) {
             $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
@@ -197,8 +197,9 @@ class NewLibraryHandler
 
         $create = json_decode($this->createLibraryDirectory($data['FolderName'], $data['LibraryStructure']), true);
 
-        if (!$create['success'])
+        if (!$create['success']) {
             return json_encode($create);
+        }
 
         $this->saveEntities(array($lib));
 
@@ -220,8 +221,9 @@ class NewLibraryHandler
         $lib->addVersion($version);
 
         $create = json_decode($this->createVersionDirectory($data['FolderName'], $version->getFolderName(), $data['LibraryStructure']), true);
-        if (!$create['success'])
+        if (!$create['success']) {
             return json_encode($create);
+        }
 
         $this->saveEntities(array($lib, $version));
         $this->saveExamples($data, $lib, $version);
@@ -251,10 +253,12 @@ class NewLibraryHandler
     private function createLibraryDirectory($folderName, $libraryStructure)
     {
         $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
-        if (is_dir($path))
+        if (is_dir($path)) {
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
-        if (!mkdir($path))
+        }
+        if (!mkdir($path)) {
             return json_encode(array("success" => false, "message" => "Cannot Save Library"));
+        }
         return json_encode(array("success" => true));
     }
 
@@ -266,16 +270,19 @@ class NewLibraryHandler
 
     private function createVersionDirectoryRecur($base, $path, $files)
     {
-        if (is_dir($path))
+        if (is_dir($path)) {
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
-        if (!mkdir($path))
+        }
+        if (!mkdir($path)) {
             return json_encode(array("success" => false, "message" => "Cannot Save Library"));
+        }
 
         foreach ($files as $file) {
             if ($file['type'] == 'dir') {
                 $create = json_decode($this->createVersionDirectoryRecur($base, $base . $file['name'] . "/", $file['contents']), true);
-                if (!$create['success'])
+                if (!$create['success']) {
                     return (json_encode($create));
+                }
             } else {
                 file_put_contents($path . $file['name'], $file['contents']);
             }
@@ -299,8 +306,9 @@ class NewLibraryHandler
 
     private function getLibFromZipFile($file)
     {
-        if (is_dir('/tmp/lib'))
-            $this->destroy_dir('/tmp/lib');
+        if (is_dir('/tmp/lib')) {
+            $this->destroyDir('/tmp/lib');
+        }
         $zip = new \ZipArchive;
         $opened = $zip->open($file);
 
@@ -347,7 +355,7 @@ class NewLibraryHandler
                 $file = json_decode($this->processZipFile($path . '/' . $file), true);
                 if ($file['success'] === true) {
                     array_push($files, $file['file']);
-                } else if ($file['message'] != "Bad Encoding") {
+                } elseif ($file['message'] != "Bad Encoding") {
                     return json_encode($file);
                 }
             }
@@ -368,15 +376,17 @@ class NewLibraryHandler
         return json_encode(['success' => true, 'file' => ['name' => basename($path), 'type' => 'file', 'contents' => $contents]]);
     }
 
-    private function destroy_dir($dir)
+    private function destroyDir($dir)
     {
         if (!is_dir($dir) || is_link($dir)) {
             return unlink($dir);
         }
         foreach (scandir($dir) as $file) {
-            if ($file != '.' && $file != '..' && !$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) {
+            if ($file != '.' && $file != '..' && !$this->destroyDir($dir . DIRECTORY_SEPARATOR . $file)) {
                 chmod($dir . DIRECTORY_SEPARATOR . $file, 0777);
-                if (!$this->destroy_dir($dir . DIRECTORY_SEPARATOR . $file)) return false;
+                if (!$this->destroyDir($dir . DIRECTORY_SEPARATOR . $file)) {
+                    return false;
+                }
             }
         }
         return rmdir($dir);

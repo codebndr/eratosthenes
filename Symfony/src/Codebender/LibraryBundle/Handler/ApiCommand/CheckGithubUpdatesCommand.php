@@ -24,7 +24,7 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         $libraries = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')->findAll();
 
         foreach ($libraries as $lib) {
-            if (!$this->isActive($lib) || !$this->hasGit($lib)){
+            if (!$this->isActive($lib) || !$this->hasGit($lib)) {
                 continue;
             }
 
@@ -55,11 +55,11 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         $apiHandler = $this->get('codebender_library.apiHandler');
         $metaData = $library->getLibraryMeta();
         return $apiHandler->isLibraryInSyncWithGit(
-                $metaData['gitOwner'],
-                $metaData['gitRepo'],
-                $metaData['gitBranch'],
-                $metaData['gitInRepoPath'],
-                $metaData['gitLastCommit']
+            $metaData['gitOwner'],
+            $metaData['gitRepo'],
+            $metaData['gitBranch'],
+            $metaData['gitInRepoPath'],
+            $metaData['gitLastCommit']
         );
     }
 
