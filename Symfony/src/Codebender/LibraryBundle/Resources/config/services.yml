@@ -3,6 +3,7 @@ parameters:
     codebender_library.handler.class: Codebender\LibraryBundle\Handler\DefaultHandler
     codebender_library.apiHandler.class: Codebender\LibraryBundle\Handler\ApiHandler
     codebender_library.apiCommandHandler.class: Codebender\LibraryBundle\Handler\ApiCommandHandler
+    codebender_library.newLibraryHandler.class: Codebender\LibraryBundle\Handler\NewLibraryHandler
 
 # Publicly accessible APIs
     codebender_api.status.class: Codebender\LibraryBundle\Handler\ApiCommand\StatusCommand
@@ -14,6 +15,7 @@ parameters:
     codebender_api.list.class: Codebender\LibraryBundle\Handler\ApiCommand\ListApiCommand
     codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
     codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
+
 
 services:
 #    codebender_library.example:
@@ -34,6 +36,12 @@ services:
 
     codebender_library.apiCommandHandler:
             class:  %codebender_library.apiCommandHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_library.newLibraryHandler:
+            class:  %codebender_library.newLibraryHandler.class%
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"

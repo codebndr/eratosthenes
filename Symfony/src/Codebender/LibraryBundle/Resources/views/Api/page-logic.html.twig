@@ -29,7 +29,7 @@
                 $('#step2').show();
                 $('#step3').show();
 
-                if (!data.owner || !data.repo || !data.branch || !data.description) {
+                if (!data.owner || !data.repo || !data.branch) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
                     return;
                 }
@@ -83,7 +83,7 @@
 
     function update_machineName()
     {
-        $("#newLibrary_MachineName").val($("#machineNames").val());
+        $("#newLibrary_DefaultHeader").val($("#machineNames").val());
     }
 
     function update_git(owner, repo, branch, description)
