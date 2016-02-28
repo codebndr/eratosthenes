@@ -406,36 +406,43 @@ class NewLibraryHandler
      * @param $name header name
      * @return string
      */
+    // TODO: better way of finding existing folder name. somehow could not use findBy multiple parameters
     private function getLibraryFolderName($name)
     {
         $name = $this->normalizeString($name);
-        $count = sizeof($this->entityManager
+        $folderName = $name;
+        $libraries = sizeof($this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('default_header' => $name)));
-        if ($count > 0) {
-            $name = $name . '_' . $count;
+
+        $count = 0;
+        while (!$this->hasFolderName($libraries, $folderName)) {
+            $count++;
+            $folderName = $name . '_' . $count;
         }
-        return $name;
+
+        return $folderName;
     }
 
     // TODO: better way of finding existing folder name. somehow could not use findBy multiple parameters
     private function getVersionFolderName($lib, $version)
     {
         $name = $this->normalizeString($version);
-        $count = 0;
+        $folderName = $name;
         $versions = $this->entityManager
             ->getRepository('CodebenderLibraryBundle:Version')
             ->findBy(array('library' => $lib));
 
-        while (!$this->hasVersionFolderName($versions, $name)) {
+        $count = 0;
+        while (!$this->hasFolderName($versions, $folderName)) {
             $count++;
-            $name = $name . '_' . $count;
+            $folderName = $name . '_' . $count;
         }
 
-        return $name;
+        return $folderName;
     }
 
-    private function hasVersionFolderName($versions, $folderName)
+    private function hasFolderName($versions, $folderName)
     {
         foreach ($versions as $version) {
             if ($version->getFolderName() === $folderName) {
