@@ -1,6 +1,21 @@
 parameters:
 #    codebender_library.example.class: Codebender\LibraryBundle\Example
     codebender_library.handler.class: Codebender\LibraryBundle\Handler\DefaultHandler
+    codebender_library.apiHandler.class: Codebender\LibraryBundle\Handler\ApiHandler
+    codebender_library.apiCommandHandler.class: Codebender\LibraryBundle\Handler\ApiCommandHandler
+    codebender_library.newLibraryHandler.class: Codebender\LibraryBundle\Handler\NewLibraryHandler
+
+# Publicly accessible APIs
+    codebender_api.status.class: Codebender\LibraryBundle\Handler\ApiCommand\StatusCommand
+    codebender_api.invalidApi.class: Codebender\LibraryBundle\Handler\ApiCommand\InvalidApiCommand
+    codebender_api.getVersions.class: Codebender\LibraryBundle\Handler\ApiCommand\GetVersionsCommand
+    codebender_api.getKeywords.class: Codebender\LibraryBundle\Handler\ApiCommand\GetKeywordsCommand
+    codebender_api.getExamples.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExamplesCommand
+    codebender_api.getExampleCode.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExampleCodeCommand
+    codebender_api.list.class: Codebender\LibraryBundle\Handler\ApiCommand\ListApiCommand
+    codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
+    codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
+
 
 services:
 #    codebender_library.example:
@@ -12,3 +27,76 @@ services:
         arguments:
             entityManager: "@doctrine.orm.entity_manager"
             containerInterface: "@service_container"
+
+    codebender_library.apiHandler:
+            class:  %codebender_library.apiHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_library.apiCommandHandler:
+            class:  %codebender_library.apiCommandHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_library.newLibraryHandler:
+            class:  %codebender_library.newLibraryHandler.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+# Publicly accessible services
+    codebender_api.status:
+            class:  %codebender_api.status.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.invalidApi:
+            class:  %codebender_api.invalidApi.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getVersions:
+            class:  %codebender_api.getVersions.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.fetch:
+            class:  %codebender_api.fetch.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getKeywords:
+            class:  %codebender_api.getKeywords.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getExamples:
+            class:  %codebender_api.getExamples.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getExampleCode:
+            class:  %codebender_api.getExampleCode.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.list:
+            class:  %codebender_api.list.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.checkGithubUpdates:
+            class:  %codebender_api.checkGithubUpdates.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"

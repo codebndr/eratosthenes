@@ -23,7 +23,8 @@ class NewLibraryForm extends AbstractType{
             ->add('Notes', 'textarea', array('label' => 'Notes for the library: ', 'required' => false, 'attr' => array('placeholder' => 'Notes for the people of codebender')))
             ->add('Go', 'submit', array('attr' => array('class' => 'btn')));
 
-    }
+
+}
 
     public function getName()
     {

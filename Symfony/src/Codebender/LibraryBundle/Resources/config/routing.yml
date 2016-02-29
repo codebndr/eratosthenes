@@ -6,6 +6,32 @@ codebender_unit_test:
     pattern:  /{authorizationKey}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
+codebender_library_view_library_v2:
+    pattern:  /{authorizationKey}/v2/view
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:viewLibrary }
+
+codebender_library_download_v2:
+    pattern: /{authorizationKey}/v2/download/{library}/{version}
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:download }
+
+codebender_library_new_external_v2:
+    pattern: /{authorizationKey}/v2/new
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:newLibrary}
+    methods:  [GET, POST]
+
+codebender_library_check_github_updates_v2:
+    pattern: /{authorizationKey}/v2/gitUpdates
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:gitUpdates}
+
+codebender_library_search_v2:
+    pattern: /{authorizationKey}/v2/search
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:search }
+
+codebender_library_status_change_v2:
+    pattern: /{authorizationKey}/v2/toggleStatus/{library}
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:changeLibraryStatus}
+    methods:  [POST]
+
 codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
@@ -45,6 +71,11 @@ codebender_library_status_change:
 codebender_library_get_keywords:
     pattern:  /{authorizationKey}/{version}/getKeywords
     defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
+
+codebender_api_handler_v2:
+    pattern:  /{authorizationKey}/v2
+    defaults: { _controller: CodebenderLibraryBundle:Api:apiHandler }
+    methods:  [POST]
 
 codebender_api_handler:
     pattern:  /{authorizationKey}/{version}

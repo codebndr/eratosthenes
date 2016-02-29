@@ -87,7 +87,9 @@ class DefaultController extends Controller
             return false;
         }
 
-        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords")) && !array_key_exists("library", $requestContent)) {
+        if (in_array($requestContent["type"], array("getExampleCode", "getExamples", "fetch", "getKeywords")) &&
+            !array_key_exists("library", $requestContent)
+        ) {
             return false;
         }
 
@@ -197,8 +199,8 @@ class DefaultController extends Controller
                 $processedGitUrl['repo'],
                 $gitBranch,
                 $processedGitUrl['folder']
-            )
-            , true
+            ),
+            true
         );
 
         if (!$githubLibrary['success']) {
@@ -244,7 +246,10 @@ class DefaultController extends Controller
 
             $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
             $pathInfo = pathinfo($example->getBaseName());
-            $files[] = array("filename" => $pathInfo['filename'] . '.ino', "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content);
+            $files[] = array(
+                "filename" => $pathInfo['filename'] . '.ino',
+                "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content
+            );
 
             // TODO: Not only .h and .cpp files in Arduino examples
             $notInoFilesFinder = new Finder();
@@ -254,8 +259,7 @@ class DefaultController extends Controller
             foreach ($notInoFilesFinder as $nonInoFile) {
                 $files[] = array(
                     "filename" => $nonInoFile->getBaseName(),
-                    "content" =>
-                        (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), "UTF-8") : $nonInoFile->getContents()
+                    "content" => (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), "UTF-8") : $nonInoFile->getContents()
                 );
             }
 
@@ -307,13 +311,21 @@ class DefaultController extends Controller
     private function getExternalExampleCode($library, $example)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $libMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
+        $libMeta = $entityManager
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findBy(array('machineName' => $library));
 
-        $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $example));
+        $exampleMeta = $entityManager
+            ->getRepository('CodebenderLibraryBundle:Example')
+            ->findBy(array('library' => $libMeta[0], 'name' => $example));
+
         if (count($exampleMeta) == 0) {
             $example = str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-            $exampleMeta = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $libMeta[0], 'name' => $filename));
+            $exampleMeta = $entityManager
+                ->getRepository('CodebenderLibraryBundle:Example')
+                ->findBy(array('library' => $libMeta[0], 'name' => $filename));
+
             if (count($exampleMeta) > 1) {
                 $meta = null;
                 foreach ($exampleMeta as $e) {
@@ -326,7 +338,7 @@ class DefaultController extends Controller
                 if (!$meta) {
                     return ['success' => false];
                 }
-            } else if (count($exampleMeta) == 0) {
+            } elseif (count($exampleMeta) == 0) {
                 return ['success' => false];
             } else {
                 $meta = $exampleMeta[0];
@@ -364,7 +376,7 @@ class DefaultController extends Controller
                 if (!$filesPath) {
                     return ['success' => false];
                 }
-            } else if (iterator_count($finder) == 0) {
+            } elseif (iterator_count($finder) == 0) {
                 return ['success' => false];
             } else {
                 $filesPathIterator = iterator_to_array($finder, false);
@@ -387,12 +399,16 @@ class DefaultController extends Controller
 
         $files = array();
         foreach ($filesFinder as $file) {
-            if ($file->getExtension() == "pde")
+            if ($file->getExtension() == "pde") {
                 $name = $file->getBasename("pde") . "ino";
-            else
+            } else {
                 $name = $file->getFilename();
+            }
 
-            $files[] = array("filename" => $name, "code" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents());
+            $files[] = array(
+                "filename" => $name,
+                "code" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents()
+            );
 
         }
 
@@ -412,23 +428,40 @@ class DefaultController extends Controller
     private function getExternalLibrariesList()
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $externalMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
+        $externalMeta = $entityManager
+            ->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findBy(array('active' => true));
 
         $libraries = array();
         foreach ($externalMeta as $library) {
             $libraryMachineName = $library->getMachineName();
             if (!isset($libraries[$libraryMachineName])) {
-                $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "examples" => array());
+                $libraries[$libraryMachineName] = array(
+                    "description" => $library->getDescription(),
+                    "humanName" => $library->getHumanName(),
+                    "examples" => array()
+                );
 
                 if ($library->getOwner() !== null && $library->getRepo() !== null) {
-                    $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(), "examples" => array());
+                    $libraries[$libraryMachineName] = array(
+                        "description" => $library->getDescription(),
+                        "humanName" => $library->getHumanName(),
+                        "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
+                        "examples" => array()
+                    );
                 }
             }
 
-            $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $library));
+            $examples = $entityManager
+                ->getRepository('CodebenderLibraryBundle:Example')
+                ->findBy(array('library' => $library));
 
             foreach ($examples as $example) {
-                $names = $this->getExampleAndLibNameFromRelativePath(pathinfo($example->getPath(), PATHINFO_DIRNAME), $example->getName());
+                $names = $this
+                    ->getExampleAndLibNameFromRelativePath(
+                        pathinfo($example->getPath(), PATHINFO_DIRNAME),
+                        $example->getName()
+                    );
 
                 $libraries[$libraryMachineName]['examples'][] = array('name' => $names['example_name']);
             }
@@ -449,7 +482,11 @@ class DefaultController extends Controller
         $libraries = array();
 
         foreach ($finder as $file) {
-            $names = $this->getExampleAndLibNameFromRelativePath($file->getRelativePath(), $file->getBasename("." . $file->getExtension()));
+            $names = $this
+                ->getExampleAndLibNameFromRelativePath(
+                    $file->getRelativePath(),
+                    $file->getBasename("." . $file->getExtension())
+                );
 
             if (!isset($libraries[$names['library_name']])) {
                 $libraries[$names['library_name']] = array("description" => "", "examples" => array());
@@ -468,10 +505,11 @@ class DefaultController extends Controller
 
         while ($tmp != "" && !($tmp === false)) {
             if ($tmp != 'examples' && $tmp != 'Examples' && $tmp != $filename) {
-                if ($type == "")
+                if ($type == "") {
                     $type = $tmp;
-                else
+                } else {
                     $type = $type . ":" . $tmp;
+                }
             }
             $tmp = strtok("/");
 
@@ -493,9 +531,9 @@ class DefaultController extends Controller
             return $exists;
         }
 
-        if ($exists['type'] == 'external') {
+        if ($exists['type'] === 'external') {
             $path = $this->container->getParameter('external_libraries') . '/' . $library;
-        } else if ($exists['type'] = 'builtin') {
+        } elseif ($exists['type'] === 'builtin') {
             $path = $this->container->getParameter('builtin_libraries') . "/libraries/" . $library;
         } else {
             return ['success' => false];
@@ -539,5 +577,4 @@ class DefaultController extends Controller
         return ['success' => true, 'keywords' => $keywords];
 
     }
-
 }

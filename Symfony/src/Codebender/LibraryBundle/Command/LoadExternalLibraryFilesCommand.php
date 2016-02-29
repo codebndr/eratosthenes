@@ -46,18 +46,21 @@ class LoadExternalLibraryFilesCommand extends ContainerAwareCommand
     {
         /* @var ContainerInterface $container */
         $container = $this->getContainer();
-        $externalLibrariesPath = $container->getParameter('external_libraries');
-        if ($externalLibrariesPath === null || $externalLibrariesPath == '') {
-            throw new InvalidConfigurationException('Parameter `external_libraries` is not properly set. Please double check your configuration files.');
-        }
+        $paths = ['external_libraries' => 'library_files', 'external_libraries_new' => 'library_files_new'];
+        foreach ($paths as $path => $source) {
+            $externalLibrariesPath = $container->getParameter($path);
+            if ($externalLibrariesPath === null || $externalLibrariesPath == '') {
+                throw new InvalidConfigurationException('Parameter `' . $path . '` is not properly set. Please double check your configuration files.');
+            }
 
-        $copyResult = $this->copyExternalLibraryFiles($externalLibrariesPath);
+            $copyResult = $this->copyExternalLibraryFiles($externalLibrariesPath, $source);
 
-        if ($copyResult['success'] != true) {
-            $output->writeln('<error>' . $copyResult['error'] . '</error>');
-            return;
+            if ($copyResult['success'] != true) {
+                $output->writeln('<error>' . $copyResult['error'] . '</error>');
+                return;
+            }
+            $output->writeln('<info>Fixture libraries data moved successfully to the `' . $path . '` directory.</info>');
         }
-        $output->writeln('<info>Fixture libraries data moved successfully to the `external_libraries` directory.</info>');
         return;
     }
 
@@ -69,10 +72,10 @@ class LoadExternalLibraryFilesCommand extends ContainerAwareCommand
      * @param $externalLibrariesPath
      * @return array
      */
-    protected function copyExternalLibraryFiles($externalLibrariesPath)
+    protected function copyExternalLibraryFiles($externalLibrariesPath, $externalLibrariesSource)
     {
         $fixturesPath = $this->getApplication()->getKernel()
-            ->locateResource('@CodebenderLibraryBundle/Resources/library_files');
+            ->locateResource('@CodebenderLibraryBundle/Resources/' . $externalLibrariesSource);
 
         $filesystem = new Filesystem();
 

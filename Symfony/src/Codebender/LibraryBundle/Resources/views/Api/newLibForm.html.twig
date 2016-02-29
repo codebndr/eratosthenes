@@ -1,0 +1,103 @@
+<head xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+    {% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
+    <script src="{{ asset('js/jstree.min.js') }}"></script>
+    <script src={{ asset("js/zip.js") }}></script>
+    {% include 'CodebenderLibraryBundle:Api:page-logic.html.twig' %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/newlibform.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/jstree/themes/default/style.min.css') }}" />
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <h2 class="title" style="text-align: center;">Let's add some libraries!</h2>
+                <br/>
+                <h3>
+                    {% for flashMessage in app.session.flashbag.get('error') %}
+                        <i>{{ flashMessage }}</i>
+                    {% endfor %}
+                </h3>
+                <h3 id = "newLibMessage"></h3>
+
+                <div class="row">
+                    <div id="steps" class="col-md-12 clearfix">
+                        <ol>
+                            <li><a class="active step1" title="Select between Github or zip" onclick="selectStep(1)">1</a></li>
+                            <li><a class="step2" title="Select directory (only applies to Github libraries)" onclick="selectStep(2)">2</a></li>
+                            <li><a class="step3" title="Add library (submit the form)" onclick="selectStep(3)">3</a></li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="step1" class="box sourcediv">
+                            <div id="gitHubDiv">
+                                <div class="row-fluid">
+                                    <div class="span12" style="text-align: center;">
+                                        <h3 class="labelcontent clearfix"><span><i class="fa fa-github fa-2x"></i> Use a Github Url</span></h3>
+                                        <br/>
+                                        <input type="text" id="githubUrl" class="input-lg" autocomplete="off" placeholder="Enter Github Url"/>
+                                        <br/>
+                                        <button id="fetchBranchesBtn" class="btn btn-info">Get the branches of the repo</button>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row-fluid">
+                                    <div class="span12" style="text-align: center;">
+                                        <h3 id="gitBranchDiv" class="labelcontent clearfix"><span><i class="fa fa-code-fork fa-2x"></i> Select a branch</span></h3>
+                                        <br/>
+                                        <select id="gitBranches"></select>
+                                        <br/>
+                                        <button id="fetchFilesBtn" class="btn btn-info">Get the files of the repo</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 id='orDiv' class="labelcontent clearfix">- or -</h3>
+                            <div id="zipDiv" style="text-align: center;">
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-upload fa-2x"></i> Upload a zip file</span></h3>
+                                <br/>
+                                <button id="takeMeThereButton" class="btn btn-info">Take me there</button>
+                            </div>
+                        </div>
+                        <div id="step2" style="overflow: scroll">
+                            <div id="jstreeDiv"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="step3" class="box metadiv">
+                            <div id="verify">
+                                <h5 id="githubChangeInfo" class="labelcontent clearfix">
+                                    Repository owner: <span id="repoInfoOwner"></span><br/>
+                                    Repository name: <span id="repoInfoRepoName"></span><br/>
+                                    Selected branch: <span id="repoInfoBranch"></span><br/>
+                                    Selected folder: <span id="repoInfoFolder"></span><br/>
+                                </h5>
+                                <a href="javascript:void(0);" class="btn btn-success" id="yes">All good</a>
+                            </div>
+                            <div id="form">
+                                {{ form_start(form) }}
+                                {{ form_errors(form) }}
+                                {{ form_widget(form.Zip) }}
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Library Name:</span> {{ form_widget(form.Name) }}</h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Default Header File Name:</span> <select id="machineNames">Header Name</select></h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Library Description:</span> {{ form_widget(form.Description) }}</h3>
+                                <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Version:</span> {{ form_widget(form.Version) }}</h3>
+                                <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Version Description:</span> {{ form_widget(form.VersionDescription) }}</h3>
+                                <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Info Url:</span> {{ form_widget(form.Url) }}</h3>
+                                <h3 id="sourceUrlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Source Url:</span> {{ form_widget(form.SourceUrl) }}</h3>
+                                <h3 id="sourceUrlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Notes for the library:</span><br/> {{ form_widget(form.Notes) }}</h3>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+
+

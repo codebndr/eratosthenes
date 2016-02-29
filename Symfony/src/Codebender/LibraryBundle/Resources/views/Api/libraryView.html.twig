@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+{% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
+
+
+    <title></title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="span1"></div>
+    <div class="span10"></div>
+        <div style="text-align: left;">
+            {% if meta.name is defined %}
+                <h2>{{ meta.name }}</h2>
+            {% else %}
+                <h2>{{ library }}</h2>
+            {% endif %}
+            <h3>(main header: {{ library }}.h)</h3>
+            {% if meta is not empty %}
+                {% if meta.verified %}
+                    <span class="label label-success" title="This is a Verified Library."><label class="icon-ok"></label> This is a Verified Library.</span>
+                {% else %}
+                    <span class="label label-warning" title="Not Verified. Use at your own risk."><label class="icon-warning-sign"></label> Not Verified. Use at your own risk.</span>
+                {% endif %}
+                <br/><br/>
+                {% if meta.active == true %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
+                {% else %}
+                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
+                {% endif %}
+                <br/><br/>
+                {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
+                    {% if meta.gitInRepoPath %}
+                        <label>You will find the files in the "<strong>{{ meta.gitInRepoPath }}</strong>" directory of the Github repository </label><br/>
+                    {% endif %}
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Github repo hosting the library code">Github Repository</a>
+                {% elseif meta.url and meta.url != '' %}
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.name }} is hosted here</a>
+                {% endif %}
+                {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+                <a id="download" class="btn btn-success" target="_blank"
+                   href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                <br/><br/>
+                {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
+                    {% if inSyncWithGit == true %}
+                        <span><label class="icon-ok"></label> In sync with <strong>{{ meta.gitBranch }}</strong> branch.</span>
+                    {% else %}
+                        <span><label class="icon-warning-sign"></label> Not in sync with {% if meta.gitBranch %} {{ meta.gitBranch }} {% else %}any{% endif %} branch.</span>
+                    {% endif %}
+                {% else %}
+                    <span>Not a Github library (might need manual update)</span>
+                {% endif %}
+            {% else %}
+                {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+                <a id="download" class="btn btn-success" target="_blank"
+                   href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                <br/><br/>
+                <span>This is a <strong>builtin</strong> library</span>
+            {% endif %}
+        </div>
+        {% if meta %}
+            {% if meta.description %}
+                <h3>Library Description:</h3>
+                <div class="well">
+                    <p>{{ meta.description }}</p>
+                </div>
+            {% endif %}
+            {% if meta.libraryNotes %}
+                <h3>Private notes for codebender staff:</h3>
+                <div class="well">
+                    <p>{{ meta.libraryNotes }}</p>
+                </div>
+            {% endif %}
+        {% endif %}
+        {% if versions %}
+            <h3>Library Files</h3>
+            <p>Showing {{ versions|length }} version(s).</p>
+        {% endif %}
+        <div>
+            {% if versions %}
+                {% include 'CodebenderLibraryBundle:Api:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
+            {% else %}
+                {% include 'CodebenderLibraryBundle:Api:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
+            {% endif %}
+        </div>
+    <div class="span1"></div>
+</div>
+
+<script type="text/javascript">
+
+    function changeLibraryStatus(library)
+    {
+        var route = "{{ path('codebender_library_status_change_v2', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
+        $.post( route.replace("LIBRARYNAME", library) )
+            .done(function( data ) {
+                var response = jQuery.parseJSON(data);
+                if(response.success)
+                {
+                    $("#statusbutton").toggleClass("btn-success");
+                    $("#statusbutton").toggleClass("btn-danger");
+
+                    if ($("#statusbutton").text().indexOf('enabled') > 0)
+                    {
+                        $("#statusbutton").html("Library <strong>disabled</strong> on codebender. Click to enable.");
+                    } else if ($("#statusbutton").text().indexOf('disabled') > 0)
+                    {
+                        $("#statusbutton").html("Library <strong>enabled</strong> on codebender. Click to disable.");
+                    }
+
+                }
+                console.log(data);
+            });
+    }
+
+</script>
+
+</body>
+</html>
