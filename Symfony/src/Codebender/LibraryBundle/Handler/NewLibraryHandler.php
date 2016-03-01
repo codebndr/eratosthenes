@@ -220,6 +220,17 @@ class NewLibraryHandler
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
+        /*
+         * If the version belongs to a Git repo, we update the lastCommit of the library accordingly
+         */
+        /* @var ApiHandler $handler */
+        $handler = $this->container->get('codebender_library.apiHandler');
+        $libraryLastCommit = $lib->getLastCommit();
+        if((!empty($data['LastCommit']) && !empty($libraryLastCommit)) &&
+            $handler->compareCommitTime($data['GitOwner'], $data['GitRepo'], $data['LastCommit'], $libraryLastCommit) > 0) {
+            $lib->setLastCommit($data['LastCommit']);
+        }
+
         $create = json_decode($this->createVersionDirectory($data['FolderName'], $version->getFolderName(), $data['LibraryStructure']), true);
         if (!$create['success']) {
             return json_encode($create);
