@@ -46,11 +46,16 @@ class NewLibraryHandler
         $handler = $this->container->get('codebender_library.handler');
         $path = '';
         $lastCommit = null;
+
+        // check if data are taken from releases
+        // if from releases, then use the tag specified
+        // otherwise, use the branch info
+        $gitRef = $data["GitRelease"] !== null ? $data["GitRelease"] : $data["GitRepo"];
         switch ($uploadType['type']) {
             case 'git':
                 $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
-                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $data['GitBranch'], $path);
-                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $data['GitBranch'], $path);
+                $libraryStructure = $handler->getGithubRepoCode($data["GitOwner"], $data["GitRepo"], $gitRef, $path);
+                $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $gitRef, $path);
                 break;
             case 'zip':
                 $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);

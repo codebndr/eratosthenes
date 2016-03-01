@@ -161,6 +161,72 @@ class ApiViewsController extends Controller
         return new JsonResponse(['success' => true]);
     }
 
+    public function getLibraryGitInfoAction()
+    {
+        if ($this->getRequest()->getMethod() != 'POST') {
+            return new JsonResponse(['success' => false, 'message' => 'POST method required']);
+        }
+
+        $handler = $this->get('codebender_library.handler');
+
+        $githubUrl = $this->getRequest()->request->get('githubUrl');
+        $processedGitUrl = $handler->processGithubUrl($githubUrl);
+
+        if ($processedGitUrl['success'] !== true) {
+            return new JsonResponse(['success' => false, 'message' => 'Could not process provided url']);
+        }
+
+        $repoBranches = $handler->fetchRepoRefsFromGit($processedGitUrl['owner'], $processedGitUrl['repo']);
+        $repoReleases = $handler->fetchRepoReleasesFromGit($processedGitUrl['owner'], $processedGitUrl['repo']);
+
+        if ($repoBranches['success'] !== true || $repoReleases['success'] !== true) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Something went wrong while fetching the library. Please double check the Url you provided.'
+            ]);
+        }
+
+        return new JsonResponse(['success' => true, 'branches' => $repoBranches['headRefs'], 'releases' => $repoReleases['releases']]);
+    }
+
+    public function getRepoGitTreeAndMetaAction()
+    {
+        $handler = $this->get('codebender_library.handler');
+
+        $githubUrl = $this->getRequest()->request->get('githubUrl');
+        $processedGitUrl = $handler->processGithubUrl($githubUrl);
+        $gitRef = $this->getRequest()->request->get('gitRef');
+
+        if ($processedGitUrl['success'] !== true) {
+            return new JsonResponse(['success' => false, 'message' => 'Could not process provided url']);
+        }
+
+        $githubLibrary = json_decode(
+            $handler->getRepoTreeStructure(
+                $processedGitUrl['owner'],
+                $processedGitUrl['repo'],
+                $gitRef,
+                $processedGitUrl['folder']
+            ),
+            true
+        );
+
+        if (!$githubLibrary['success']) {
+            return new JsonResponse($githubLibrary);
+        }
+
+        $description = $handler->getRepoDefaultDescription($processedGitUrl['owner'], $processedGitUrl['repo']);
+
+        return new JsonResponse([
+            'success' => true,
+            'files' => $githubLibrary['files'],
+            'owner' => $processedGitUrl['owner'],
+            'repo' => $processedGitUrl['repo'],
+            'ref' => $gitRef,
+            'description' => $description
+        ]);
+    }
+
     public function downloadAction($defaultHeaderFile, $version)
     {
         $htmlcode = 200;

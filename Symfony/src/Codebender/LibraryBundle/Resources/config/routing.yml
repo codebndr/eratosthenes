@@ -32,6 +32,16 @@ codebender_library_status_change_v2:
     defaults: {_controller:CodebenderLibraryBundle:ApiViews:changeLibraryStatus}
     methods:  [POST]
 
+codebender_library_get_library_git_info:
+    pattern: /{authorizationKey}/v2/getLibGitInfo
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getLibraryGitInfo}
+    methods:  [POST]
+
+codebender_library_get_repo_tree_meta_v2:
+    pattern: /{authorizationKey}/v2/get_repo_tree_meta
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getRepoGitTreeAndMeta}
+    methods:  [POST]
+
 codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }

@@ -726,6 +726,39 @@ class DefaultHandler
     }
 
     /**
+     * Fetch all releases from the Github repo
+     * @param $owner String
+     * @param $repo String
+     * @return array
+     */
+    public function fetchRepoReleasesFromGit($owner, $repo)
+    {
+        $url = "https://api.github.com/repos/$owner/$repo/releases";
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/releases/
+         * for more info on the json returned.
+         */
+        $gitResponse = $this->curlGitRequest($url);
+
+        if (array_key_exists('message', $gitResponse)) {
+            return array('success' => false, 'message' => $gitResponse['message']);
+        }
+
+        $releases = array();
+        foreach ($gitResponse as $release) {
+            $releases[] = [
+                'name' => $release['name'],
+                'tag' => $release['tag_name'],
+                'branch' => $release['target_commitish'],
+                'source' => $release['zipball_url']
+            ];
+        }
+
+        return array('success' => true, 'releases' => $releases);
+    }
+
+    /**
      * Returns the description of a Github repository
      *
      * @param string $owner The owner of the repository

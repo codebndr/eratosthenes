@@ -14,6 +14,7 @@ class NewLibraryFormV2 extends AbstractType{
             ->add('GitRepo', 'hidden')
             ->add('GitBranch', 'hidden')
             ->add('GitPath', 'hidden')
+            ->add('GitRelease', 'hidden')
             ->add('Zip', 'file')
             ->add('Name', 'text', array('label' => 'Human Name: '))
             ->add('DefaultHeader', 'hidden')

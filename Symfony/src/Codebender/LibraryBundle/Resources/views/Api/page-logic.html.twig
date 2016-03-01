@@ -1,11 +1,12 @@
 <script type="text/javascript">
 
-    function get_repo_and_meta()
+    function get_repo_and_meta(isFromRelease)
     {
+        isFromRelease = isFromRelease || false;
         $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching file tree..');
         var $url = $("#githubUrl").val();
-        var $branch = $("#gitBranches").val();
-        $.post( "{{ path('codebender_library_get_repo_tree_meta', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, githubBranch : $branch })
+        var $ref = isFromRelease ? $("#gitReleases").val() : $("#gitBranches").val();
+        $.post( "{{ path('codebender_library_get_repo_tree_meta_v2', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, gitRef : $ref })
             .done(function( data ) {
                 if(!data.success) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> There is no such library');
@@ -29,11 +30,11 @@
                 $('#step2').show();
                 $('#step3').show();
 
-                if (!data.owner || !data.repo || !data.branch) {
+                if (!data.owner || !data.repo || !data.ref) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
                     return;
                 }
-                update_git(data.owner, data.repo, data.branch, data.description)
+                update_git(data.owner, data.repo, data.ref, data.description, isFromRelease)
             });
     }
 
@@ -43,7 +44,7 @@
         $('#jstreeDiv').jstree(true).refresh(false, true);
     }
 
-    function get_github_branches()
+    function get_github_info()
     {
         var $url = $("#githubUrl").val();
         var $github_url_pattern = /^(https?:\/\/)?(www.)?github.com\/[a-zA-Z0-9\.\-_]+\/[a-zA-Z0-9\.\-_]+/;
@@ -51,24 +52,37 @@
             $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Invalid Github Url');
             return;
         }
-        $('#fetchFilesBtn').removeAttr('disabled');
-        $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching branches..');
-        $.post( "{{ path('codebender_library_get_library_git_branches', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
+
+        $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching data..');
+        $.post( "{{ path('codebender_library_get_library_git_info', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
             .done(function( data ) {
                 if(data.success)
                 {
-                    if (data.branches) {
-                        if (data.branches == 0) {
-                            $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> No branches found');
+                    if (data.branches && data.releases) {
+                        $('#fetchFilesBtn').removeAttr('disabled');
+                        $('#fetchFilesForReleasesBtn').removeAttr('disabled');
+
+                        if (data.branches.length === 0) {
+                            $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> No branches or releases found');
                             do_step_1();
                             return;
                         }
 
-                        $("#gitBranches").show();
-                        $("#gitBranchDiv").show();
-                        $('#fetchFilesBtn').show();
-                        $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Select a branch');
+                        var message = '<span><i class="fa fa-chevron-circle-right"></i></span> Select a branch';
+
+                        $("#container-git-release").hide();
+                        if (data.releases.length !== 0) {
+                            $("#container-git-release").show();
+                            $("#gitReleases").html('');
+                            update_git_releases(data.releases);
+                            message += ' or a release';
+                        }
+
+                        $("#container-git-branchs").show();
+
+
                         $("#gitBranches").html('');
+                        $("#newLibMessage").html(message);
                         update_git_branches(data.branches);
                     } else {
                         $("#newLibMessage").html('<span><i class="fa fa-meh-o"></i></span> Something went wrong');
@@ -86,22 +100,46 @@
         $("#newLibrary_DefaultHeader").val($("#machineNames").val());
     }
 
-    function update_git(owner, repo, branch, description)
+    function update_git(owner, repo, ref, description, isFromRelease)
     {
         $("#newLibrary_GitOwner").val(owner);
         $("#newLibrary_GitRepo").val(repo);
-        $("#newLibrary_GitBranch").val(branch);
         $("#newLibrary_Description").val(description);
+        $("#newLibrary_GitRelease").val('');
+
+        // fill in version data if it's from a release
+        if (isFromRelease) {
+            var selectedDom = $("#gitReleases").find(':selected');
+            $("#newLibrary_Version").val(selectedDom.val());
+            $("#newLibrary_VersionDescription").val(selectedDom.text());
+            $("#newLibrary_SourceUrl").val(selectedDom.data('source'));
+            $("#newLibrary_GitRelease").val(selectedDom.val());
+        }
+        $("#newLibrary_GitBranch").val(isFromRelease ? selectedDom.data('branch') : ref);
     }
 
     function update_git_branches(branches)
     {
-        for (i = 0; i < branches.length; i++) {
-            $("#gitBranches")
-                .append($("<option></option>")
-                .attr("value", branches[i])
-                .text(branches[i]));
-        }
+        var selectDom = $("#gitBranches");
+        branches.forEach(function(val) {
+
+            selectDom.append($("<option></option>")
+                    .attr("value", val) // use release's tag name as value
+                    .text(val));
+        });
+    }
+
+    function update_git_releases(releases)
+    {
+        var selectDom = $("#gitReleases");
+        releases.forEach(function(val) {
+
+            selectDom.append($("<option></option>")
+                    .attr("value", val.tag) // use release's tag name as value
+                    .attr("data-branch", val.branch) // save branch info
+                    .attr("data-source", val.source) // save source url of this release
+                    .text(val.name));
+        });
     }
 
     function endsWith(str, suffix) {
@@ -161,6 +199,7 @@
         $("#newLibrary_GitRepo").attr("disabled", "disabled");
         $("#newLibrary_GitBranch").attr("disabled", "disabled");
         $("#newLibrary_GitPath").attr("disabled", "disabled");
+        $("#newLibrary_GitRelease").val('');
         $("#newLibrary_Zip").removeAttr("disabled");
         $("#newLibrary_Zip").show();
         $("#newLibrary_Url").removeAttr("disabled");
@@ -254,11 +293,18 @@
     $(document).ready(function()
     {
         $("#newLibMessage").html('<span><i class="fa fa-chevron-circle-right"></i></span> Choose one of the available options');
-        $("#gitBranchDiv").hide();
-        $("#gitBranches").hide();
+        // select git branch
+        $("#container-git-branchs").hide();
+        $('#fetchFilesBtn').click(function(){ get_repo_and_meta(); });
+
+        // select git release
+        $("#container-git-release").hide();
+        $('#fetchFilesForReleasesBtn').click(function(){ get_repo_and_meta(true); });
+
+        // get info button
+        $('#fetchInfoBtn').click(function(){ get_github_info(); });
+
         $("#newLibrary_Zip").hide();
-        $('#fetchBranchesBtn').click(function(){ get_github_branches(); });
-        $('#fetchFilesBtn').click(function(){ get_repo_and_meta(); }).hide();
         $('#takeMeThereButton').click(function(){ $('#step1').hide(); select_zip(); });
         $("#newLibrary_Zip").change(function(){ get_lib_from_zip(); });
         $("#machineNames").change(function(){ update_machineName(); });
@@ -276,11 +322,13 @@
 
         $("#githubUrl").keyup(function() {
             $('#fetchFilesBtn').attr('disabled', 'disabled');
+            $('#fetchFilesForReleasesBtn').attr('disabled', 'disabled');
             if ($("#githubUrl").val() != '') {
                 $('#orDiv').hide();
                 $('#zipDiv').hide();
             } else {
-                $("#gitBranches").hide();
+                $("#container-git-branchs").hide();
+                $("#container-git-release").hide();
                 $('#orDiv').show();
                 $('#zipDiv').show();
             }
