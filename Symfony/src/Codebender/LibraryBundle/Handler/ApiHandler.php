@@ -323,6 +323,38 @@ class ApiHandler
     }
 
     /**
+     * This method compares the commit time of two commits. The method returns an integer less than 0 if commit1
+     * is before commit2, 0 if commit 1 was committed at the same time as commit 2, and greater than 0 if commit1
+     * is later than commit2.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param $commit1
+     * @param $commit2
+     * @return int
+     */
+    public function compareCommitTime($gitOwner, $gitRepo, $commit1, $commit2) {
+        $commit1Timestamp = $this->getCommitTimestamp($gitOwner, $gitRepo, $commit1);
+        $commit2Timestamp = $this->getCommitTimestamp($gitOwner, $gitRepo, $commit2);
+        return $commit1Timestamp - $commit2Timestamp;
+    }
+
+    /**
+     * This method returns the UNIX timestamp of a commit.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param $commit
+     * @return int
+     */
+    public function getCommitTimestamp($gitOwner, $gitRepo, $commit) {
+        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/git/commits/" . $commit;
+        $reponse = $this->curlGitRequest($url);
+        $dateString = $reponse['committer']['date'];
+        return strtotime($dateString);
+    }
+
+    /**
      * This method takes in an object and returns and empty
      * string if the object is null. Otherwise, the original
      * object is returned.
