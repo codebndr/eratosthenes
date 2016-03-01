@@ -736,4 +736,52 @@ class ApiViewsControllerTest extends WebTestCase
             $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("' . $file . '")')->count());
         }
     }
+
+    public function testViewExternalGitLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // Using `disabled` flag because the library was not activated on upload
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/view?library=WebSerial&disabled=1');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("WebSerial Arduino Library")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: WebSerial.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/v2/download/WebSerial/1.0.0"]:contains("Version - 1.0.0")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="https://github.com/codebendercc/webserial"]:contains("Github Repository")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('span:contains("In sync with master branch.")')->count());
+
+        $this->assertEquals(2, $crawler->filter('div[class="well"]:contains("Arduino WebSerial Library")')->count());
+
+        $filesAndExamples = [
+            'Version - 1.0.0',
+            'WebSerial.cpp',
+            'WebSerial.h',
+            'README.md',
+            'examples/WebASCIITable/WebASCIITable.ino',
+            'examples/WebSerialEcho/WebSerialEcho.ino'
+        ];
+
+        foreach ($filesAndExamples as $file) {
+            $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("' . $file . '")')->count());
+        }
+    }
 }
