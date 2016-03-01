@@ -17,12 +17,13 @@ class NewLibraryFormV2 extends AbstractType{
             ->add('Zip', 'file')
             ->add('Name', 'text', array('label' => 'Human Name: '))
             ->add('DefaultHeader', 'hidden')
+            ->add('Notes', 'textarea', array('label' => 'Notes for the library: ', 'required' => false, 'attr' => array('placeholder' => 'Notes about the library')))
             ->add('Version', 'text', array('label' => 'Version: '))
             ->add('Description', 'text', array('label' => 'Library Description: '))
             ->add('VersionDescription', 'text', array('label' => 'Version Description: '))
+            ->add('VersionNotes', 'textarea', array('label' => 'Notes for the version: ', 'required' => false, 'attr' => array('placeholder' => 'Notes about the version')))
             ->add('Url', 'text', array('label' => 'Info Url: ', 'required' => false, 'attr' => array('placeholder' => 'The url where you can find info about the library')))
             ->add('SourceUrl', 'text', array('label' => 'Source Url: ', 'required' => false, 'attr' => array('placeholder' => 'A link to the actual code of the library (i.e. zip, etc)')))
-            ->add('Notes', 'textarea', array('label' => 'Notes for the library: ', 'required' => false, 'attr' => array('placeholder' => 'Notes for the people of codebender')))
             ->add('Go', 'submit', array('attr' => array('class' => 'btn')));
 
     }

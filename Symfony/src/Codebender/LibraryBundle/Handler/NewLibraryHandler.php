@@ -216,7 +216,7 @@ class NewLibraryHandler
         $version->setDescription($data['VersionDescription']);
         $version->setReleaseCommit($data['LastCommit']);
         $version->setSourceUrl($data['SourceUrl']);
-        $version->setNotes($data['Notes']);
+        $version->setNotes($data['VersionNotes']);
         $version->setVersion($data['Version']);
         $lib->addVersion($version);
 
