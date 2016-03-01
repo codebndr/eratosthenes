@@ -400,7 +400,7 @@ class NewLibraryHandler
     {
         return $this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
-            ->findBy(array('default_header' => $defaultHeader))[0];
+            ->findOneBy(['default_header' => $defaultHeader]);
     }
 
     private function saveEntities($entities)
@@ -424,6 +424,10 @@ class NewLibraryHandler
         $libraries = sizeof($this->entityManager
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('default_header' => $name)));
+
+        if ($libraries === 0) {
+            return $folderName;
+        }
 
         $count = 0;
         while (!$this->hasFolderName($libraries, $folderName)) {
