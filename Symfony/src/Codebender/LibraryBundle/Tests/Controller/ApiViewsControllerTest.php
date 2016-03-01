@@ -132,9 +132,11 @@ class ApiViewsControllerTest extends WebTestCase
             'newLibrary[Name]' => 'WebSerial Arduino Library',
             'newLibrary[DefaultHeader]' => 'WebSerial',
             'newLibrary[Description]' => 'Arduino WebSerial Library',
+            'newLibrary[Notes]' => 'Some notes about Arduino WebSerial Library',
             'newLibrary[Url]' => 'https://github.com/codebendercc/webserial',
             'newLibrary[Version]' => '1.0.0',
             'newLibrary[VersionDescription]' => 'The very first version',
+            'newLibrary[VersionNotes]' => 'Some notes about Arduino WebSerial v1.0.0',
             'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/WebSerial/archive/master.zip',
             'newLibrary[_token]' => $token
         ];
@@ -160,8 +162,8 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertFalse($libraryEntity->getActive());
         $this->assertFalse($libraryEntity->getVerified());
         $this->assertEquals('Arduino WebSerial Library', $libraryEntity->getDescription());
+        $this->assertEquals('Some notes about Arduino WebSerial Library', $libraryEntity->getNotes());
         $this->assertEquals('WebSerial', $libraryEntity->getRepo());
-        $this->assertEquals('', $libraryEntity->getNotes());
         /*
          * No need to check the validity of the last commit here,
          * another test does that.
@@ -177,6 +179,7 @@ class ApiViewsControllerTest extends WebTestCase
             ->getRepository('CodebenderLibraryBundle:Version')
             ->findOneBy(['library' => $libraryEntity, 'version' => '1.0.0']);
         $this->assertEquals('The very first version', $versionEntity->getDescription());
+        $this->assertEquals('Some notes about Arduino WebSerial v1.0.0', $versionEntity->getNotes());
         $this->assertEquals(
             'https://github.com/codebendercc/WebSerial/archive/master.zip',
             $versionEntity->getSourceUrl()
