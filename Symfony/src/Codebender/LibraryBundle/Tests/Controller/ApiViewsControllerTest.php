@@ -217,6 +217,113 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertTrue(file_exists($versionPath . 'examples/WebSerialEcho/WebSerialEcho.ino'));
     }
 
+    public function testAddGitRelease()
+    {
+        $this->addWebSerialRelease('WebSerialRelease', 'v1.0.0');
+
+        /*
+         * Since this is an integration test, the library will actually be downloaded
+         * from Github. Then, we can make sure all the data is properly stored in the database,
+         * and the files have been saved in the filesystem
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $client = static::createClient();
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findOneBy(['default_header' => 'WebSerialRelease']);
+
+        $this->assertEquals('nus-fboa2016-CB', $libraryEntity->getOwner());
+        $this->assertEquals('WebSerial Arduino Library', $libraryEntity->getName());
+        $this->assertEquals('master', $libraryEntity->getBranch());
+        $this->assertEquals('WebSerialRelease', $libraryEntity->getDefaultHeader());
+        $this->assertEquals('', $libraryEntity->getInRepoPath());
+        $this->assertEquals('https://github.com/nus-fboa2016-CB/WebSerial', $libraryEntity->getUrl());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals('Arduino WebSerial Library', $libraryEntity->getDescription());
+        $this->assertEquals('Some notes about Arduino WebSerial Library', $libraryEntity->getNotes());
+        $this->assertEquals('WebSerial', $libraryEntity->getRepo());
+        $this->assertEquals('2dd7838fe42d36ea9b322e731fd654a6b0f176de', $libraryEntity->getLastCommit());
+
+        /*
+         * Check that the version attributes are correctly set
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
+        $versionEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findOneBy(['library' => $libraryEntity, 'version' => 'v1.0.0']);
+        $this->assertEquals('WebSerial v1.0.0', $versionEntity->getDescription());
+        $this->assertEquals('Some notes about Arduino WebSerial v1.0.0', $versionEntity->getNotes());
+        $this->assertEquals(
+            'https://api.github.com/repos/nus-fboa2016-CB/WebSerial/zipball/v1.0.0',
+            $versionEntity->getSourceUrl()
+        );
+
+        /*
+         * Check the examples' metadata have been stored correctly in the database
+         */
+        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            ->findOneBy(['version' => $versionEntity, 'name' => 'WebASCIITable']);
+        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
+        $this->assertEquals('examples/WebASCIITable/WebASCIITable.ino', $example->getPath());
+
+        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            ->findOneBy(['version' => $versionEntity, 'name' => 'WebSerialEcho']);
+        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
+        $this->assertEquals('examples/WebSerialEcho/WebSerialEcho.ino', $example->getPath());
+
+
+        /*
+         * Check the files of the library have been stored on the filesystem.
+         * TODO: Add a test for the validity of the files' contents.
+         */
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $libraryFolderName = $libraryEntity->getFolderName();
+        $versionFolderName = $versionEntity->getFolderName();
+        $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
+        $this->assertTrue(file_exists($versionPath . 'README.md'));
+        $this->assertTrue(file_exists($versionPath . 'WebSerial.cpp'));
+        $this->assertTrue(file_exists($versionPath . 'WebSerial.h'));
+        $this->assertTrue(file_exists($versionPath . 'examples/WebASCIITable/WebASCIITable.ino'));
+        $this->assertTrue(file_exists($versionPath . 'examples/WebSerialEcho/WebSerialEcho.ino'));
+    }
+
+    public function testUpdateLastCommit()
+    {
+        /*
+         * Add the older release, then the newer one.
+         * lastCommit should be the commit of the latest release (i.e. v1.1.0)
+         */
+        $defaultHeader = 'WebSerialUpdate1';
+        $release1 = 'v1.0.0';
+        $release2 = 'v1.1.0';
+        $this->addWebSerialRelease($defaultHeader, $release1);
+        $this->addWebSerialRelease($defaultHeader, $release2);
+
+        $client = static::createClient();
+        $libraryRepo = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Library');
+
+        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $libraryEntity = $libraryRepo->findOneBy(['default_header' => $defaultHeader]);
+        $this->assertEquals('06f083efbc9226e13319691ddc202f686d07c118', $libraryEntity->getLastCommit());
+
+        /*
+         * Add the newer release before the older release.
+         * lastCommit should still be the commit of the latest release (i.e. v1.1.0)
+         */
+        $defaultHeader = 'WebSerialUpdate2';
+        $this->addWebSerialRelease($defaultHeader, $release2);
+        $this->addWebSerialRelease($defaultHeader, $release1);
+
+        $libraryEntity = $libraryRepo->findOneBy(['default_header' => $defaultHeader]);
+        $this->assertEquals('06f083efbc9226e13319691ddc202f686d07c118', $libraryEntity->getLastCommit());
+    }
+
     public function testAddZipLibrary()
     {
         $client = static::createClient();
@@ -509,5 +616,48 @@ class ApiViewsControllerTest extends WebTestCase
 
         $this->assertEquals($client->getResponse()->headers->get('content-type'), 'application/octet-stream');
         $this->assertEquals($client->getResponse()->headers->get('content-disposition'), 'attachment;filename="default.zip"');
+    }
+
+    /**
+     * This methods adds a WebSerial release with the given defaultHeader and release.
+     *
+     * @param $defaultHeader
+     * @param $release
+     */
+    private function addWebSerialRelease($defaultHeader, $release) {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/new');
+        /*
+         * Need to get the CSRF token from the crawler and submit it with the form,
+         * otherwise the form might be invalid.
+         */
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        /*
+         * Fill in the form values and submit the form
+         */
+        $form = $crawler->selectButton('Go')->form();
+        $values = [
+            'newLibrary[GitOwner]' => 'nus-fboa2016-CB',
+            'newLibrary[GitRepo]' => 'WebSerial',
+            'newLibrary[GitBranch]' => 'master',
+            'newLibrary[GitRelease]' => $release,
+            'newLibrary[GitPath]' => 'WebSerial',
+            'newLibrary[Name]' => 'WebSerial Arduino Library',
+            'newLibrary[DefaultHeader]' => $defaultHeader,
+            'newLibrary[Description]' => 'Arduino WebSerial Library',
+            'newLibrary[Notes]' => 'Some notes about Arduino WebSerial Library',
+            'newLibrary[Url]' => 'https://github.com/nus-fboa2016-CB/WebSerial',
+            'newLibrary[Version]' => $release,
+            'newLibrary[VersionDescription]' => 'WebSerial ' . $release,
+            'newLibrary[VersionNotes]' => 'Some notes about Arduino WebSerial ' . $release,
+            'newLibrary[SourceUrl]' => 'https://api.github.com/repos/nus-fboa2016-CB/WebSerial/zipball/' . $release,
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
     }
 }
