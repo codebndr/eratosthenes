@@ -687,4 +687,53 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("examples/eeprom_write/eeprom_write.ino")')->count());
 
     }
+
+    public function testViewExternalZipLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // Using `disabled` flag because the library was not activated on upload
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/view?library=EMIC2&disabled=1');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("EMIC2 Arduino Library")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: EMIC2.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/v2/download/EMIC2/1.0.0"]:contains("Version - 1.0.0")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="https://github.com/pAIgn10/EMIC2"]:contains("EMIC2 Arduino Library is hosted here")'
+            )->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('span:contains("Not a Github library (might need manual update)")')->count());
+
+        $this->assertEquals(1, $crawler->filter('div[class="well"]:contains("An Arduino library for interfacing with Emic 2 Text-to-Speech modules.")')->count());
+
+        $filesAndExamples = [
+            'Version - 1.0.0',
+            'EMIC2.cpp',
+            'EMIC2.h',
+            'keywords.txt',
+            'README.md',
+            'examples/SpeakMessage/SpeakMessage.ino',
+            'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino '
+        ];
+
+        foreach ($filesAndExamples as $file) {
+            $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("' . $file . '")')->count());
+        }
+    }
 }
