@@ -317,6 +317,86 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertTrue(file_exists($versionPath . 'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino'));
     }
 
+    public function testAddGitLibraryFromSubfolder()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/new');
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        /*
+         * Fill in the form values and submit the form
+         */
+        $form = $crawler->selectButton('Go')->form();
+        $values = [
+            'newLibrary[GitOwner]' => 'codebendercc',
+            'newLibrary[GitRepo]' => 'arduino-library-files',
+            'newLibrary[GitBranch]' => 'testing',
+            'newLibrary[GitPath]' => 'arduino-library-files/libraries/EEPROM2',
+            'newLibrary[Name]' => 'EEPROM2 Arduino Library',
+            'newLibrary[DefaultHeader]' => 'EEPROM2',
+            'newLibrary[Description]' => 'arduino files for use both by the compiler and the main symfony project',
+            'newLibrary[Notes]' => 'Some notes about EEPROM2',
+            'newLibrary[Version]' => '1.0.0',
+            'newLibrary[VersionDescription]' => 'The very first version',
+            'newLibrary[VersionNotes]' => 'Some notes about EEPROM2 v1.0.0',
+            'newLibrary[Url]' => 'https://github.com/codebendercc/arduino-library-files',
+            'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/arduino-library-files/archive/testing.zip',
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
+
+        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findOneBy(['default_header' => 'EEPROM2']);
+
+        /*
+         * Make sure the library metadata has correclty been stored in the database
+         */
+        $this->assertEquals('codebendercc', $libraryEntity->getOwner());
+        $this->assertEquals('EEPROM2 Arduino Library', $libraryEntity->getName());
+        $this->assertEquals('testing', $libraryEntity->getBranch());
+        $this->assertEquals('EEPROM2', $libraryEntity->getDefaultHeader());
+        $this->assertEquals('libraries/EEPROM2', $libraryEntity->getInRepoPath());
+        $this->assertEquals('https://github.com/codebendercc/arduino-library-files', $libraryEntity->getUrl());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals(
+            'arduino files for use both by the compiler and the main symfony project',
+            $libraryEntity->getDescription()
+        );
+        $this->assertEquals('arduino-library-files', $libraryEntity->getRepo());
+        $this->assertEquals('Some notes about EEPROM2', $libraryEntity->getNotes());
+        $this->assertEquals('c5e3ae9847f77cdad9d1353b2ff838b09d0f5e66', $libraryEntity->getLastCommit());
+
+        /*
+         * Check that the version attributes are correctly set
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
+        $versionEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findOneBy(['library' => $libraryEntity, 'version' => '1.0.0']);
+        $this->assertEquals('The very first version', $versionEntity->getDescription());
+        $this->assertEquals('Some notes about EEPROM2 v1.0.0', $versionEntity->getNotes());
+        $this->assertEquals(
+            'https://github.com/codebendercc/arduino-library-files/archive/testing.zip',
+            $versionEntity->getSourceUrl()
+        );
+
+        /*
+         * The same applies to the library example
+         */
+        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            ->findOneBy(['version' => $versionEntity]);
+        $this->assertEquals('examples/eeprom2_clear/eeprom2_clear.ino', $example->getPath());
+    }
+
     public function testSearchExternalLibrary()
     {
         $client = static::createClient();
