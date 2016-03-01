@@ -226,7 +226,7 @@ class NewLibraryHandler
         /* @var ApiHandler $handler */
         $handler = $this->container->get('codebender_library.apiHandler');
         $libraryLastCommit = $lib->getLastCommit();
-        if((!empty($data['LastCommit']) && !empty($libraryLastCommit)) &&
+        if ((!empty($data['LastCommit']) && !empty($libraryLastCommit)) &&
             $handler->compareCommitTime($data['GitOwner'], $data['GitRepo'], $data['LastCommit'], $libraryLastCommit) > 0) {
             $lib->setLastCommit($data['LastCommit']);
         }

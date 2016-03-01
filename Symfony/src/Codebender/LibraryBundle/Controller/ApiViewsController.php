@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Finder\Finder;
 use ZipArchive;
 
-
 class ApiViewsController extends Controller
 {
 
@@ -39,7 +38,7 @@ class ApiViewsController extends Controller
         $formData = $form->getData();
         $newLibraryHandler = $this->get('codebender_library.newLibraryHandler');
         $libraryAdded = $newLibraryHandler->addLibrary($formData);
-        if ($libraryAdded['success'] !== true){
+        if ($libraryAdded['success'] !== true) {
             $flashBag = $this->get('session')->getFlashBag();
             $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
             $form = $this->createForm(new NewLibraryFormV2());
@@ -50,8 +49,12 @@ class ApiViewsController extends Controller
             ]);
         }
 
-        return $this->redirect($this->generateUrl('codebender_library_view_library_v2',
-            ['authorizationKey' => $authorizationKey, 'library' => $formData['DefaultHeader'], 'disabled' => 1]));
+        return $this->redirect(
+            $this->generateUrl(
+                'codebender_library_view_library_v2',
+                ['authorizationKey' => $authorizationKey, 'library' => $formData['DefaultHeader'], 'disabled' => 1]
+            )
+        );
     }
 
     public function viewLibraryAction()
@@ -126,15 +129,18 @@ class ApiViewsController extends Controller
 
 
             foreach ($libraries as $lib) {
-                if ($lib->getActive())
+                if ($lib->getActive()) {
                     $names[] = $lib->getDefaultHeader();
+                }
             }
         }
         if ($json !== null && $json = true) {
             return new JsonResponse(['success' => true, 'libs' => $names]);
         }
-        return $this->render('CodebenderLibraryBundle:Api:search.html.twig',
-            ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]);
+        return $this->render(
+            'CodebenderLibraryBundle:Api:search.html.twig',
+            ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]
+        );
     }
 
     public function changeLibraryStatusAction($library)
