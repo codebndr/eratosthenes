@@ -660,4 +660,31 @@ class ApiViewsControllerTest extends WebTestCase
 
         $client->submit($form, $values);
     }
+
+    public function testViewBuiltinExample()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/view?library=EEPROM');
+
+        $this->assertEquals(1, $crawler->filter('h2:contains("EEPROM")')->count());
+        $this->assertEquals(1, $crawler->filter('h3:contains("main header: EEPROM.h")')->count());
+
+        $this->assertEquals(
+            1,
+            $crawler->filter(
+                'a[href="/' . $authorizationKey . '/download/EEPROM"]:contains("Download from Eratosthenes")'
+            )->count());
+
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("EEPROM.h")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("EEPROM.cpp")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("keywords.txt")')->count());
+
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("examples/eeprom_clear/eeprom_clear.ino")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("examples/eeprom_read/eeprom_read.ino")')->count());
+        $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("examples/eeprom_write/eeprom_write.ino")')->count());
+
+    }
 }
