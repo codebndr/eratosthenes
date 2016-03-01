@@ -50,7 +50,7 @@ class NewLibraryHandler
         // check if data are taken from releases
         // if from releases, then use the tag specified
         // otherwise, use the branch info
-        $gitRef = $data["GitRelease"] !== null ? $data["GitRelease"] : $data["GitRepo"];
+        $gitRef = $data["GitRelease"] !== null ? $data["GitRelease"] : $data["GitBranch"];
         switch ($uploadType['type']) {
             case 'git':
                 $path = $this->getInRepoPath($data["GitRepo"], $data['GitPath']);
