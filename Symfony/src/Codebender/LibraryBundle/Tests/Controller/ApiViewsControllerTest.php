@@ -172,7 +172,6 @@ class ApiViewsControllerTest extends WebTestCase
 
         /*
          * Check that the version attributes are correctly set
-         * TODO: Check version notes
          */
         /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
         $versionEntity = $client->getContainer()->get('Doctrine')
@@ -216,6 +215,106 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertTrue(file_exists($versionPath . 'WebSerial.h'));
         $this->assertTrue(file_exists($versionPath . 'examples/WebASCIITable/WebASCIITable.ino'));
         $this->assertTrue(file_exists($versionPath . 'examples/WebSerialEcho/WebSerialEcho.ino'));
+    }
+
+    public function testAddZipLibrary()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/new');
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        $form = $crawler->selectButton('Go')->form();
+        $zipFilePath = $client->getKernel()
+            ->locateResource('@CodebenderLibraryBundle/Resources/zip_data/EMIC2.zip');
+
+        /*
+         * Symfony's way of uploading files to forms during tests.
+         */
+        $form['newLibrary[Zip]']->upload($zipFilePath);
+
+        /*
+         * Fill in the zip-upload related data and submit the form
+         */
+        $values = [
+            'newLibrary[Name]' => 'EMIC2 Arduino Library',
+            'newLibrary[DefaultHeader]' => 'EMIC2',
+            'newLibrary[Description]' => 'An Arduino library for interfacing with Emic 2 Text-to-Speech modules.',
+            'newLibrary[Notes]' => 'Some notes about EMIC2',
+            'newLibrary[Url]' => 'https://github.com/pAIgn10/EMIC2',
+            'newLibrary[Version]' => '1.0.0',
+            'newLibrary[VersionDescription]' => 'The very first version',
+            'newLibrary[VersionNotes]' => 'Some notes about EMIC2 v1.0.0',
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
+
+        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findOneBy(['default_header' => 'EMIC2']);
+
+        $this->assertEquals('EMIC2', $libraryEntity->getDefaultHeader());
+        $this->assertEquals('EMIC2 Arduino Library', $libraryEntity->getName());
+        $this->assertNull($libraryEntity->getOwner());
+        $this->assertNull($libraryEntity->getRepo());
+        $this->assertEmpty($libraryEntity->getInRepoPath());
+        $this->assertNull($libraryEntity->getBranch());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals(
+            'An Arduino library for interfacing with Emic 2 Text-to-Speech modules.',
+            $libraryEntity->getDescription()
+        );
+        $this->assertEquals('Some notes about EMIC2', $libraryEntity->getNotes());
+        $this->assertEquals('https://github.com/pAIgn10/EMIC2', $libraryEntity->getUrl());
+
+        /*
+         * Check that the version attributes are correctly set
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
+        $versionEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findOneBy(['library' => $libraryEntity, 'version' => '1.0.0']);
+        $this->assertEquals('The very first version', $versionEntity->getDescription());
+        $this->assertEquals('Some notes about EMIC2 v1.0.0', $versionEntity->getNotes());
+        $this->assertNull($versionEntity->getSourceUrl());
+
+        /*
+         * Check the examples' metadata have been stored correctly in the database
+         */
+        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            ->findOneBy(['name' => 'SpeakMessage']);
+        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
+        $this->assertEquals('examples/SpeakMessage/SpeakMessage.ino', $example->getPath());
+
+        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
+        $example = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:LibraryExample')
+            ->findOneBy(['name' => 'SpeakMsgFromSD']);
+        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
+        $this->assertEquals('examples/SpeakMsgFromSD/SpeakMsgFromSD.ino', $example->getPath());
+
+        /*
+         * Check the files of the library have been stored on the filesystem.
+         * TODO: Add a test for the validity of the files' contents.
+         */
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $libraryFolderName = $libraryEntity->getFolderName();
+        $versionFolderName = $example->getVersion()->getFolderName();
+        $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
+        $this->assertTrue(file_exists($versionPath . 'README.md'));
+        $this->assertTrue(file_exists($versionPath . 'EMIC2.cpp'));
+        $this->assertTrue(file_exists($versionPath . 'EMIC2.h'));
+        $this->assertTrue(file_exists($versionPath . 'keywords.txt'));
+        $this->assertTrue(file_exists($versionPath . 'LICENSE'));
+        $this->assertTrue(file_exists($versionPath . 'examples/SpeakMessage/SpeakMessage.ino'));
+        $this->assertTrue(file_exists($versionPath . 'examples/SpeakMsgFromSD/SpeakMsgFromSD.ino'));
     }
 
     public function testSearchExternalLibrary()
