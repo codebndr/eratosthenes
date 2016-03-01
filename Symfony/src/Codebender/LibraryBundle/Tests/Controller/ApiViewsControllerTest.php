@@ -208,7 +208,7 @@ class ApiViewsControllerTest extends WebTestCase
          */
         $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
         $libraryFolderName = $libraryEntity->getFolderName();
-        $versionFolderName = $example->getVersion()->getFolderName();
+        $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
         $this->assertTrue(file_exists($versionPath . 'README.md'));
         $this->assertTrue(file_exists($versionPath . 'WebSerial.cpp'));
@@ -306,7 +306,7 @@ class ApiViewsControllerTest extends WebTestCase
          */
         $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
         $libraryFolderName = $libraryEntity->getFolderName();
-        $versionFolderName = $example->getVersion()->getFolderName();
+        $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
         $this->assertTrue(file_exists($versionPath . 'README.md'));
         $this->assertTrue(file_exists($versionPath . 'EMIC2.cpp'));
@@ -395,6 +395,90 @@ class ApiViewsControllerTest extends WebTestCase
             ->getRepository('CodebenderLibraryBundle:LibraryExample')
             ->findOneBy(['version' => $versionEntity]);
         $this->assertEquals('examples/eeprom2_clear/eeprom2_clear.ino', $example->getPath());
+    }
+
+    public function testLibraryWithFilesBiggerThanOneMegaByte()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/new');
+        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
+
+        /*
+         * Fill in the form values and submit the form
+         */
+        $form = $crawler->selectButton('Go')->form();
+        $values = [
+            'newLibrary[GitOwner]' => 'codebendercc',
+            'newLibrary[GitRepo]' => 'maxFileSize',
+            'newLibrary[GitBranch]' => 'master',
+            'newLibrary[GitPath]' => 'maxFileSize',
+            'newLibrary[Name]' => 'Library with big files',
+            'newLibrary[DefaultHeader]' => 'max_size',
+            'newLibrary[Description]' => 'A repo used for testing fetching files with size > 1MB from Github API',
+            'newLibrary[Version]' => '1.0.0',
+            'newLibrary[VersionDescription]' => 'The very first version',
+            'newLibrary[Url]' => 'https://github.com/codebendercc/maxFileSize',
+            'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/maxFileSize/archive/master.zip',
+            'newLibrary[_token]' => $token
+        ];
+
+        $client->submit($form, $values);
+
+        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $libraryEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findOneBy(['default_header' => 'max_size']);
+
+        /*
+         * Make sure the library metadata has correclty been stored in the database
+         */
+        $this->assertEquals('codebendercc', $libraryEntity->getOwner());
+        $this->assertEquals('Library with big files', $libraryEntity->getName());
+        $this->assertEquals('master', $libraryEntity->getBranch());
+        $this->assertEquals('max_size', $libraryEntity->getDefaultHeader());
+        $this->assertEquals('', $libraryEntity->getInRepoPath());
+        $this->assertEquals('https://github.com/codebendercc/maxFileSize', $libraryEntity->getUrl());
+        $this->assertFalse($libraryEntity->getActive());
+        $this->assertFalse($libraryEntity->getVerified());
+        $this->assertEquals(
+            'A repo used for testing fetching files with size > 1MB from Github API',
+            $libraryEntity->getDescription()
+        );
+        $this->assertEquals('maxFileSize', $libraryEntity->getRepo());
+        $this->assertEquals('', $libraryEntity->getNotes());
+        $this->assertEquals('4f8ca699e3be8d013a189fcbb79f1ceebc1b22ba', $libraryEntity->getLastCommit());
+
+        /*
+         * Check that the version attributes are correctly set
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
+        $versionEntity = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findOneBy(['library' => $libraryEntity, 'version' => '1.0.0']);
+        $this->assertEquals('The very first version', $versionEntity->getDescription());
+        $this->assertEquals('', $versionEntity->getNotes());
+        $this->assertEquals(
+            'https://github.com/codebendercc/maxFileSize/archive/master.zip',
+            $versionEntity->getSourceUrl()
+        );
+
+        $filesAndExamples = [
+            'code.cpp',
+            'README.md',
+            'logfile.log',
+            'max_size.h'
+        ];
+
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $libraryFolderName = $libraryEntity->getFolderName();
+        $versionFolderName = $versionEntity->getFolderName();
+        $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
+        foreach ($filesAndExamples as $file) {
+            $this->assertTrue(file_exists($versionPath . $file));
+        }
     }
 
     public function testSearchExternalLibrary()
