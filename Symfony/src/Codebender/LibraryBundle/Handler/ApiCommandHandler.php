@@ -38,12 +38,9 @@ class ApiCommandHandler
         $serviceName = $apiPrefix . $apiName;
 
         if (!$this->container->has($serviceName)) {
-            $invalidApi = $this->container->get($apiPrefix . 'invalidApi');
-            return $invalidApi;
+            return $this->container->get($apiPrefix . 'invalidApi');
         }
-
-        $service = $this->container->get($serviceName);
-        return $service;
+        return $this->container->get($serviceName);
     }
 
     /**
