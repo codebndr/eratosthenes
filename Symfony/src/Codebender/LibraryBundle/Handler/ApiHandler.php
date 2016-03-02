@@ -46,7 +46,8 @@ class ApiHandler
     }
 
     /**
-     * Constrct the path for the given library and version
+     * Construct the path for the given library and version
+     * 
      * @param $defaultHeader
      * @param $version
      * @return string
