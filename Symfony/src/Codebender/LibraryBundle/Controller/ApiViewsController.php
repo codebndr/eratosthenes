@@ -134,7 +134,7 @@ class ApiViewsController extends Controller
                 }
             }
         }
-        if ($json !== null && $json = true) {
+        if ($json !== null && $json === "true") {
             return new JsonResponse(['success' => true, 'libs' => $names]);
         }
         return $this->render(
