@@ -109,39 +109,7 @@ class ApiViewsControllerTest extends WebTestCase
 
     public function testAddGitLibrary()
     {
-        $client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
-        $crawler = $client->request('GET', '/' . $authorizationKey . '/v2/new');
-        /*
-         * Need to get the CSRF token from the crawler and submit it with the form,
-         * otherwise the form might be invalid.
-         */
-        $token = $crawler->filter('input[id="newLibrary__token"]')->attr('value');
-
-        /*
-         * Fill in the form values and submit the form
-         */
-        $form = $crawler->selectButton('Go')->form();
-        $values = [
-            'newLibrary[GitOwner]' => 'codebendercc',
-            'newLibrary[GitRepo]' => 'WebSerial',
-            'newLibrary[GitBranch]' => 'master',
-            'newLibrary[GitPath]' => 'WebSerial',
-            'newLibrary[Name]' => 'WebSerial Arduino Library',
-            'newLibrary[DefaultHeader]' => 'WebSerial',
-            'newLibrary[Description]' => 'Arduino WebSerial Library',
-            'newLibrary[Notes]' => 'Some notes about Arduino WebSerial Library',
-            'newLibrary[Url]' => 'https://github.com/codebendercc/webserial',
-            'newLibrary[Version]' => '1.0.0',
-            'newLibrary[VersionDescription]' => 'The very first version',
-            'newLibrary[VersionNotes]' => 'Some notes about Arduino WebSerial v1.0.0',
-            'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/WebSerial/archive/master.zip',
-            'newLibrary[_token]' => $token
-        ];
-
-        $client->submit($form, $values);
+        $this->addWebSerialRelease('WebSerial', 'v1.0.0');
 
         /*
          * Since this is an integration test, the library will actually be downloaded
@@ -149,93 +117,15 @@ class ApiViewsControllerTest extends WebTestCase
          * and the files have been saved in the filesystem
          */
         /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
+        $client = static::createClient();
         $libraryEntity = $client->getContainer()->get('Doctrine')
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findOneBy(['default_header' => 'WebSerial']);
 
-        $this->assertEquals('codebendercc', $libraryEntity->getOwner());
-        $this->assertEquals('WebSerial Arduino Library', $libraryEntity->getName());
-        $this->assertEquals('master', $libraryEntity->getBranch());
-        $this->assertEquals('WebSerial', $libraryEntity->getDefaultHeader());
-        $this->assertEquals('', $libraryEntity->getInRepoPath());
-        $this->assertEquals('https://github.com/codebendercc/webserial', $libraryEntity->getUrl());
-        $this->assertFalse($libraryEntity->getActive());
-        $this->assertFalse($libraryEntity->getVerified());
-        $this->assertEquals('Arduino WebSerial Library', $libraryEntity->getDescription());
-        $this->assertEquals('Some notes about Arduino WebSerial Library', $libraryEntity->getNotes());
-        $this->assertEquals('WebSerial', $libraryEntity->getRepo());
-        /*
-         * No need to check the validity of the last commit here,
-         * another test does that.
-         */
-        $this->assertNotEquals('', $libraryEntity->getLastCommit());
-
-        /*
-         * Check that the version attributes are correctly set
-         */
-        /* @var \Codebender\LibraryBundle\Entity\Version $versionEntity */
-        $versionEntity = $client->getContainer()->get('Doctrine')
-            ->getRepository('CodebenderLibraryBundle:Version')
-            ->findOneBy(['library' => $libraryEntity, 'version' => '1.0.0']);
-        $this->assertEquals('The very first version', $versionEntity->getDescription());
-        $this->assertEquals('Some notes about Arduino WebSerial v1.0.0', $versionEntity->getNotes());
-        $this->assertEquals(
-            'https://github.com/codebendercc/WebSerial/archive/master.zip',
-            $versionEntity->getSourceUrl()
-        );
-
-        /*
-         * Check the examples' metadata have been stored correctly in the database
-         */
-        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
-        $example = $client->getContainer()->get('Doctrine')
-            ->getRepository('CodebenderLibraryBundle:LibraryExample')
-            ->findOneBy(['name' => 'WebASCIITable']);
-        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
-        $this->assertEquals('examples/WebASCIITable/WebASCIITable.ino', $example->getPath());
-
-        /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
-        $example = $client->getContainer()->get('Doctrine')
-            ->getRepository('CodebenderLibraryBundle:LibraryExample')
-            ->findOneBy(['name' => 'WebSerialEcho']);
-        $this->assertEquals($libraryEntity, $example->getVersion()->getLibrary());
-        $this->assertEquals('examples/WebSerialEcho/WebSerialEcho.ino', $example->getPath());
-
-
-        /*
-         * Check the files of the library have been stored on the filesystem.
-         * TODO: Add a test for the validity of the files' contents.
-         */
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
-        $libraryFolderName = $libraryEntity->getFolderName();
-        $versionFolderName = $versionEntity->getFolderName();
-        $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
-        $this->assertTrue(file_exists($versionPath . 'README.md'));
-        $this->assertTrue(file_exists($versionPath . 'WebSerial.cpp'));
-        $this->assertTrue(file_exists($versionPath . 'WebSerial.h'));
-        $this->assertTrue(file_exists($versionPath . 'examples/WebASCIITable/WebASCIITable.ino'));
-        $this->assertTrue(file_exists($versionPath . 'examples/WebSerialEcho/WebSerialEcho.ino'));
-    }
-
-    public function testAddGitRelease()
-    {
-        $this->addWebSerialRelease('WebSerialRelease', 'v1.0.0');
-
-        /*
-         * Since this is an integration test, the library will actually be downloaded
-         * from Github. Then, we can make sure all the data is properly stored in the database,
-         * and the files have been saved in the filesystem
-         */
-        /* @var \Codebender\LibraryBundle\Entity\Library $libraryEntity */
-        $client = static::createClient();
-        $libraryEntity = $client->getContainer()->get('Doctrine')
-            ->getRepository('CodebenderLibraryBundle:Library')
-            ->findOneBy(['default_header' => 'WebSerialRelease']);
-
         $this->assertEquals('nus-fboa2016-CB', $libraryEntity->getOwner());
         $this->assertEquals('WebSerial Arduino Library', $libraryEntity->getName());
         $this->assertEquals('master', $libraryEntity->getBranch());
-        $this->assertEquals('WebSerialRelease', $libraryEntity->getDefaultHeader());
+        $this->assertEquals('WebSerial', $libraryEntity->getDefaultHeader());
         $this->assertEquals('', $libraryEntity->getInRepoPath());
         $this->assertEquals('https://github.com/nus-fboa2016-CB/WebSerial', $libraryEntity->getUrl());
         $this->assertFalse($libraryEntity->getActive());
@@ -752,13 +642,13 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals(
             1,
             $crawler->filter(
-                'a[href="/' . $authorizationKey . '/v2/download/WebSerial/1.0.0"]:contains("Version - 1.0.0")'
+                'a[href="/' . $authorizationKey . '/v2/download/WebSerial/v1.0.0"]:contains("Version - v1.0.0")'
             )->count());
 
         $this->assertEquals(
             1,
             $crawler->filter(
-                'a[href="https://github.com/codebendercc/webserial"]:contains("Github Repository")'
+                'a[href="https://github.com/nus-fboa2016-CB/WebSerial"]:contains("Github Repository")'
             )->count());
 
         $this->assertEquals(
@@ -767,12 +657,12 @@ class ApiViewsControllerTest extends WebTestCase
                 'button[id="statusbutton"]:contains("Library disabled on codebender. Click to enable.")'
             )->count());
 
-        $this->assertEquals(1, $crawler->filter('span:contains("In sync with master branch.")')->count());
+        $this->assertEquals(1, $crawler->filter('span:contains("Not in sync with  master  branch.")')->count());
 
         $this->assertEquals(2, $crawler->filter('div[class="well"]:contains("Arduino WebSerial Library")')->count());
 
         $filesAndExamples = [
-            'Version - 1.0.0',
+            'Version - v1.0.0',
             'WebSerial.cpp',
             'WebSerial.h',
             'README.md',
