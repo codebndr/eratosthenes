@@ -44,6 +44,46 @@
         $('#jstreeDiv').jstree(true).refresh(false, true);
     }
 
+    function updateLibraryMeta(name)
+    {
+        var route = "{{ path('codebender_library_get_library_meta', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
+        $.post( route.replace("LIBRARYNAME", name) )
+            .done(function(data) {
+                if (data.success) {
+                    populateLibraryMeta(data.meta);
+                    $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Default header found in system: add as new version');
+                } else {
+                    enableLibraryMetaInput();
+                    $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Add new library');
+                }
+            });
+    }
+
+    function enableLibraryMetaInput() {
+        $("#newLibrary_Name").removeAttr("disabled");
+        $("#newLibrary_Description").removeAttr("disabled");
+        $("#newLibrary_Notes").removeAttr("disabled");
+        $("#newLibrary_Url").removeAttr("disabled");
+
+        $("#newLibrary_Name").val('');
+        $("#newLibrary_Description").val('');
+        $("#newLibrary_Notes").val('');
+        $("#newLibrary_Url").val('');
+    }
+
+    function populateLibraryMeta(meta) {
+        // disabled fields
+        $("#newLibrary_Name").attr("disabled", "disabled");
+        $("#newLibrary_Description").attr("disabled", "disabled");
+        $("#newLibrary_Notes").attr("disabled", "disabled");
+        $("#newLibrary_Url").attr("disabled", "disabled");
+        // populate fields
+        $("#newLibrary_Name").val(meta.name);
+        $("#newLibrary_Description").val(meta.description);
+        $("#newLibrary_Notes").val(meta.libraryNotes);
+        $("#newLibrary_Url").val(meta.url);
+    }
+
     function get_github_info()
     {
         var $url = $("#githubUrl").val();
@@ -97,7 +137,10 @@
 
     function update_machineName()
     {
-        $("#newLibrary_DefaultHeader").val($("#machineNames").val());
+        var machineName = $("#machineNames").val();
+        $("#newLibrary_DefaultHeader").val(machineName);
+        // check if the machine name exists in the databse
+        updateLibraryMeta(machineName);
     }
 
     function update_git(owner, repo, ref, description, isFromRelease)
