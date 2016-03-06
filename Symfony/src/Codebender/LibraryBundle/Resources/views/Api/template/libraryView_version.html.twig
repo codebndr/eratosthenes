@@ -4,21 +4,27 @@
             <div class="panel-heading" role="tab">
                 <h4 class="panel-title">
                     <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#versions_accordion" href="#versions_collapse{{ loop.index }}">
-                        Version - {{ version }} <i class="fa fa-chevron-down"></i>
+                        Version - {{ version.version }} <i class="fa fa-chevron-down"></i>
                     </a>
                 </h4>
             </div>
             {% set versionId = loop.index %}
             <div id="versions_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel">
                 <div class="panel-body">
-                    {% set download_hash = { 'version' : (version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
+                    {% if version.notes %}
+                        <h3>Notes for this version</h3>
+                        <div class="well">
+                            <p>{{ version.notes }}</p>
+                        </div>
+                    {% endif %}
+                    {% set download_hash = { 'version' : (version.version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
                     <a id="download" class="btn btn-success" target="_blank"
                        href="{{ path('codebender_library_download_v2', download_hash) }}">Download this version</a>
                     <br/>
                     <br/>
                     <h3>Files:</h3>
                     <div class="panel-group" id="files_{{ versionId }}_accordion" role="tablist" aria-multiselectable="true">
-                        {% for file in attribute(files, version) %}
+                        {% for file in attribute(files, version.version) %}
                             <div class="panel panel-default">
                                 <div class="panel-heading" role="tab">
                                     <h4 class="panel-title">
@@ -36,13 +42,13 @@
                         {% endfor %}
                     </div>
 
-                    {% set exampleCount = attribute(examples, version) | length %}
+                    {% set exampleCount = attribute(examples, version.version) | length %}
                     <h3>Examples ({{ exampleCount }} found): </h3>
                     <div class="panel-group" id="examples_{{ versionId }}_accordion" role="tablist" aria-multiselectable="true">
                         {% if exampleCount == 0 %}
                             <h2><small>The library contains no examples.</small></h2>
                         {% else %}
-                            {% for file in attribute(examples, version) %}
+                            {% for file in attribute(examples, version.version) %}
                                 <div class="panel panel-default">
                                     <div class="panel-heading" role="tab">
                                         <h4 class="panel-title">
