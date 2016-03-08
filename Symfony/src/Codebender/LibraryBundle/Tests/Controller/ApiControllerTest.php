@@ -468,6 +468,37 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
+     * This method tests the authentication mechanism of Eratosthenes
+     */
+    public function testApiAuthentication()
+    {
+        $client = static::createClient();
+        $invalidAuthorizationKey = 'thisIsAnInvalidAuthorizationKey';
+        $validV1AuthorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $validV2AuthorizationKey = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Partner')
+            ->findOneBy(['name' => 'arduino.cc'])
+            ->getAuthKey();
+        $this->assertFailAuthorization($invalidAuthorizationKey);
+        $this->assertPassAuthorization($validV1AuthorizationKey);
+        $this->assertPassAuthorization($validV2AuthorizationKey);
+    }
+
+    private function assertFailAuthorization($authorizationKey) {
+        $client = static::createClient();
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"status"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(false, $response['success']);
+    }
+
+    private function assertPassAuthorization($authorizationKey) {
+        $client = static::createClient();
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"status"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+    }
+
+    /**
      * Use this method for library manager API requests with POST data
      *
      * @param Client $client
