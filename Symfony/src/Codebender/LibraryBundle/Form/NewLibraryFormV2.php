@@ -23,6 +23,13 @@ class NewLibraryFormV2 extends AbstractType{
             ->add('Description', 'text', array('label' => 'Library Description: '))
             ->add('VersionDescription', 'text', array('label' => 'Version Description: '))
             ->add('VersionNotes', 'textarea', array('label' => 'Notes for the version: ', 'required' => false, 'attr' => array('placeholder' => 'Notes about the version')))
+            ->add('Architectures', 'entity',
+                array(
+                    'class' => 'CodebenderLibraryBundle:Architecture',
+                    'expanded' => true,
+                    'multiple' => true
+                )
+            )
             ->add('Url', 'text', array('label' => 'Info Url: ', 'required' => false, 'attr' => array('placeholder' => 'The url where you can find info about the library')))
             ->add('SourceUrl', 'text', array('label' => 'Source Url: ', 'required' => false, 'attr' => array('placeholder' => 'A link to the actual code of the library (i.e. zip, etc)')))
             ->add('Go', 'submit', array('attr' => array('class' => 'btn')));
