@@ -48,8 +48,8 @@
                         </button>
                         <ul class="dropdown-menu">
                             {% for version in versions %}
-                                {% set download_hash = { 'version' : (version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
-                                <li><a href="{{ path('codebender_library_download_v2', download_hash) }}">Version - {{ version }}</a></li>
+                                {% set download_hash = { 'version' : (version.version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
+                                <li><a href="{{ path('codebender_library_download_v2', download_hash) }}">Version - {{ version.version }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
