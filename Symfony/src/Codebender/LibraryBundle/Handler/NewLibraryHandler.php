@@ -92,10 +92,12 @@ class NewLibraryHandler
         if ($lib === null) {
             $data['FolderName'] = $this->getLibraryFolderName($data['DefaultHeader']);
 
-            $creationResponse = json_decode($this->saveNewLibrary($data), true);
+            $creationResponse = $this->saveNewLibrary($data);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
             }
+
+            $lib = $creationResponse["lib"];
         } else {
             $data['FolderName'] = $lib->getFolderName();
         }
@@ -109,6 +111,12 @@ class NewLibraryHandler
             }
         } else {
             return array("success" => false, "message" => "Library '" . $data['DefaultHeader'] . "' already has version '" . $data['Version'] . "'");
+        }
+
+        if ($data['IsLatestVersion']) {
+            $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
+            $lib->setLatestVersionId($version->getId());
+            $this->editEntity($lib);
         }
 
         return array('success' => true);
@@ -203,12 +211,12 @@ class NewLibraryHandler
         $create = json_decode($this->createLibraryDirectory($data['FolderName'], $data['LibraryStructure']), true);
 
         if (!$create['success']) {
-            return json_encode($create);
+            return $create;
         }
 
         $this->saveEntities(array($lib));
 
-        return json_encode(array("success" => true));
+        return array("success" => true, "lib" => $lib);
     }
 
     private function saveNewVersionAndExamples($data)
@@ -425,6 +433,13 @@ class NewLibraryHandler
             $this->entityManager->persist($entity);
         }
         $this->entityManager->flush();
+    }
+
+    private function editEntity($lib)
+    {
+        $old = $this->getLibrary($lib->getDefaultHeader());
+        $this->entityManager->remove($old);
+        $this->saveEntities(array($lib));
     }
 
     /**

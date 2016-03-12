@@ -122,6 +122,11 @@ class Library
     private $versions;
 
     /**
+     * @ORM\Column(name="latest_version_id", length=255, nullable = true)
+     */
+    private $latest_version_id;
+
+    /**
      * Get id
      *
      * @return integer
@@ -468,6 +473,28 @@ class Library
     public function getVersions()
     {
         return $this->versions;
+    }
+
+    /**
+     * Return latest version id
+     *
+     * @return integer
+     */
+    public function getLatestVersionId()
+    {
+        return $this->latest_version_id;
+    }
+
+    /**
+     * Set latest version id
+     *
+     * @return Library
+     */
+    public function setLatestVersionId($latest_version_id)
+    {
+        $this->latest_version_id = $latest_version_id;
+
+        return $this;
     }
 
     /**
