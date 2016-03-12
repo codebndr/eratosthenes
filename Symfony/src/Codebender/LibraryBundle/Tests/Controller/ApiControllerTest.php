@@ -125,10 +125,8 @@ class ApiControllerTest extends WebTestCase
      */
     private function areSimilarArrays($array1, $array2)
     {
-        $arrayDiff1 = array_diff($array1, $array2);
-        $arrayDiff2 = array_diff($array2, $array1);
-        $totalDifferences = array_merge($arrayDiff1, $arrayDiff2);
-
-        return empty($totalDifferences);
+        sort($array1);
+        sort($array2);
+        return $array1 === $array2;
     }
 }
