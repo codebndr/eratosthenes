@@ -34,7 +34,7 @@
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
                     return;
                 }
-                update_git(data.owner, data.repo, data.ref, data.description, isFromRelease)
+                update_git(data.owner, data.repo, data.ref, data.description, isFromRelease);
             });
     }
 
@@ -50,8 +50,17 @@
         $.post( route.replace("LIBRARYNAME", name) )
             .done(function(data) {
                 if (data.success) {
-                    populateLibraryMeta(data.meta);
-                    $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Default header found in system: add as new version');
+                    // header file name collision
+                    // ask for user option
+                    $('#myModal').modal('show');
+                    $('#modal-button-ok').click(function() {
+                        $('#myModal').modal('hide');
+                        populateLibraryMeta(data.meta);
+                        $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Default header found in system: add as new version');
+                    });
+                    $('#modal-cancel').click(function() {
+                        location.reload(); // reset the progress
+                    });
                 } else {
                     enableLibraryMetaInput();
                     $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Add new library');
@@ -375,6 +384,13 @@
                 $('#orDiv').show();
                 $('#zipDiv').show();
             }
+        });
+
+        // set up modal
+        $('#myModal').modal({
+            keyboard: false,
+            show: false,
+            backdrop: 'static'
         });
 
         /*

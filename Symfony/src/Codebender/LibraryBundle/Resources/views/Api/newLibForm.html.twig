@@ -105,6 +105,24 @@
             </div>
         </div>
     </div>
+    <!-- A modal used when header name collision happen -->
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Header file name already exists</h4>
+                </div>
+                <div class="modal-body">
+                    <p>The header file name of the library already exists in our system.</p>
+                    <p>Are you wish to continue and add as a new version for the existing library?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="modal-cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="modal-button-ok">Add as new version</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 </body>
 
