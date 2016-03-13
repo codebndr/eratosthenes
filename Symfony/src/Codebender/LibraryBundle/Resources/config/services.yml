@@ -14,6 +14,7 @@ parameters:
     codebender_api.getExampleCode.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExampleCodeCommand
     codebender_api.list.class: Codebender\LibraryBundle\Handler\ApiCommand\ListApiCommand
     codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
+    codebender_api.fetchLatest.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchLatestApiCommand
     codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
 
 
@@ -67,6 +68,12 @@ services:
 
     codebender_api.fetch:
             class:  %codebender_api.fetch.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.fetchLatest:
+            class:  %codebender_api.fetchLatest.class%
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
