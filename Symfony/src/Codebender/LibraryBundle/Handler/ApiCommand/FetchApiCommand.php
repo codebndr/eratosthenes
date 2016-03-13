@@ -53,12 +53,16 @@ class FetchApiCommand extends AbstractApiCommand
                 ];
             }
 
+            $lib = $apiHandler->getLibraryFromDefaultHeader($filename);
             $versionObjects = $apiHandler->getAllVersionsFromDefaultHeader($filename);
 
             // use the requested version (if any) for fetching data
             // else fetch data for all versions
             $versions = $versionObjects->toArray();
-            if ($content['version'] !== null) {
+            if ($content['latest']) {
+                $versionId = $lib->getLatestVersionId();
+                $versions = [$apiHandler->getVersionFromId($versionId)];
+            } else if ($content['version'] !== null) {
                 $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
                     return $version->getVersion() === $content['version'];
                 });
@@ -119,6 +123,7 @@ class FetchApiCommand extends AbstractApiCommand
     {
         $content['disabled'] = (array_key_exists('disabled', $content) ? $content['disabled'] : false);
         $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
+        $content['latest'] = (array_key_exists('latest', $content) ? $content['latest'] : false);
         $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
         return $content;
     }

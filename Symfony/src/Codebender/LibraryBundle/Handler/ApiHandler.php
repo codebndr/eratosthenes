@@ -200,6 +200,20 @@ class ApiHandler
     }
 
     /**
+     * Get the Version entity for the given version id
+     * @param $versionId
+     * @return Version
+     */
+    public function getVersionFromId($versionId)
+    {
+        $version = $this->entityManager
+            ->getRepository('CodebenderLibraryBundle:Version')
+            ->findOneBy(array('id' => $versionId));
+
+        return $version;
+    }
+
+    /**
      * Get LibraryExample entity for the requested library example
      * @param $library
      * @param $version
@@ -264,7 +278,7 @@ class ApiHandler
     public function isLibraryInSyncWithGit($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath, $gitLastCommit)
     {
         /*
-         * The values below are fetched fromt the database of the application. If any of them is not set
+         * The values below are fetched it the database of the application. If any of them is not set
          * in the database, the default (null) value will be returned.
          */
         if ($gitOwner === null || $gitRepo === null || $gitBranch === null || $gitLastCommit === null) {
