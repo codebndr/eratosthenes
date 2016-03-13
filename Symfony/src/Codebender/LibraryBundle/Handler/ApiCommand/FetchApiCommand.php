@@ -9,6 +9,10 @@ class FetchApiCommand extends AbstractApiCommand
 {
     public function execute($content)
     {
+        if (!array_key_exists('library', $content)) {
+            return ["success" => false, "message" => "You need to specify which library to fetch."];
+        }
+
         $content = $this->setDefault($content);
         $filename = $content['library'];
 
