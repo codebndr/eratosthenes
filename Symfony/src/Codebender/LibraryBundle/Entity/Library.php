@@ -122,7 +122,9 @@ class Library
     private $versions;
 
     /**
-     * @ORM\Column(name="latest_version_id", length=255, nullable = true)
+     * @var integer
+     *
+     * @ORM\Column(name="latest_version_id", type="integer", nullable = true)
      */
     private $latest_version_id;
 

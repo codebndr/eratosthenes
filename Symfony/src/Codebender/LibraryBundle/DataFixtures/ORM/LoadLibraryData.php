@@ -34,6 +34,7 @@ class LoadLibraryData extends AbstractFixture implements OrderedFixtureInterface
         $defaultLibrary->setNotes('No notes provided for this library');
         $defaultLibrary->setUrl('http://localhost/library/url');
         $defaultLibrary->setFolderName('default');
+        $defaultLibrary->setLatestVersionId(2);
 
         /*
          * Set a reference for the library and add it to the database using

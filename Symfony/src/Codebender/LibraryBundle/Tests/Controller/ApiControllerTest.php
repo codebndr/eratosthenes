@@ -434,6 +434,47 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('assembly_file.S', $filenames);
     }
 
+    public function testFetchApiCommandWithoutVersion()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $this->assertArrayHasKey('1.0.0', $response['files']);
+        $this->assertArrayHasKey('1.1.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.1.0'], 'filename');
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testFetchLatestApiCommand()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetchLatest","library":"default"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $this->assertArrayHasKey('1.1.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.1.0'], 'filename');
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
+    }
+
     /**
      * This method tests the checkGithubUpdates API.
      */
