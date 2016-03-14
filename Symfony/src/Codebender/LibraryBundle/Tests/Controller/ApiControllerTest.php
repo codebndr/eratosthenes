@@ -107,7 +107,7 @@ class ApiControllerTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM", "version":"default"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
         $this->assertArrayHasKey('keywords', $response);
@@ -192,7 +192,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExamples", "library" : "EEPROM"}'
+            '{"type":"getExamples", "library" : "EEPROM", "version":"default"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -304,7 +304,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExampleCode", "library":"EEPROM", "example":"eeprom_read"}'
+            '{"type":"getExampleCode", "library":"EEPROM", "version":"default", "example":"eeprom_read"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
@@ -314,7 +314,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExampleCode", "library":"WiFi", "example":"WiFiWebClient"}'
+            '{"type":"getExampleCode", "library":"WiFi", "version":"default", "example":"WiFiWebClient"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
@@ -438,6 +438,25 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testFetchBuiltInApiCommand()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{ "type":"fetch", "library":"EEPROM", "version":"default" }');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $this->assertArrayHasKey('default', $response['files']);
+
+        $filenames = array_column($response['files']['default'], 'filename');
+        $this->assertContains('EEPROM.cpp', $filenames);
+        $this->assertContains('EEPROM.h', $filenames);
+        $this->assertContains('keywords.txt', $filenames);
     }
 
     /**

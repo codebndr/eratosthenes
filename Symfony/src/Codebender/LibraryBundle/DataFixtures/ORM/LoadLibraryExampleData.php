@@ -240,7 +240,10 @@ class LoadLibraryExamplesData extends AbstractFixture implements OrderedFixtureI
         // From here on add the internal library examples. Only few are added.
         $builtInLibs = [
             "EEPROM" => ["eeprom_clear", "eeprom_read", "eeprom_write"],
-            "Robot_Control" => ["explore", "learn"]
+            "Robot_Control" => ["explore", "learn"],
+            "WiFi" => ["ConnectNoEncryption", "ScanNetworks", "WiFiPachubeClient", "WiFiUdpNtpClient", "WiFiWebClientRepeating",
+                "ConnectWithWEP", "SimpleWebServerWiFi", "WiFiPachubeClientString", "WiFiUdpSendReceiveString", "WiFiWebServer",
+                "ConnectWithWPA", "WiFiChatServer", "WiFiTwitterClient", "WiFiWebClient"]
         ];
         $builtInDefaultVersion = 'default';
         foreach ($builtInLibs as $name => $examples) {

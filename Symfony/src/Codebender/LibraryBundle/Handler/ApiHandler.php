@@ -67,15 +67,7 @@ class ApiHandler
         return $path;
     }
 
-    // TODO: this function is obsolete
-    public function getBuiltInLibraryPath($defaultHeader)
-    {
-        $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
-        $path = $builtInLibraryRoot . '/libraries/' . $defaultHeader;
-        return $path;
-    }
-
-    // TODO: this function is obsolete
+    // TODO: rearrange filesystem to completely remove builtin_libraries parameter
     public function getBuiltInLibraryExamplePath($exmapleName)
     {
         $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
@@ -93,9 +85,7 @@ class ApiHandler
      */
     public function libraryVersionExists($defaultHeader, $version, $checkDisabled = false)
     {
-        if ($this->isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled)) {
-            return true;
-        } elseif ($this->isBuiltInLibrary($defaultHeader)) {
+        if ($this->isValidLibraryVersion($defaultHeader, $version, $checkDisabled)) {
             return true;
         } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
             return true;
@@ -103,6 +93,14 @@ class ApiHandler
 
         return false;
     }
+
+    public function isLibrary($defaultHeader, $getDisabled = false)
+    {
+        $library = $this->getLibraryFromDefaultHeader($defaultHeader);
+
+        return $getDisabled ? $library !== null : $library !== null && $library->getActive();
+    }
+
 
     /**
      * This method checks if the given built-in library exists (specified by
@@ -389,9 +387,9 @@ class ApiHandler
      * @param bool $checkDisabled
      * @return bool
      */
-    private function isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled = false)
+    private function isValidLibraryVersion($defaultHeader, $version, $checkDisabled = false)
     {
-        if (!$this->isExternalLibrary($defaultHeader, $checkDisabled)) {
+        if (!$this->isLibrary($defaultHeader, $checkDisabled)) {
             return false;
         }
 

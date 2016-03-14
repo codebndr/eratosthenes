@@ -33,8 +33,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         switch ($type) {
             case 'builtin':
-                $dir = $handler->getBuiltInLibraryPath($library);
-                $example = $this->getExampleCodeFromDir($dir, $example);
+                $example = $this->getExternalExampleCode($library, $version, $example);
                 break;
             case 'external':
                 $example = $this->getExternalExampleCode($library, $version, $example);
@@ -65,7 +64,6 @@ class GetExampleCodeCommand extends AbstractApiCommand
         if (count($exampleMeta) === 0) {
             $example = str_replace(":", "/", $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-
             $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $filename);
 
             if (count($exampleMeta) > 1) {

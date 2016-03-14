@@ -31,7 +31,7 @@ class FetchApiCommand extends AbstractApiCommand
             $filename = $RESERVED_NAMES[$filename];
         }
 
-        if (!$apiHandler->isExternalLibrary($filename, $content['disabled'])) {
+        if (!$apiHandler->isLibrary($filename, $content['disabled'])) {
             return ["success" => false, "message" => "No Library named " . $filename . " found."];
         }
 
