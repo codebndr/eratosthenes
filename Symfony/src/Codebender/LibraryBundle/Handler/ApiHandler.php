@@ -67,6 +67,7 @@ class ApiHandler
         return $path;
     }
 
+    // TODO: this function is obsolete
     public function getBuiltInLibraryPath($defaultHeader)
     {
         $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
@@ -74,6 +75,7 @@ class ApiHandler
         return $path;
     }
 
+    // TODO: this function is obsolete
     public function getBuiltInLibraryExamplePath($exmapleName)
     {
         $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
@@ -111,9 +113,12 @@ class ApiHandler
      */
     public function isBuiltInLibrary($defaultHeader)
     {
-        $lib = $this->getLibraryFromDefaultHeader($defaultHeader);
+        $library = $this->getLibraryFromDefaultHeader($defaultHeader);
 
-        return $lib->isBuiltIn();
+        if ($library === null) {
+            return false;
+        }
+        return $library->isBuiltIn();
     }
 
     /**
@@ -143,7 +148,10 @@ class ApiHandler
     {
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
 
-        return $getDisabled ? $library !== null : $library !== null && $library->getActive();
+        if ($library === null || $library->isBuiltIn()) {
+            return false;
+        }
+        return $getDisabled ? true : $library->getActive();
     }
 
     /**
