@@ -159,6 +159,22 @@ class LoadVersionData extends AbstractFixture implements OrderedFixtureInterface
         $this->setReference('EncodeLibraryVersion1', $encodeLibraryVersion1);
         $objectManager->persist($encodeLibraryVersion1);
 
+        // From here on add all the internal libraries
+        $builtInLibs = ["EEPROM", "Ethernet", "GSM", "Robot_Control", "SD", "SoftwareSerial", "Stepper", "WiFi",
+            "Esplora", "Firmata", "LiquidCrystal", "Robot_Motor", "Servo", "SPI", "TFT", "Wire"];
+        $builtInDefaultVersion = 'default';
+        foreach ($builtInLibs as $name) {
+            $lib = $this->getReference($name . 'Library');
+
+            $builtInLib = new Version();
+            $builtInLib->setVersion($builtInDefaultVersion);
+            $builtInLib->setLibrary($lib);
+            $builtInLib->setDescription("Built-in library " . $name . " default version.");
+            $builtInLib->setFolderName($builtInDefaultVersion);
+
+            $objectManager->persist($builtInLib);
+        }
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
