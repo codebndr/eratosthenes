@@ -466,6 +466,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
 
+        $this->assertEquals(1, count($response['files']));
         $this->assertArrayHasKey('1.1.0', $response['files']);
 
         $filenames = array_column($response['files']['1.1.0'], 'filename');
