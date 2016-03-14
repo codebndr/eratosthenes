@@ -142,6 +142,23 @@ class LoadLibraryData extends AbstractFixture implements OrderedFixtureInterface
         // Persist the new library
         $objectManager->persist($binaryLbrary);
 
+        // From here on add all the internal libraries
+        $builtInLibs = ["EEPROM", "Ethernet", "GSM", "Robot_Control", "SD", "SoftwareSerial", "Stepper", "WiFi",
+            "Esplora", "Firmata", "LiquidCrystal", "Robot_Motor", "Servo", "SPI", "TFT", "Wire"];
+        foreach ($builtInLibs as $name) {
+            $builtInLib = new Library();
+            $builtInLib->setName($name);
+            $builtInLib->setDefaultHeader($name);
+            $builtInLib->setActive(true);
+            $builtInLib->setVerified(true);
+            $builtInLib->setDescription("Built-in library " . $name);
+            $builtInLib->setFolderName($name);
+            $builtInLib->setIsBuiltIn(true);
+
+            $this->setReference($name . 'Library', $builtInLib);
+            $objectManager->persist($builtInLib);
+        }
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager

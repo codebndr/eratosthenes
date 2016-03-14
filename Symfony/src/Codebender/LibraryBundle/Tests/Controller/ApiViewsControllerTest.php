@@ -565,7 +565,7 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals(
             1,
             $crawler->filter(
-                'a[href="/' . $authorizationKey . '/download/EEPROM"]:contains("Download from Eratosthenes")'
+                'a[href="/' . $authorizationKey . '/v2/download/EEPROM/default"]:contains("Version - default")'
             )->count());
 
         $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("EEPROM.h")')->count());

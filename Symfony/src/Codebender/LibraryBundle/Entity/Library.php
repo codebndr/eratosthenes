@@ -122,6 +122,11 @@ class Library
     private $versions;
 
     /**
+     * @ORM\Column(name="is_built_in", type="boolean")
+     */
+    private $is_built_in = false;
+
+    /**
      * Get id
      *
      * @return integer
@@ -468,6 +473,28 @@ class Library
     public function getVersions()
     {
         return $this->versions;
+    }
+
+    /**
+     * Check whether it is built in
+     *
+     * @return boolean
+     */
+    public function isBuiltIn()
+    {
+        return $this->is_built_in;
+    }
+
+    /**
+     * Set whether it is built in
+     *
+     * @return Library
+     */
+    public function setIsBuiltIn($is_built_in)
+    {
+        $this->is_built_in = $is_built_in;
+
+        return $this;
     }
 
     /**
