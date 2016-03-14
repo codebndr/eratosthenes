@@ -14,6 +14,10 @@ class ListApiCommand extends AbstractApiCommand
          */
         $externalLibraries = $this->getLibraryList();
 
+        $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
+        $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles . "examples");
+
+        ksort($builtinExamples);
         ksort($externalLibraries['Builtin Libraries']);
         ksort($externalLibraries['External Libraries']);
 
@@ -21,10 +25,31 @@ class ListApiCommand extends AbstractApiCommand
             'success' => true,
             'text' => 'Successful Request!',
             'categories' => [
+                'Examples' => $builtinExamples,
                 'Builtin Libraries' => $externalLibraries['Builtin Libraries'],
                 'External Libraries' => $externalLibraries['External Libraries']
             ]
         ];
+    }
+
+    private function getLibariesListFromDir($path)
+    {
+        $finder = new Finder();
+        $finder->files()->name('*.ino')->name('*.pde');
+        $finder->in($path);
+        $libraries = array();
+        foreach ($finder as $file) {
+            $names = $this
+                ->getExampleAndLibNameFromRelativePath(
+                    $file->getRelativePath(),
+                    $file->getBasename("." . $file->getExtension())
+                );
+            if (!isset($libraries[$names['library_name']])) {
+                $libraries[$names['library_name']] = array("description" => "", "examples" => array());
+            }
+            $libraries[$names['library_name']]['examples'][] = array('name' => $names['example_name']);
+        }
+        return $libraries;
     }
 
     private function getLibraryList()
