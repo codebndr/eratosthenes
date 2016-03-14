@@ -159,7 +159,7 @@ class LoadVersionData extends AbstractFixture implements OrderedFixtureInterface
         $this->setReference('EncodeLibraryVersion1', $encodeLibraryVersion1);
         $objectManager->persist($encodeLibraryVersion1);
 
-        // From here on add all the internal libraries
+        // From here on add all the internal library versions
         $builtInLibs = ["EEPROM", "Ethernet", "GSM", "Robot_Control", "SD", "SoftwareSerial", "Stepper", "WiFi",
             "Esplora", "Firmata", "LiquidCrystal", "Robot_Motor", "Servo", "SPI", "TFT", "Wire"];
         $builtInDefaultVersion = 'default';
@@ -172,6 +172,7 @@ class LoadVersionData extends AbstractFixture implements OrderedFixtureInterface
             $builtInLib->setDescription("Built-in library " . $name . " default version.");
             $builtInLib->setFolderName($builtInDefaultVersion);
 
+            $this->setReference($name . ucfirst($builtInDefaultVersion) . 'Version', $builtInLib);
             $objectManager->persist($builtInLib);
         }
 

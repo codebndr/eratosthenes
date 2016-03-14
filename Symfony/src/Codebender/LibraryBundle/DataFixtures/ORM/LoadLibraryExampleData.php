@@ -236,6 +236,27 @@ class LoadLibraryExamplesData extends AbstractFixture implements OrderedFixtureI
          */
         $objectManager->persist($encodeLibraryExample);
 
+
+        // From here on add the internal library examples. Only few are added.
+        $builtInLibs = [
+            "EEPROM" => ["eeprom_clear", "eeprom_read", "eeprom_write"],
+            "Robot_Control" => ["explore", "learn"]
+        ];
+        $builtInDefaultVersion = 'default';
+        foreach ($builtInLibs as $name => $examples) {
+            $builtInLibVersion = $this->getReference($name . ucfirst($builtInDefaultVersion) . 'Version');
+
+            foreach ($examples as $example) {
+                $builtInLibExample = new LibraryExample();
+                $builtInLibExample->setName($example);
+                $builtInLibExample->setVersion($builtInLibVersion);
+                $builtInLibExample->setPath('examples/' . $example . '/' . $example . '.ino');
+                $builtInLibExample->setBoards(null);
+
+                $objectManager->persist($builtInLibExample);
+            }
+        }
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
