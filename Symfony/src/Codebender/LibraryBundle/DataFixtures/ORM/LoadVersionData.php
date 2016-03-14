@@ -58,6 +58,12 @@ class LoadVersionData extends AbstractFixture implements OrderedFixtureInterface
         $this->setReference('defaultLibraryVersion2', $defaultLibraryVersion2);
         $objectManager->persist($defaultLibraryVersion2);
 
+        /*
+         * Set the latest version for the library
+         */
+        $defaultLibrary->setLatestVersion($defaultLibraryVersion2);
+        $objectManager->persist($defaultLibrary);
+
         /* @var \Codebender\LibraryBundle\Entity\Library $dahLibrary */
         $dahLibrary = $this->getReference('dynamicArrayHelperLibrary');
 

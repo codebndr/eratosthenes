@@ -113,12 +113,6 @@ class NewLibraryHandler
             return array("success" => false, "message" => "Library '" . $data['DefaultHeader'] . "' already has version '" . $data['Version'] . "'");
         }
 
-        if ($data['IsLatestVersion']) {
-            $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
-            $lib->setLatestVersionId($version->getId());
-            $this->editEntity($lib);
-        }
-
         return array('success' => true);
     }
 
@@ -251,6 +245,11 @@ class NewLibraryHandler
 
         $this->saveEntities(array($lib, $version));
         $this->saveExamples($data, $lib, $version);
+
+        if ($data['IsLatestVersion']) {
+            $lib->setLatestVersion($version);
+            $this->editEntity($lib);
+        }
 
         return json_encode(array("success" => true));
     }

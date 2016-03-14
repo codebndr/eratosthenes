@@ -64,8 +64,7 @@ class FetchApiCommand extends AbstractApiCommand
             // else fetch data for all versions
             $versions = $versionObjects->toArray();
             if ($content['latest']) {
-                $versionId = $lib->getLatestVersionId();
-                $versions = [$apiHandler->getVersionFromId($versionId)];
+                $versions = [$lib->getLatestVersion()];
             } else if ($content['version'] !== null) {
                 $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
                     return $version->getVersion() === $content['version'];

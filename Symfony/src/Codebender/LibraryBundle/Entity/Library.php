@@ -124,9 +124,9 @@ class Library
     /**
      * @var integer
      *
-     * @ORM\Column(name="latest_version_id", type="integer", nullable = true)
+     * @ORM\OneToOne(targetEntity="Version")
      */
-    private $latest_version_id;
+    private $latest_version;
 
     /**
      * Get id
@@ -482,19 +482,19 @@ class Library
      *
      * @return integer
      */
-    public function getLatestVersionId()
+    public function getLatestVersion()
     {
-        return $this->latest_version_id;
+        return $this->latest_version;
     }
 
     /**
-     * Set latest version id
+     * Set latest version
      *
      * @return Library
      */
-    public function setLatestVersionId($latest_version_id)
+    public function setLatestVersion($latest_version)
     {
-        $this->latest_version_id = $latest_version_id;
+        $this->latest_version = $latest_version;
 
         return $this;
     }
