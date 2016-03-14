@@ -46,6 +46,7 @@ class ApiHandler
      * @param $defaultHeader
      * @param $version
      * @return string
+     * TODO: consider changing name into getLibraryPath
      */
     public function getExternalLibraryPath($defaultHeader, $version)
     {
@@ -68,6 +69,7 @@ class ApiHandler
     }
 
     // TODO: rearrange filesystem to completely remove builtin_libraries parameter
+    // TODO: consider changing name into getArduinoExamplePath
     public function getBuiltInLibraryExamplePath($exmapleName)
     {
         $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
@@ -125,6 +127,7 @@ class ApiHandler
      *
      * @param $defaultHeader
      * @return bool
+     * TODO: consider changing name into isArduinoExample
      */
     public function isBuiltInLibraryExample($defaultHeader)
     {
@@ -209,6 +212,7 @@ class ApiHandler
      * @param $version
      * @param $example
      * @return array
+     * TODO: consider changing name into getExampleForLibrary
      */
     public function getExampleForExternalLibrary($library, $version, $example)
     {
