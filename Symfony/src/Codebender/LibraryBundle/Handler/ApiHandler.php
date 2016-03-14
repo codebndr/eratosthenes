@@ -111,11 +111,9 @@ class ApiHandler
      */
     public function isBuiltInLibrary($defaultHeader)
     {
-        if (!is_dir($this->getBuiltInLibraryPath($defaultHeader))) {
-            return false;
-        }
+        $lib = $this->getLibraryFromDefaultHeader($defaultHeader);
 
-        return true;
+        return $lib->isBuiltIn();
     }
 
     /**
