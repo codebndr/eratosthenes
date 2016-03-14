@@ -47,32 +47,19 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('categories', $response);
         $categories = $response['categories'];
 
-        $this->assertArrayHasKey('Examples', $categories);
-        $this->assertNotEmpty($categories['Examples']);
-
         $this->assertArrayHasKey('Builtin Libraries', $categories);
         $this->assertNotEmpty($categories['Builtin Libraries']);
 
-        $basicExamples = $categories['Examples']['01.Basics']['examples'];
-
-        // Check for a specific, known example
-        $foundExample = array_filter($basicExamples, function($element) {
-            if ($element['name'] == 'AnalogReadSerial') {
-                return true;
-            }
-        });
-
-        $foundExample = array_values($foundExample);
-
-        // Make sure the example was found
-        $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
+        $this->assertArrayHasKey('EEPROM', $categories['Builtin Libraries']);
+        $this->assertArrayHasKey('default', $categories['Builtin Libraries']['EEPROM']);
+        $this->assertTrue(in_array('eeprom_clear', $categories['Builtin Libraries']['EEPROM']['default']['examples']));
 
         $this->assertArrayHasKey('External Libraries', $categories);
         $this->assertNotEmpty($categories['External Libraries']);
 
+        $this->assertArrayHasKey('MultiIno', $categories['External Libraries']);
         $this->assertArrayHasKey('1.0.0', $categories['External Libraries']['MultiIno']);
         $this->assertArrayHasKey('2.0.0', $categories['External Libraries']['MultiIno']);
-
         $this->assertTrue(in_array('multi_ino_example', $categories['External Libraries']['MultiIno']['1.0.0']['examples']));
     }
 
