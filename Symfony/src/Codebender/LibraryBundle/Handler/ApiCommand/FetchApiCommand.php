@@ -6,17 +6,13 @@ use Symfony\Component\Finder\Finder;
 
 class FetchApiCommand extends AbstractApiCommand
 {
+    protected $apiHandler;
+
     public function execute($content)
     {
         $content = $this->setDefault($content);
 
-        $apiHandler = $this->container->get('codebender_library.apiHandler');
-
-        $builtinLibrariesPath = $this->container->getParameter('builtin_libraries');
-        $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
-
-        $finder = new Finder();
-        $exampleFinder = new Finder();
+        $this->apiHandler = $this->container->get('codebender_library.apiHandler');
 
         $filename = $content['library'];
 
@@ -32,50 +28,84 @@ class FetchApiCommand extends AbstractApiCommand
             $filename = $reservedNames[$filename];
         }
 
-        if ($apiHandler->isBuiltInLibrary($filename)) {
-            $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
-
-            if ($content['renderView']) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
-                $meta = [];
-            }
+        if ($this->apiHandler->isBuiltInLibrary($filename)) {
+            $response = $this->fetchBuiltInLibrary($content);
         } else {
-            if (!$apiHandler->isExternalLibrary($filename)) {
-                return ["success" => false, "message" => "No Library named " . $filename . " found."];
-            }
-
-            $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
-            if (empty($response)) {
-                return ['success' => false, 'message' => 'No files for Library named `' . $filename . '` with version `' . $content['version'] . '` found.'];
-            }
-
-            if ($content['renderView']) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
-
-                $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
-                    ->findOneBy(array('machineName' => $filename));
-                $filename = $externalLibrary->getMachineName();
-                $meta = $externalLibrary->getLiraryMeta();
-            }
+            $response = $this->fetchExternalLibrary($content);
         }
 
-        if (!$content['renderView']) {
-            return ['success' => true, 'message' => 'Library found', 'files' => $response];
+        return $response;
+    }
+
+    private function fetchExternalLibrary($content)
+    {
+        $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
+        $finder = new Finder();
+        $exampleFinder = new Finder();
+        $filename = $content['library'];
+
+        if (!$this->apiHandler->isExternalLibrary($filename)) {
+            return ["success" => false, "message" => "No Library named " . $filename . " found."];
         }
 
-        return [
-            'success' => true,
-            'library' => $filename,
-            'files' => $response,
-            'examples' => $examples,
-            'meta' => $meta
-        ];
+        $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
+        if (empty($response)) {
+            return ['success' => false, 'message' => 'No files for Library named `' . $filename . '` with version `' . $content['version'] . '` found.'];
+        }
+
+        if ($content['renderView']) {
+            $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename . "/" . $content['version']);
+
+            $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+                ->findOneBy(array('machineName' => $filename));
+            $filename = $externalLibrary->getMachineName();
+            $meta = $externalLibrary->getLiraryMeta();
+
+            return [
+                'success' => true,
+                'library' => $filename,
+                'files' => $response,
+                'examples' => $examples,
+                'meta' => $meta
+            ];
+        }
+
+        return ['success' => true, 'message' => 'Library found', 'files' => $response];
+    }
+
+    private function fetchBuiltInLibrary($content)
+    {
+        $builtinLibrariesPath = $this->container->getParameter('builtin_libraries');
+        $finder = new Finder();
+        $exampleFinder = new Finder();
+        $filename = $content['library'];
+
+        $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
+
+        if ($content['renderView']) {
+            $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
+            $meta = [];
+
+            return [
+                'success' => true,
+                'library' => $filename,
+                'files' => $response,
+                'examples' => $examples,
+                'meta' => $meta
+            ];
+        }
+
+        return ['success' => true, 'message' => 'Library found', 'files' => $response];
     }
 
     private function setDefault($content)
     {
-        $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
-        $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
+        if (!array_key_exists('version', $content)) {
+            $content['version'] = null;
+        }
+        if (!array_key_exists('renderView', $content)) {
+            $content['renderView'] = false;
+        }
         return $content;
     }
 
