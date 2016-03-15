@@ -476,6 +476,28 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('assembly_file.S', $filenames);
     }
 
+    public function testGetDefaultVersionCommand()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Wrong data', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion", "library":"NoSuchLib"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('No library named NoSuchLib was found.', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion","library":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('1.1.0', $response['version']);
+    }
+
     /**
      * This method tests the checkGithubUpdates API.
      */
