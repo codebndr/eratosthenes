@@ -480,7 +480,7 @@ class Library
     /**
      * Return latest version id
      *
-     * @return integer
+     * @return Version
      */
     public function getLatestVersion()
     {
@@ -490,9 +490,10 @@ class Library
     /**
      * Set latest version
      *
+     * @param \Codebender\LibraryBundle\Entity\Version $latest_version
      * @return Library
      */
-    public function setLatestVersion($latest_version)
+    public function setLatestVersion(\Codebender\LibraryBundle\Entity\Version $latest_version)
     {
         $this->latest_version = $latest_version;
 
