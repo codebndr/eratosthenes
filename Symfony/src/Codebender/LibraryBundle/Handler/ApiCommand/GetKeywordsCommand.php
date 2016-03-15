@@ -35,7 +35,7 @@ class GetKeywordsCommand extends AbstractApiCommand
         $version = $content['version'];
 
         if (!$this->apiHandler->libraryVersionExists($defaultHeader, $version)) {
-            return ['success' => false, 'message' => 'Version ' .$version. ' of library named ' .$defaultHeader. ' not found.'];
+            return ['success' => false, 'message' => "Couldn't find version $version of library $defaultHeader."];
         }
 
         $libraryType = $this->apiHandler->getLibraryType($defaultHeader);
