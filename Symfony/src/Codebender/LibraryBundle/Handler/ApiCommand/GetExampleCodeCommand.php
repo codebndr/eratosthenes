@@ -24,7 +24,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $type = $handler->getLibraryType($library);
         if ($type === 'unknown') {
-            return ['success' => false, 'message' => 'Requested library named ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested library named $library not found"];
         }
 
         if ($type === 'external' && !$handler->libraryVersionExists($library, $version)) {
@@ -63,7 +63,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
         $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $example);
 
         if (count($exampleMeta) === 0) {
-            $example = str_replace(":", "/", $example);
+            $example = str_replace(':', '/', $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
 
             $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $filename);
@@ -107,12 +107,12 @@ class GetExampleCodeCommand extends AbstractApiCommand
     {
         $finder = new Finder();
         $finder->in($dir);
-        $finder->name($example . ".ino", $example . ".pde");
+        $finder->name($example . '.ino', $example . '.pde');
 
         if (iterator_count($finder) === 0) {
-            $example = str_replace(":", "/", $example);
+            $example = str_replace(':', '/', $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-            $finder->name($filename . ".ino", $filename . ".pde");
+            $finder->name($filename . '.ino', $filename . '.pde');
             if (iterator_count($finder) > 1) {
                 $filesPath = null;
                 foreach ($finder as $e) {
@@ -153,20 +153,20 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $files = array();
         foreach ($filesFinder as $file) {
-            if ($file->getExtension() === "pde") {
-                $name = $file->getBasename("pde") . "ino";
+            if ($file->getExtension() === 'pde') {
+                $name = $file->getBasename('pde') . 'ino';
             } else {
                 $name = $file->getFilename();
             }
 
             $files[] = array(
-                "filename" => $name,
-                "code" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents()
+                'filename' => $name,
+                'code' => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), 'UTF-8') : $file->getContents()
             );
 
         }
 
-        return ['success' => true, "files" => $files];
+        return ['success' => true, 'files' => $files];
     }
 
     /**
