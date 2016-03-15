@@ -146,7 +146,7 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     {
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
-        return !is_null($gitOwner) && !is_null($gitRepo);
+        return ($gitOwner !== null && $gitRepo !== null);
     }
 
     /**
