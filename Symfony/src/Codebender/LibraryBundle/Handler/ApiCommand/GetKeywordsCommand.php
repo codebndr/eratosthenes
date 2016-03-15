@@ -58,7 +58,7 @@ class GetKeywordsCommand extends AbstractApiCommand
      */
     private function isValidContent($content)
     {
-        return array_key_exists("library", $content);
+        return array_key_exists('library', $content);
     }
 
     /**
