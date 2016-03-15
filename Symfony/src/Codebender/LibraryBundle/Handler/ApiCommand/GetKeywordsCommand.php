@@ -114,7 +114,7 @@ class GetKeywordsCommand extends AbstractApiCommand
 
         $finder = new Finder();
         $finder->in($path);
-        $finder->name('/keywords\.txt/i');
+        $finder->name('/^keywords\.txt$/i');
 
         foreach ($finder as $file) {
             $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
