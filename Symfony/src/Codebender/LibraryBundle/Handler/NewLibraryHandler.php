@@ -102,16 +102,24 @@ class NewLibraryHandler
             $data['FolderName'] = $lib->getFolderName();
         }
 
+        var_dump("here!");
+
         $handler = $this->container->get('codebender_library.apiHandler');
         $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
         if ($version === null) {
-            $creationResponse = json_decode($this->saveNewVersionAndExamples($data), true);
+            $creationResponse = json_decode($this->saveNewVersionAndExamples($data, $lib), true);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
             }
         } else {
             return array("success" => false, "message" => "Library '" . $data['DefaultHeader'] . "' already has version '" . $data['Version'] . "'");
         }
+
+        // flush all changes if nothing goes wrong
+        var_dump("flush");
+        $this->entityManager->flush();
+
+        var_dump("flushed!");
 
         return array('success' => true);
     }
@@ -213,9 +221,11 @@ class NewLibraryHandler
         return array("success" => true, "lib" => $lib);
     }
 
-    private function saveNewVersionAndExamples($data)
+    private function saveNewVersionAndExamples($data, Library $lib)
     {
-        $lib = $this->getLibrary($data['DefaultHeader']);
+        if ($lib === null) {
+            return json_encode(['success' => false]);
+        }
 
         $version = new Version();
         $version->setLibrary($lib);
@@ -431,7 +441,6 @@ class NewLibraryHandler
         foreach ($entities as $entity) {
             $this->entityManager->persist($entity);
         }
-        $this->entityManager->flush();
     }
 
     private function editEntity($lib)
