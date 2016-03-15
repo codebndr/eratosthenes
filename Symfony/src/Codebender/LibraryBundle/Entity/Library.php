@@ -122,6 +122,11 @@ class Library
     private $versions;
 
     /**
+     * @ORM\Column(name="is_built_in", type="boolean")
+     */
+    private $is_built_in = false;
+
+    /**
      * @var integer
      *
      * @ORM\OneToOne(targetEntity="Version")
@@ -497,6 +502,28 @@ class Library
     public function setLatestVersion(\Codebender\LibraryBundle\Entity\Version $latest_version)
     {
         $this->latest_version = $latest_version;
+
+        return $this;
+    }
+
+    /**
+     * Check whether it is built in
+     *
+     * @return boolean
+     */
+    public function isBuiltIn()
+    {
+        return $this->is_built_in;
+    }
+
+    /**
+     * Set whether it is built in
+     *
+     * @return Library
+     */
+    public function setIsBuiltIn($is_built_in)
+    {
+        $this->is_built_in = $is_built_in;
 
         return $this;
     }

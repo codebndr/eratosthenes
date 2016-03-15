@@ -8,47 +8,42 @@ class ListApiCommand extends AbstractApiCommand
 {
     public function execute($content)
     {
-        $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
-
-        $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles . "examples");
-        $includedLibraries = $this->getLibariesListFromDir($arduinoLibraryFiles . "libraries");
         /*
          * External libraries list is fetched from the database, because we need to list
          * active libraries only
          */
         $externalLibraries = $this->getLibraryList();
 
+        $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
+        $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles . "examples");
+
         ksort($builtinExamples);
-        ksort($includedLibraries);
-        ksort($externalLibraries);
+        ksort($externalLibraries['Builtin Libraries']);
+        ksort($externalLibraries['External Libraries']);
 
         return [
             'success' => true,
             'text' => 'Successful Request!',
             'categories' => [
                 'Examples' => $builtinExamples,
-                'Builtin Libraries' => $includedLibraries,
-                'External Libraries' => $externalLibraries
+                'Builtin Libraries' => $externalLibraries['Builtin Libraries'],
+                'External Libraries' => $externalLibraries['External Libraries']
             ]
         ];
     }
 
     private function getLibariesListFromDir($path)
     {
-
         $finder = new Finder();
         $finder->files()->name('*.ino')->name('*.pde');
         $finder->in($path);
-
         $libraries = array();
-
         foreach ($finder as $file) {
             $names = $this
                 ->getExampleAndLibNameFromRelativePath(
                     $file->getRelativePath(),
                     $file->getBasename("." . $file->getExtension())
                 );
-
             if (!isset($libraries[$names['library_name']])) {
                 $libraries[$names['library_name']] = array("description" => "", "examples" => array());
             }
@@ -64,15 +59,21 @@ class ListApiCommand extends AbstractApiCommand
             ->getRepository('CodebenderLibraryBundle:Library')
             ->findBy(array('active' => true));
 
-        $libraries = array();
+        $libraries = ['Builtin Libraries' => [], 'External Libraries' => []];
         foreach ($externalMeta as $library) {
+            if ($library->isBuiltIn()) {
+                $category = 'Builtin Libraries';
+            } else {
+                $category = 'External Libraries';
+            }
+
             $defaultHeader = $library->getDefaultHeader();
 
-            $libraries[$defaultHeader] = array();
+            $libraries[$category][$defaultHeader] = array();
 
             $versions = $library->getVersions();
             foreach ($versions as $version) {
-                $libraries[$defaultHeader][$version->getVersion()] = array(
+                $libraries[$category][$defaultHeader][$version->getVersion()] = array(
                     "description" => $library->getDescription(),
                     "name" => $library->getName(),
                     "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
@@ -90,7 +91,7 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
+                    $libraries[$category][$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
                 }
             }
         }

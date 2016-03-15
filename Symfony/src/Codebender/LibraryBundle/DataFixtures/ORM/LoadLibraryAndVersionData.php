@@ -333,6 +333,41 @@ class LoadLibraryAndVersionData extends AbstractFixture implements OrderedFixtur
          * it's time to flush the contents of the ObjectManager
          */
         $objectManager->flush();
+
+
+        // From here on add all the internal libraries
+        $builtInLibs = ["EEPROM", "Ethernet", "GSM", "Robot_Control", "SD", "SoftwareSerial", "Stepper", "WiFi",
+            "Esplora", "Firmata", "LiquidCrystal", "Robot_Motor", "Servo", "SPI", "TFT", "Wire"];
+        $builtInDefaultVersion = 'default';
+        foreach ($builtInLibs as $name) {
+            $builtInLib = new Library();
+            $builtInLib->setName($name);
+            $builtInLib->setDefaultHeader($name);
+            $builtInLib->setActive(true);
+            $builtInLib->setVerified(true);
+            $builtInLib->setDescription("Built-in library " . $name);
+            $builtInLib->setFolderName($name);
+            $builtInLib->setIsBuiltIn(true);
+
+            $builtInLibVersion = new Version();
+            $builtInLibVersion->setVersion($builtInDefaultVersion);
+            $builtInLibVersion->setLibrary($builtInLib);
+            $builtInLibVersion->setDescription("Built-in library " . $name . " default version.");
+            $builtInLibVersion->setFolderName($builtInDefaultVersion);
+
+            $builtInLib->setLatestVersion($builtInLibVersion);
+
+            $this->setReference($name . 'Library', $builtInLib);
+            $this->setReference($name . ucfirst($builtInDefaultVersion) . 'Version', $builtInLibVersion);
+            $objectManager->persist($builtInLib);
+            $objectManager->persist($builtInLibVersion);
+        }
+
+        /*
+         * After all fixture objects have been added to the ObjectManager (`persist` operation),
+         * it's time to flush the contents of the ObjectManager
+         */
+        $objectManager->flush();
     }
 
     /**
