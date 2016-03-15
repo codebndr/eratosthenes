@@ -9,7 +9,7 @@ class FetchLatestApiCommand extends AbstractApiCommand
 {
     public function execute($content)
     {
-        if ($content['library'] === null) {
+        if (!array_key_exists('library', $content)) {
             return ['success' => false, 'message' => 'Wrong data'];
         }
 
