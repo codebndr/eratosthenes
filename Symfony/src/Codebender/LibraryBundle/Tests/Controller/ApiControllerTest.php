@@ -84,7 +84,6 @@ class ApiControllerTest extends WebTestCase
         // Test successful getVersions calls
         $this->assertSuccessfulGetVersions('default', ['1.0.0', '1.1.0']);
         $this->assertSuccessfulGetVersions('DynamicArrayHelper', ['1.0.0']);
-        $this->assertSuccessfulGetVersions('HtmlLib', []);
 
         // Test invalid getVersions calls
         $this->assertFailedGetVersions('nonExistentLib');

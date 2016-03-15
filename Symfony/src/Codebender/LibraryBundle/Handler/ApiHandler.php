@@ -187,8 +187,6 @@ class ApiHandler
         /* @var ArrayCollection $versionCollection */
         $versionCollection = $this->getAllVersionsFromDefaultHeader($library);
 
-        var_dump("flag1");
-
         // check if this library contains requested version
         $result = $versionCollection->filter(
             function (Version $versionObject) use ($version) {
@@ -199,8 +197,6 @@ class ApiHandler
         if ($result->isEmpty()) {
             return null;
         }
-
-        var_dump("flag2");
 
         return $result->first();
     }

@@ -3,6 +3,7 @@
 namespace Codebender\LibraryBundle\Handler;
 
 use Doctrine\ORM\EntityManager;
+use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Codebender\LibraryBundle\Entity\Library;
@@ -90,9 +91,10 @@ class NewLibraryHandler
         // if same header name exists, add as a new version
         // otherwise, create the library first then add new version
         if ($lib === null) {
+            $data['IsLatestVersion'] = true;
             $data['FolderName'] = $this->getLibraryFolderName($data['DefaultHeader']);
 
-            $creationResponse = $this->saveNewLibrary($data);
+            $creationResponse = $this->makeNewLibrary($data);
             if ($creationResponse['success'] != true) {
                 return array('success' => false, 'message' => $creationResponse['message']);
             }
@@ -102,24 +104,25 @@ class NewLibraryHandler
             $data['FolderName'] = $lib->getFolderName();
         }
 
-        var_dump("here!");
-
         $handler = $this->container->get('codebender_library.apiHandler');
         $version = $handler->getVersionFromDefaultHeader($data['DefaultHeader'], $data['Version']);
-        if ($version === null) {
-            $creationResponse = json_decode($this->saveNewVersionAndExamples($data, $lib), true);
-            if ($creationResponse['success'] != true) {
-                return array('success' => false, 'message' => $creationResponse['message']);
-            }
-        } else {
+        if ($version !== null) {
             return array("success" => false, "message" => "Library '" . $data['DefaultHeader'] . "' already has version '" . $data['Version'] . "'");
         }
 
-        // flush all changes if nothing goes wrong
-        var_dump("flush");
-        $this->entityManager->flush();
+        $creationResponse = $this->makeNewVersionAndExamples($data, $lib);
+        if (!$creationResponse['success']) {
+            return array('success' => false, 'message' => $creationResponse['message']);
+        }
 
-        var_dump("flushed!");
+        $lib = $creationResponse["lib"];
+        $version = $creationResponse["version"];
+
+        $this->saveEntities([$version, $lib]);
+        $this->saveExamples($data, $lib, $version);
+
+        // flush all changes if nothing goes wrong
+        $this->entityManager->flush();
 
         return array('success' => true);
     }
@@ -193,7 +196,7 @@ class NewLibraryHandler
         return $files;
     }
 
-    private function saveNewLibrary($data)
+    private function makeNewLibrary($data)
     {
         $lib = new Library();
         $lib->setName($data['Name']);
@@ -216,12 +219,12 @@ class NewLibraryHandler
             return $create;
         }
 
-        $this->saveEntities(array($lib));
+//        $this->saveEntities(array($lib));
 
-        return array("success" => true, "lib" => $lib);
+        return ["success" => true, "lib" => $lib];
     }
 
-    private function saveNewVersionAndExamples($data, Library $lib)
+    private function makeNewVersionAndExamples($data, Library $lib)
     {
         if ($lib === null) {
             return json_encode(['success' => false]);
@@ -253,15 +256,11 @@ class NewLibraryHandler
             return json_encode($create);
         }
 
-        $this->saveEntities(array($lib, $version));
-        $this->saveExamples($data, $lib, $version);
-
         if ($data['IsLatestVersion']) {
             $lib->setLatestVersion($version);
-            $this->editEntity($lib);
         }
 
-        return json_encode(array("success" => true));
+        return ["success" => true, "lib" => $lib, "version" => $version];
     }
 
     /**
