@@ -4,6 +4,8 @@ namespace Codebender\LibraryBundle\Handler;
 
 use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\LibraryExample;
+use Codebender\LibraryBundle\Entity\Partner;
+use Codebender\LibraryBundle\Entity\Preference;
 use Codebender\LibraryBundle\Entity\Version;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -368,6 +370,108 @@ class ApiHandler
         $reponse = $this->curlGitRequest($url);
         $dateString = $reponse['committer']['date'];
         return strtotime($dateString);
+    }
+
+    /**
+     * Create a new default version Preference for the partner
+     * Assume no Preference has been created for this library
+     * @param $partnerKey
+     * @param $defaultHeader
+     * @param $versionName
+     */
+    public function createPartnerDefaultVersion($partnerKey, $defaultHeader, $versionName)
+    {
+        $partner = $this->getPartnerFromAuthKey($partnerKey);
+        $version = $this->getVersionFromDefaultHeader($defaultHeader, $versionName);
+        $this->createNewPreferences($partner, $version);
+    }
+
+    /**
+     * Update a preference for the user
+     * @param $partnerKey
+     * @param $defaultHeader
+     * @param $versionName
+     */
+    public function updatePartnerDefaultVersion($partnerKey, $defaultHeader, $versionName)
+    {
+        $partner = $this->getPartnerFromAuthKey($partnerKey);
+        $version = $this->getVersionFromDefaultHeader($defaultHeader, $versionName);
+        $library = $version->getLibrary();
+        $preference = $this->getPartnerPreferenceForLibrary($partner, $library);
+
+        if ($preference !== null) {
+            $preference->setVersion($version);
+            $this->entityManager->persist($preference);
+        }
+    }
+
+    /**
+     * @param $partnerKey
+     * @param $defaultHeader
+     * @return Version
+     */
+    public function fetchPartnerDefaultVersion($partnerKey, $defaultHeader)
+    {
+        $partner = $this->getPartnerFromAuthKey($partnerKey);
+        $library = $this->getLibraryFromDefaultHeader($defaultHeader);
+        $preference = $this->getPartnerPreferenceForLibrary($partner, $library);
+
+        // if no explicit default version set for this library
+        if ($preference === null) {
+            return $library->getLatestVersion();
+        }
+
+        return $preference->getVersion();
+    }
+
+    /**
+     * Get the Partner entity from the authorization key
+     * @param $authKey
+     * @return Partner|null the partner entity
+     */
+    public function getPartnerFromAuthKey($authKey)
+    {
+        $partner = $this->entityManager
+            ->getRepository('CodebenderLibraryBundle:Partner')
+            ->findOneBy(array('auth_key' => $authKey));
+
+        return $partner;
+    }
+
+    /**
+     * Create a new Preference entity and save it in the database
+     * @param $partner Partner
+     * @param $version Version
+     */
+    private function createNewPreferences($partner, $version)
+    {
+        $preference = new Preference();
+        $preference->setLibrary($version->getLibrary());
+        $preference->setVersion($version);
+        $preference->setPartner($partner);
+        $this->entityManager->persist($preference);
+    }
+
+    /**
+     * Get a partner's Preference entity for a specific library
+     * @param $partner Partner
+     * @param $library Library
+     * @return Preference|null
+     */
+    private function getPartnerPreferenceForLibrary($partner, $library)
+    {
+        $result = $partner->getPreferences()
+            ->filter(
+                function ($preference) use ($library) {
+                    return $preference->getLibrary()->getId() === $library->getId();
+                }
+            );
+
+        if ($result->isEmpty()) {
+            return null;
+        }
+
+        return $result->first();
     }
 
     /**
