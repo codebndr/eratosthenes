@@ -6,8 +6,8 @@
         $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching file tree..');
         var $url = $("#githubUrl").val();
         var $ref = isFromRelease ? $("#gitReleases").val() : $("#gitBranches").val();
-        $.post( "{{ path('codebender_library_get_repo_tree_meta_v2', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, gitRef : $ref })
-            .done(function( data ) {
+        $.post("{{ path('codebender_library_get_repo_tree_meta_v2', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, gitRef : $ref })
+            .done(function(data) {
                 if(!data.success) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> There is no such library');
                     return;
@@ -47,7 +47,7 @@
     function updateLibraryMeta(name)
     {
         var route = "{{ path('codebender_library_get_library_meta', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
-        $.post( route.replace("LIBRARYNAME", name) )
+        $.post(route.replace("LIBRARYNAME", name))
             .done(function(data) {
                 if (data.success) {
                     // header file name collision
@@ -103,8 +103,8 @@
         }
 
         $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching data..');
-        $.post( "{{ path('codebender_library_get_library_git_info', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
-            .done(function( data ) {
+        $.post("{{ path('codebender_library_get_library_git_info', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
+            .done(function(data) {
                 if(data.success)
                 {
                     if (data.branches && data.releases) {
