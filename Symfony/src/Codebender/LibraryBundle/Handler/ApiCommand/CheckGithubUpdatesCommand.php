@@ -78,12 +78,8 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     {
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
-
-        $branch = $library->getBranch();
-        $branch = $this->convertNullToEmptyString($branch); // not providing any branch will make git return the commits of the default branch
-
-        $directoryInRepo = $library->getInRepoPath();
-        $directoryInRepo = $this->convertNullToEmptyString($directoryInRepo);
+        $branch = (string)$library->getBranch(); // not providing any branch will make git return the commits of the default branch
+        $directoryInRepo = (string)$library->getInRepoPath();
 
         $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
         return $lastCommitFromGithub === $library->getLastCommit();
@@ -105,24 +101,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
             'Git Branch' => $library->getBranch(),
             'Path in Git Repo' => $library->getInRepoPath()
         ];
-    }
-
-    /**
-     * This method takes in an object and returns and empty
-     * string if the object is null. Otherwise, the original
-     * object is returned.
-     *
-     * @param $object
-     * @return string an empty string if $object is null, otherwise
-     * $object is returned
-     */
-    private function convertNullToEmptyString($object)
-    {
-        if ($object === null) {
-            return '';
-        }
-
-        return $object;
     }
 
     /**
