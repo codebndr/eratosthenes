@@ -79,7 +79,7 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
 
-        $branch = '1.0.x';
+        $branch = $library->getBranch();
         $branch = $this->convertNullToEmptyString($branch); // not providing any branch will make git return the commits of the default branch
 
         $directoryInRepo = $library->getInRepoPath();
