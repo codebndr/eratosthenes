@@ -32,9 +32,13 @@ class ApiHandler
     {
         if ($this->isExternalLibrary($defaultHeader)) {
             return 'external';
-        } elseif ($this->isBuiltInLibrary($defaultHeader)) {
+        }
+
+        if ($this->isBuiltInLibrary($defaultHeader)) {
             return 'builtin';
-        } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
+        }
+
+        if ($this->isBuiltInLibraryExample($defaultHeader)) {
             return 'example';
         }
 
@@ -92,9 +96,13 @@ class ApiHandler
     {
         if ($this->isValidExternalLibraryVersion($defaultHeader, $version)) {
             return true;
-        } elseif ($this->isBuiltInLibrary($defaultHeader)) {
+        }
+
+        if ($this->isBuiltInLibrary($defaultHeader)) {
             return true;
-        } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
+        }
+
+        if ($this->isBuiltInLibraryExample($defaultHeader)) {
             return true;
         }
 

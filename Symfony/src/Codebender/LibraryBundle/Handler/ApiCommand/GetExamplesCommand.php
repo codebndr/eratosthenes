@@ -15,7 +15,10 @@ class GetExamplesCommand extends AbstractApiCommand
         $library = $content['library'];
 
         // TODO: use a default version if version is not given in the request
-        $version = array_key_exists('version', $content) ? $content['version'] : '';
+        $version = '';
+        if (array_key_exists('version', $content)) {
+            $version = $content['version'];
+        }
 
         /* @var ApiHandler $handler */
         $handler = $this->get('codebender_library.apiHandler');
