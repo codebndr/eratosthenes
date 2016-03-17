@@ -7,6 +7,7 @@ parameters:
 # Publicly accessible APIs
     codebender_api.status.class: Codebender\LibraryBundle\Handler\ApiCommand\StatusCommand
     codebender_api.invalidApi.class: Codebender\LibraryBundle\Handler\ApiCommand\InvalidApiCommand
+    codebender_api.getExampleCode.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExampleCodeCommand
     codebender_api.getExamples.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExamplesCommand
     codebender_api.getVersions.class: Codebender\LibraryBundle\Handler\ApiCommand\GetVersionsCommand
     codebender_api.getKeywords.class: Codebender\LibraryBundle\Handler\ApiCommand\GetKeywordsCommand
@@ -45,6 +46,12 @@ services:
 
     codebender_api.invalidApi:
             class:  %codebender_api.invalidApi.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getExampleCode:
+            class:  %codebender_api.getExampleCode.class%
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
