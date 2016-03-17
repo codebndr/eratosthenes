@@ -9,6 +9,7 @@ parameters:
     codebender_api.invalidApi.class: Codebender\LibraryBundle\Handler\ApiCommand\InvalidApiCommand
     codebender_api.getExamples.class: Codebender\LibraryBundle\Handler\ApiCommand\GetExamplesCommand
     codebender_api.getVersions.class: Codebender\LibraryBundle\Handler\ApiCommand\GetVersionsCommand
+    codebender_api.getKeywords.class: Codebender\LibraryBundle\Handler\ApiCommand\GetKeywordsCommand
 
 services:
 #    codebender_library.example:
@@ -54,6 +55,12 @@ services:
 
     codebender_api.getVersions:
             class:  %codebender_api.getVersions.class%
+            arguments:
+                entityManager: "@doctrine.orm.entity_manager"
+                containerInterface: "@service_container"
+
+    codebender_api.getKeywords:
+            class:  %codebender_api.getKeywords.class%
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
