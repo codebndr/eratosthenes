@@ -123,6 +123,22 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('Requested version for library MultiIno not found', $response['message']);
     }
 
+    /*
+     * This method tests the getVersions API.
+     */
+    public function testGetVersions()
+    {
+        // Test successful getVersions calls
+        $this->assertSuccessfulGetVersions('default', ['1.0.0', '1.1.0']);
+        $this->assertSuccessfulGetVersions('DynamicArrayHelper', ['1.0.0']);
+        $this->assertSuccessfulGetVersions('HtmlLib', []);
+
+        // Test invalid getVersions calls
+        $this->assertFailedGetVersions('nonExistentLib');
+        $this->assertFailedGetVersions('');
+        $this->assertFailedGetVersions(null);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *
@@ -153,5 +169,63 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"' .$type. '"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         return $response;
+    }
+
+    /**
+     * This method submits a POST request to the getVersions API
+     * and returns its response.
+     *
+     * @param $defaultHeader
+     * @return $response
+     */
+    private function postGetVersionsApi($defaultHeader)
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getVersions","library":"' . $defaultHeader . '"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        return $response;
+    }
+
+    /**
+     * This method checks if the response of a single getVersions
+     * API call is successful and returns the correct versions.
+     *
+     * @param $defaultHeader
+     * @param $expectedVersions
+     */
+    private function assertSuccessfulGetVersions($defaultHeader, $expectedVersions)
+    {
+        $response = $this->postGetVersionsApi($defaultHeader);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('versions', $response);
+        $this->assertTrue($this->areSimilarArrays($expectedVersions, $response['versions']));
+    }
+
+    /**
+     * This method checks if the response of a single getVersions
+     * API call is unsuccessful.
+     *
+     * @param $defaultHeader
+     */
+    private function assertFailedGetVersions($defaultHeader)
+    {
+        $response = $this->postGetVersionsApi($defaultHeader);
+        $this->assertEquals(false, $response['success']);
+    }
+
+    /**
+     * This method checks if two arrays, $array1 and $array2,
+     * has the same elements.
+     *
+     * @param $array1
+     * @param $array2
+     * @return bool
+     */
+    private function areSimilarArrays($array1, $array2)
+    {
+        sort($array1);
+        sort($array2);
+        return $array1 === $array2;
     }
 }
