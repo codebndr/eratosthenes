@@ -224,7 +224,6 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
         $destinationRootDirectory = $this->container->getParameter('external_libraries_new');
         $destinationPath = $destinationRootDirectory . '/' . $defaultHeader . '/' . $version;
         $filesystem->mirror($sourcePath, $destinationPath);
-        $filesystem->remove($sourcePath);
     }
 
     /**
@@ -243,7 +242,6 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
         $sourcePath = $sourceRootDirectory . '/' . $defaultHeader;
         $destinationPath = $destinationRootDirectory . '/' . $defaultHeader . '/' . $version;
         $filesystem->mirror($sourcePath, $destinationPath);
-        $filesystem->remove($sourcePath);
     }
 
     /**
