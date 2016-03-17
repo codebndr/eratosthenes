@@ -60,6 +60,7 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
          */
         $externalLibraries = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
             ->findAll();
+        $externalLibraryVersion = 'CB-1';
         /* @var ExternalLibrary $externalLibrary */
         foreach ($externalLibraries as $externalLibrary) {
             $defaultHeader = $externalLibrary->getMachineName();
@@ -88,13 +89,12 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
             $library->setIsBuiltIn(False);
 
             $version = new Version();
-            $versionField = '1.0.0';
             $version->setLibrary($library);
-            $version->setVersion($versionField);
+            $version->setVersion($externalLibraryVersion);
             $version->setDescription($externalLibrary->getDescription());
             $version->setNotes($externalLibrary->getNotes());
             $version->setSourceUrl($externalLibrary->getSourceUrl());
-            $version->setFolderName($versionField);
+            $version->setFolderName($externalLibraryVersion);
             $version->addArchitecture($avrArchitecture);
 
             $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')
@@ -121,7 +121,7 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
              */
             $entityManager->persist($library);
             $entityManager->persist($version);
-            $this->moveExternalLibraryFiles($defaultHeader, $versionField);
+            $this->moveExternalLibraryFiles($defaultHeader, $externalLibraryVersion);
         }
         $entityManager->flush();
 
