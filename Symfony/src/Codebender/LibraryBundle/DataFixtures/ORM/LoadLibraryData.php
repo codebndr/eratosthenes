@@ -52,6 +52,7 @@ class LoadLibraryData extends AbstractFixture implements OrderedFixtureInterface
         $dahLibrary->setUrl('https://github.com/codebendercc/DynamicArrayHelper-Arduino-Library');
         $dahLibrary->setOwner('codebendercc');
         $dahLibrary->setRepo('DynamicArrayHelper-Arduino-Library');
+        $dahLibrary->setBranch('1.0.x');
         $dahLibrary->setInRepoPath('');
         $dahLibrary->setLastCommit('72b8865ee53b3edf159f22f5ff6f9a6dafa7ee1b'); // This is not the last commit of the branch
         $dahLibrary->setFolderName('DynamicArrayHelper');
