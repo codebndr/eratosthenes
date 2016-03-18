@@ -392,6 +392,21 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('Could not retrieve the requested example', $response['message']);
     }
 
+    public function testFetchApiCommand()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default","version":"1.1.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+        $filenames = array_column($response['files'], 'filename');
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
+    }
+
     /**
      * Use this method for library manager API requests with POST data
      *
