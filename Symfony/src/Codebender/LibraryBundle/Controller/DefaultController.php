@@ -434,9 +434,7 @@ class DefaultController extends Controller
             }
 
             if ($library->getOwner() !== null && $library->getRepo() !== null) {
-                $libraries[$libraryMachineName] = [
-                    'url' => 'https://github.com/' . $library->getOwner() . '/' . $library->getRepo()
-                ];
+                $libraries[$libraryMachineName]['url'] = 'https://github.com/' . $library->getOwner() . '/' . $library->getRepo();
             }
 
             $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')
