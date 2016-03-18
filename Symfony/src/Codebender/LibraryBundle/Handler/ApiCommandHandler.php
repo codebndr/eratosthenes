@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Handler;
 
+use Codebender\LibraryBundle\Handler\ApiCommand\AbstractApiCommand;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,7 +29,7 @@ class ApiCommandHandler
      * public.
      *
      * @param $content
-     * @return InvalidApiCommand
+     * @return AbstractApiCommand
      */
     public function getService($content)
     {
@@ -36,13 +37,10 @@ class ApiCommandHandler
         $apiName = $this->removeNonAlphabetic($content['type']);
         $serviceName = $apiPrefix . $apiName;
 
-        if ($this->container->has($serviceName)) {
-            $service = $this->container->get($serviceName);
-        } else {
-            $service = $this->container->get($apiPrefix . 'invalidApi');
+        if (!$this->container->has($serviceName)) {
+            return $this->container->get($apiPrefix . 'invalidApi');
         }
-
-        return $service;
+        return $this->container->get($serviceName);
     }
 
     /**
