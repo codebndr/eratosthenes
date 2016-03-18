@@ -22,7 +22,6 @@ class ApiControllerTest extends WebTestCase
 
         $response = $this->postApiType('98am(DW*340D(#*5$%');
         $this->assertFalse($response['success']);
-<<<<<<< HEAD
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
@@ -31,10 +30,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
     }
     
-=======
-    }
-
->>>>>>> origin/v2-api-development
     public function testList()
     {
         $client = static::createClient();
@@ -82,7 +77,6 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
-<<<<<<< HEAD
      * This method tests the getVersions API.
      */
     public function testGetVersions()
@@ -165,8 +159,6 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
-=======
->>>>>>> origin/v2-api-development
      * Test for the getExamples API
      */
     public function testGetExternalLibraryExamples()
@@ -263,77 +255,6 @@ class ApiControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals('Requested version for library MultiIno not found', $response['message']);
-<<<<<<< HEAD
-
-=======
-    }
-
-    /*
-     * This method tests the getVersions API.
-     */
-    public function testGetVersions()
-    {
-        // Test successful getVersions calls
-        $this->assertSuccessfulGetVersions('default', ['1.0.0', '1.1.0']);
-        $this->assertSuccessfulGetVersions('DynamicArrayHelper', ['1.0.0']);
-        $this->assertSuccessfulGetVersions('HtmlLib', []);
-
-        // Test invalid getVersions calls
-        $this->assertFailedGetVersions('nonExistentLib');
-        $this->assertFailedGetVersions('');
-        $this->assertFailedGetVersions(null);
-    }
-
-    /*
-     * This method test the getKeywords API.
-     */
-    public function testGetKeywords()
-    {
-        $client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(true, $response['success']);
-        $this->assertArrayHasKey('keywords', $response);
-        $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
-        $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
-    }
-
-    /*
-     * This method tests the checkGithubUpdates API.
-     */
-    public function testCheckGithubUpdates()
-    {
-        $client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertTrue($response['success']);
-        $this->assertEquals('1 external libraries need to be updated', $response['message']);
-        /*
-         * DynamicArrayHelper library's last commit is not the same as its origin.
-         */
-        $this->assertEquals('DynamicArrayHelper', $response['libraries'][0]['Machine Name']);
-
-        /*
-         * Disabling the library should make it not be returned in the list.
-         */
-        $handler = $this->getService('codebender_api.checkGithubUpdates');
-        $handler->toggleLibraryStatus('DynamicArrayHelper');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertTrue($response['success']);
-        $this->assertEquals('No external libraries need to be updated', $response['message']);
->>>>>>> origin/v2-api-development
     }
 
     /**
@@ -497,7 +418,6 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default","version":"1.1.0"}');
-<<<<<<< HEAD
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -507,12 +427,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('1.1.0', $response['files']);
 
         $filenames = array_column($response['files']['1.1.0'], 'filename');
-=======
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($response['success']);
-        $this->assertEquals('Library found', $response['message']);
-        $filenames = array_column($response['files'], 'filename');
->>>>>>> origin/v2-api-development
         $this->assertContains('default.cpp', $filenames);
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
@@ -520,7 +434,6 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
-<<<<<<< HEAD
      * This method tests the checkGithubUpdates API.
      */
     public function testCheckGithubUpdates()
@@ -554,8 +467,6 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
-=======
->>>>>>> origin/v2-api-development
      * Use this method for library manager API requests with POST data
      *
      * @param Client $client
@@ -640,7 +551,6 @@ class ApiControllerTest extends WebTestCase
      */
     private function areSimilarArrays($array1, $array2)
     {
-<<<<<<< HEAD
         $arrayDiff1 = array_diff($array1, $array2);
         $arrayDiff2 = array_diff($array2, $array1);
         $totalDifferences = array_merge($arrayDiff1, $arrayDiff2);
@@ -649,14 +559,6 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
-=======
-        sort($array1);
-        sort($array2);
-        return $array1 === $array2;
-    }
-
-    /*
->>>>>>> origin/v2-api-development
      * This method returns a given service from its name.
      *
      * @param $service

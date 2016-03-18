@@ -24,11 +24,7 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         $libraries = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')->findAll();
 
         foreach ($libraries as $lib) {
-<<<<<<< HEAD
             if (!$this->isActive($lib) || !$this->hasGit($lib)) {
-=======
-            if (!$this->isActive($lib) || !$this->hasGit($lib)){
->>>>>>> origin/v2-api-development
                 continue;
             }
 
@@ -49,8 +45,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     }
 
     /**
-<<<<<<< HEAD
-=======
      * This method toggles the active status of a library.
      *
      * @param $defaultHeader
@@ -75,7 +69,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     }
 
     /**
->>>>>>> origin/v2-api-development
      * This method checks if a given library is updated or not.
      *
      * @param $library
@@ -83,17 +76,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
      */
     private function isUpdated($library)
     {
-<<<<<<< HEAD
-        $apiHandler = $this->get('codebender_library.apiHandler');
-        $metaData = $library->getLibraryMeta();
-        return $apiHandler->isLibraryInSyncWithGit(
-            $metaData['gitOwner'],
-            $metaData['gitRepo'],
-            $metaData['gitBranch'],
-            $metaData['gitInRepoPath'],
-            $metaData['gitLastCommit']
-        );
-=======
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
         $branch = (string)$library->getBranch(); // not providing any branch will make git return the commits of the default branch
@@ -101,7 +83,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
 
         $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
         return $lastCommitFromGithub === $library->getLastCommit();
->>>>>>> origin/v2-api-development
     }
 
     /**
@@ -143,11 +124,6 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     {
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
-<<<<<<< HEAD
-        return !is_null($gitOwner) && !is_null($gitRepo);
-    }
-}
-=======
         return ($gitOwner !== null && $gitRepo !== null);
     }
 
@@ -245,4 +221,3 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         return $jsonDecodedContent;
     }
 }
->>>>>>> origin/v2-api-development

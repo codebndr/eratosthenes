@@ -121,8 +121,4 @@ class ListApiCommand extends AbstractApiCommand
         $exampleName = ($type == "" ? $filename : $type . ":" . $filename);
         return (array('library_name' => $libraryName, 'example_name' => $exampleName));
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/v2-api-development
