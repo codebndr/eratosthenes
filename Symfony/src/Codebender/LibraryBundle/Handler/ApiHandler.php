@@ -32,9 +32,19 @@ class ApiHandler
     {
         if ($this->isExternalLibrary($defaultHeader)) {
             return 'external';
+<<<<<<< HEAD
         } elseif ($this->isBuiltInLibrary($defaultHeader)) {
             return 'builtin';
         } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
+=======
+        }
+
+        if ($this->isBuiltInLibrary($defaultHeader)) {
+            return 'builtin';
+        }
+
+        if ($this->isBuiltInLibraryExample($defaultHeader)) {
+>>>>>>> origin/v2-api-development
             return 'example';
         }
 
@@ -42,7 +52,12 @@ class ApiHandler
     }
 
     /**
+<<<<<<< HEAD
      * Constrct the path for the given library and version
+=======
+     * Construct the path for the given library and version
+     *
+>>>>>>> origin/v2-api-development
      * @param $defaultHeader
      * @param $version
      * @return string
@@ -74,10 +89,17 @@ class ApiHandler
         return $path;
     }
 
+<<<<<<< HEAD
     public function getBuiltInLibraryExamplePath($exmapleName)
     {
         $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
         $path = $builtInLibraryRoot . '/examples/' . $exmapleName;
+=======
+    public function getBuiltInLibraryExamplePath($exampleName)
+    {
+        $builtInLibraryRoot = $this->container->getParameter('builtin_libraries');
+        $path = $builtInLibraryRoot . '/examples/' . $exampleName;
+>>>>>>> origin/v2-api-development
         return $path;
     }
 
@@ -86,6 +108,7 @@ class ApiHandler
      *
      * @param $defaultHeader
      * @param $version
+<<<<<<< HEAD
      * @param bool $checkDisabled
      * @return bool
      */
@@ -96,6 +119,21 @@ class ApiHandler
         } elseif ($this->isBuiltInLibrary($defaultHeader)) {
             return true;
         } elseif ($this->isBuiltInLibraryExample($defaultHeader)) {
+=======
+     * @return bool
+     */
+    public function libraryVersionExists($defaultHeader, $version)
+    {
+        if ($this->isValidExternalLibraryVersion($defaultHeader, $version)) {
+            return true;
+        }
+
+        if ($this->isBuiltInLibrary($defaultHeader)) {
+            return true;
+        }
+
+        if ($this->isBuiltInLibraryExample($defaultHeader)) {
+>>>>>>> origin/v2-api-development
             return true;
         }
 
@@ -138,6 +176,7 @@ class ApiHandler
      * This method checks if a given external library exists in the database.
      *
      * @param $defaultHeader
+<<<<<<< HEAD
      * @param bool $getDisabled
      * @return bool
      */
@@ -146,6 +185,13 @@ class ApiHandler
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
 
         return $getDisabled ? $library !== null : $library !== null && $library->getActive();
+=======
+     * @return bool
+     */
+    public function isExternalLibrary($defaultHeader)
+    {
+        return ($this->getLibraryFromDefaultHeader($defaultHeader) !== null);
+>>>>>>> origin/v2-api-development
     }
 
     /**
@@ -228,6 +274,7 @@ class ApiHandler
     }
 
     /**
+<<<<<<< HEAD
      * This method toggles the active status of a library.
      *
      * @param $defaultHeader
@@ -375,17 +422,27 @@ class ApiHandler
     }
 
     /**
+=======
+>>>>>>> origin/v2-api-development
      * This method checks if the given version exists in the given library
      * specified by the $defaultHeader.
      *
      * @param $defaultHeader
      * @param $version
+<<<<<<< HEAD
      * @param bool $checkDisabled
      * @return bool
      */
     private function isValidExternalLibraryVersion($defaultHeader, $version, $checkDisabled = false)
     {
         if (!$this->isExternalLibrary($defaultHeader, $checkDisabled)) {
+=======
+     * @return bool
+     */
+    private function isValidExternalLibraryVersion($defaultHeader, $version)
+    {
+        if (!$this->isExternalLibrary($defaultHeader)) {
+>>>>>>> origin/v2-api-development
             return false;
         }
 
@@ -398,6 +455,7 @@ class ApiHandler
 
         return !$versionsCollection->isEmpty();
     }
+<<<<<<< HEAD
 
     /**
      * Fetches the last commit sha of a repo. `sha` parameter can either be the name of a branch, or a commit
@@ -492,4 +550,6 @@ class ApiHandler
 
         return $jsonDecodedContent;
     }
+=======
+>>>>>>> origin/v2-api-development
 }

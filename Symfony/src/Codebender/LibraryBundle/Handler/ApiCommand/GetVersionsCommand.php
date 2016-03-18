@@ -65,4 +65,8 @@ class GetVersionsCommand extends AbstractApiCommand
         $versions = $versionsCollection->toArray();
         return $versions;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/v2-api-development

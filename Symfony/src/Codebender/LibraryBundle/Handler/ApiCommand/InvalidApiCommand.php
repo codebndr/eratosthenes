@@ -11,4 +11,8 @@ class InvalidApiCommand extends AbstractApiCommand
     {
         return ['success' => false, 'message' => 'No valid action requested'];
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/v2-api-development
