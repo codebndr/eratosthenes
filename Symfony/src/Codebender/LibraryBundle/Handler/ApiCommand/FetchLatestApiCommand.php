@@ -14,6 +14,7 @@ class FetchLatestApiCommand extends AbstractApiCommand
         }
 
         $content['latest'] = true;
+        $content['version'] = null;
         $fetchApiCommand = new FetchApiCommand($this->entityManager, $this->container);
         return $fetchApiCommand->execute($content);
     }

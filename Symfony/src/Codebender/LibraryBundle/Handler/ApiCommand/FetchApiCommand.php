@@ -57,19 +57,23 @@ class FetchApiCommand extends AbstractApiCommand
                 ];
             }
 
-            $lib = $apiHandler->getLibraryFromDefaultHeader($filename);
             $versionObjects = $apiHandler->getAllVersionsFromDefaultHeader($filename);
 
-            // use the requested version (if any) for fetching data
-            // else fetch data for all versions
-            $versions = $versionObjects->toArray();
-            if ($content['latest']) {
-                $versions = [$lib->getLatestVersion()];
-            } else if ($content['version'] !== null) {
+            // fetch default version
+            // if rendering view, fetch all versions
+            // if specifically asked for a certain version, fetch that version
+            // else if specifically asked for latest version, fetch latest version
+            $versions = [$apiHandler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $filename)];
+            if ($content['renderView'] && is_null($content['version'])) {
+                $versions = $versionObjects->toArray();
+            } else if (!is_null($content['version'])) {
                 $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
                     return $version->getVersion() === $content['version'];
                 });
                 $versions = $versionsCollection->toArray();
+            } else if ($content['latest']) {
+                $lib = $apiHandler->getLibraryFromDefaultHeader($filename);
+                $versions = [$lib->getLatestVersion()];
             }
 
             // fetch library files for each version
