@@ -64,7 +64,7 @@ class FetchApiCommand extends AbstractApiCommand
             // if specifically asked for a certain version, fetch that version
             // else if specifically asked for latest version, fetch latest version
             $versions = [$apiHandler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $filename)];
-            if ($content['renderView']) {
+            if ($content['renderView'] && is_null($content['version'])) {
                 $versions = $versionObjects->toArray();
             } else if (!is_null($content['version'])) {
                 $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
