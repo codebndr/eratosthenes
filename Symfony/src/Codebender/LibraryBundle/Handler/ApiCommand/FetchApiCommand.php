@@ -9,6 +9,10 @@ class FetchApiCommand extends AbstractApiCommand
 {
     public function execute($content)
     {
+        if (!array_key_exists('library', $content)) {
+            return ["success" => false, "message" => "You need to specify which library to fetch."];
+        }
+
         $content = $this->setDefault($content);
         $filename = $content['library'];
 
@@ -55,14 +59,23 @@ class FetchApiCommand extends AbstractApiCommand
 
             $versionObjects = $apiHandler->getAllVersionsFromDefaultHeader($filename);
 
-            // use the requested version (if any) for fetching data
-            // else fetch data for all versions
-            $versions = $versionObjects->toArray();
+            // fetch default version
+            // if rendering view, fetch all versions
+            // if specifically asked for a certain version, fetch that version
+            // else if specifically asked for latest version, fetch latest version
+            $versions = [$apiHandler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $filename)];
+            if ($content['renderView'] && $content['version'] === null) {
+                $versions = $versionObjects->toArray();
+            }
             if ($content['version'] !== null) {
                 $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
                     return $version->getVersion() === $content['version'];
                 });
                 $versions = $versionsCollection->toArray();
+            }
+            if ($content['latest']) {
+                $lib = $apiHandler->getLibraryFromDefaultHeader($filename);
+                $versions = [$lib->getLatestVersion()];
             }
 
             // fetch library files for each version
@@ -119,6 +132,7 @@ class FetchApiCommand extends AbstractApiCommand
     {
         $content['disabled'] = (array_key_exists('disabled', $content) ? $content['disabled'] : false);
         $content['version'] = (array_key_exists('version', $content) ? $content['version'] : null);
+        $content['latest'] = (array_key_exists('latest', $content) ? $content['latest'] : false);
         $content['renderView'] = (array_key_exists('renderView', $content) ? $content['renderView'] : false);
         return $content;
     }

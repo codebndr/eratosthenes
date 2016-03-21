@@ -122,6 +122,14 @@ class Library
     private $versions;
 
     /**
+     * @var integer
+     *
+     * @ORM\OneToOne(targetEntity="Version")
+     * @ORM\JoinColumn(name="latest_version", referencedColumnName="id", nullable = false)
+     */
+    private $latest_version;
+
+    /**
      * Get id
      *
      * @return integer
@@ -468,6 +476,29 @@ class Library
     public function getVersions()
     {
         return $this->versions;
+    }
+
+    /**
+     * Return latest version
+     *
+     * @return Version
+     */
+    public function getLatestVersion()
+    {
+        return $this->latest_version;
+    }
+
+    /**
+     * Set latest version
+     *
+     * @param \Codebender\LibraryBundle\Entity\Version $latest_version
+     * @return Library
+     */
+    public function setLatestVersion(\Codebender\LibraryBundle\Entity\Version $latest_version)
+    {
+        $this->latest_version = $latest_version;
+
+        return $this;
     }
 
     /**

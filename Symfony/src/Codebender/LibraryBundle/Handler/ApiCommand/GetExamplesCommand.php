@@ -14,23 +14,28 @@ class GetExamplesCommand extends AbstractApiCommand
         }
         $library = $content['library'];
 
-        // TODO: use a default version if version is not given in the request
-        $version = array_key_exists('version', $content) ? $content['version'] : '';
-
         /* @var ApiHandler $handler */
         $handler = $this->get('codebender_library.apiHandler');
         $type = $handler->getLibraryType($library);
-
         if ($type === 'unknown') {
-            return ['success' => false, 'message' => 'Requested library named ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested library named $library not found"];
         }
 
+        $version = '';
+        // for external library, fetch default version for partner
+        if ($type === 'external') {
+            $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
+        }
+
+        // use specific requested version if any
+        if (array_key_exists('version', $content)) {
+            $version = $content['version']; // use specific requested version if any
+        }
 
         if (!$handler->libraryVersionExists($library, $version)) {
-            return ['success' => false, 'message' => 'Requested version for library ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested version for library $library not found"];
         }
 
-        $path = "";
         /*
          * Assume the requested library is an example
          */

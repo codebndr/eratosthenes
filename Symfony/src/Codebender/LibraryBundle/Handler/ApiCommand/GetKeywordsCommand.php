@@ -29,22 +29,25 @@ class GetKeywordsCommand extends AbstractApiCommand
             return ['success' => false, 'message' => 'Incorrect request fields'];
         }
 
-        $this->setDefaults($content);
-
         $defaultHeader = $content['library'];
-        $version = $content['version'];
-
-        if (!$this->apiHandler->libraryVersionExists($defaultHeader, $version)) {
-            return ['success' => false, 'message' => 'Version ' .$version. ' of library named ' .$defaultHeader. ' not found.'];
-        }
 
         $libraryType = $this->apiHandler->getLibraryType($defaultHeader);
+        if ($libraryType === 'example' || $libraryType === 'unknown') {
+            return ['success' => false, 'message' => 'Could not find keywords for requested library version.'];
+        }
+
         if ($libraryType === 'external') {
+            $version = $this->getRequestedVersions($content);
+
+            if (!$this->apiHandler->libraryVersionExists($defaultHeader, $version)) {
+                return ['success' => false, 'message' => 'Could not find keywords for requested library version.'];
+            }
+
             $keywords = $this->getExternalLibraryKeywords($defaultHeader, $version);
-        } elseif ($libraryType === 'builtin') {
+        }
+
+        if ($libraryType === 'builtin') {
             $keywords = $this->getBuiltInLibraryKeywords($defaultHeader);
-        } else {
-            return ['success' => false];
         }
 
         return ['success' => true, 'keywords' => $keywords];
@@ -62,15 +65,20 @@ class GetKeywordsCommand extends AbstractApiCommand
     }
 
     /**
-     * This method sets the default values for unset variables in $content.
-     *
+     * This method get partner default version for the requested external library
      * @param $content
+     * @return mixed
      */
-    private function setDefaults(&$content)
+    private function getRequestedVersions($content)
     {
         if (!array_key_exists("version", $content)) {
-            $content['version'] = '';
+            return $this->apiHandler->fetchPartnerDefaultVersion(
+                $this->getRequest()->get('authorizationKey'),
+                $content['library']
+            )->getVersion();
         }
+
+        return $content['version'];
     }
 
     /**
