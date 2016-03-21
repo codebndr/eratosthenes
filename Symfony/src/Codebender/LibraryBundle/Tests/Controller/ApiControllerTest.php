@@ -113,6 +113,11 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
         $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
 
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"default", "version" : "1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
@@ -142,7 +147,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Version 1.0.0 of library named noSuchLib not found.', $response['message']);
+        $this->assertEquals('Could not find keywords for requested library.', $response['message']);
 
         $client = $this->postApiRequest(
             $client,
@@ -151,7 +156,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Version 9.9.9 of library named default not found.', $response['message']);
+        $this->assertEquals('Could not find keywords for requested library version.', $response['message']);
 
         // unsupported library
         $client = $this->postApiRequest(
@@ -170,6 +175,17 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getExamples", "library" : "MultiIno"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('multi_ino_example:methods', $response['examples']);
+        $this->assertArrayHasKey('multi_ino_example', $response['examples']);
+
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
@@ -270,6 +286,16 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getExampleCode", "library":"SubCateg", "example":"subcateg_example_one"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('subcateg_example_one.ino', $response['files'][0]['filename']);
+        $this->assertContains('void setup()', $response['files'][0]['code']);
 
         $client = $this->postApiRequest(
             $client,
@@ -469,7 +495,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
 
-        $this->assertArrayHasKey('1.0.0', $response['files']);
         $this->assertArrayHasKey('1.1.0', $response['files']);
 
         $filenames = array_column($response['files']['1.1.0'], 'filename');
@@ -498,6 +523,28 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testGetDefaultVersionCommand()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Wrong data', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion", "library":"NoSuchLib"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('No library named NoSuchLib was found.', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion","library":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('1.1.0', $response['version']);
     }
 
     /**
