@@ -36,7 +36,7 @@ class LoadPreferenceData extends AbstractFixture implements OrderedFixtureInterf
          * Get reference for our mock version data
          */
         /* @var \Codebender\LibraryBundle\Entity\Version $defaultLibraryVersion2 */
-        $defaultLibraryVersion2 = $this->getReference('defaultLibraryVersion2');
+        $defaultLibraryVersion = $this->getReference('defaultLibraryVersion1');
 
         /* @var \Codebender\LibraryBundle\Entity\Version $dahLibraryVersion1 */
         $dahLibraryVersion1 = $this->getReference('dynamicArrayHelperLibraryVersion1');
@@ -57,8 +57,8 @@ class LoadPreferenceData extends AbstractFixture implements OrderedFixtureInterf
          * Add mock preference for partner: codebender
          */
         $preference1 = new Preference();
-        $preference1->setLibrary($defaultLibraryVersion2->getLibrary());
-        $preference1->setVersion($defaultLibraryVersion2);
+        $preference1->setLibrary($defaultLibraryVersion->getLibrary());
+        $preference1->setVersion($defaultLibraryVersion);
         $preference1->setPartner($codebender);
         $objectManager->persist($preference1);
 
@@ -96,8 +96,8 @@ class LoadPreferenceData extends AbstractFixture implements OrderedFixtureInterf
          * Add mock preference for partner: arduino.cc
          */
         $preference7 = new Preference();
-        $preference7->setLibrary($defaultLibraryVersion2->getLibrary());
-        $preference7->setVersion($defaultLibraryVersion2);
+        $preference7->setLibrary($defaultLibraryVersion->getLibrary());
+        $preference7->setVersion($defaultLibraryVersion);
         $preference7->setPartner($arduinoCc);
         $objectManager->persist($preference7);
 

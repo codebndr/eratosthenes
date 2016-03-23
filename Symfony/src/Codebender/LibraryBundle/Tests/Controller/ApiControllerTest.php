@@ -495,9 +495,10 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
 
-        $this->assertArrayHasKey('1.1.0', $response['files']);
+        $this->assertEquals(1, sizeof($response['files']));
+        $this->assertArrayHasKey('1.0.0', $response['files']);
 
-        $filenames = array_column($response['files']['1.1.0'], 'filename');
+        $filenames = array_column($response['files']['1.0.0'], 'filename');
         $this->assertContains('default.cpp', $filenames);
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
@@ -544,7 +545,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion","library":"default"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
-        $this->assertEquals('1.1.0', $response['version']);
+        $this->assertEquals('1.0.0', $response['version']);
     }
 
     /**
