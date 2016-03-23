@@ -76,6 +76,9 @@
                 <br/><br/>
                 <span>This is a <strong>builtin</strong> library</span>
             {% endif %}
+            <br/>
+            <button class="btn btn-danger" id="delete-library-button" href=""> Delete library </button>
+            <span id="delete-library-output"></span>
         </div>
         {% if meta %}
             {% if meta.description %}
@@ -138,6 +141,40 @@
             </div>
         </div>
     <div class="span1"></div>
+    <!-- Library Deletion Modal -->
+    <div id="deletionModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete {{ library }} library</h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to permanently delete {{ library }} library. Are you sure?</p>
+                    <button id="yes-button" class="btn btn-default">Do it!</button>
+                    <button id="no-button" class="btn btn-default" data-dismiss="modal">God no..</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Library Deleted Modal -->
+    <div id="deletedModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Library {{ library }} deleted!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Click on the button below to get redirected to the library addition page.</p>
+                    <button id="redirect-button" class="btn btn-default">Take me there</button>
+                    <p><strong>Don't forget to delete the cached library object files from the compiler!</strong></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -147,7 +184,7 @@
         var route = "{{ path('codebender_library_status_change', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
         $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
-                var response = jQuery.parseJSON(data);
+                var response = data;
                 if(response.success)
                 {
                     $("#statusbutton").toggleClass("btn-success");
@@ -165,6 +202,35 @@
                 console.log(data);
             });
     }
+
+    $(document).ready(function() {
+
+        $('#delete-library-button').click(function() {
+            $('#deletionModal').modal('show');
+        });
+        $("#yes-button").click(function () {
+            $('#deletionModal').modal('hide');
+            $.ajax({
+                type: "POST",
+                url: "{{ path('codebender_api_handler', {'authorizationKey' : authorizationKey, 'version' : 'v1'}) }}",
+                data: '{"type":"deleteLibrary","library":"{{ library }}"}',
+                dataType: 'json'
+            }).done(function( data ) {
+                if(!data.success) {
+                    $("#delete-library-output").html(data.error);
+                }
+                if(data.success) {
+                    $('.btn').attr('disabled', 'disabled'); //disable all buttons to avoid performing operations on a deleted library
+                    $('#redirect-button').removeAttr('disabled');
+                    $('#deletedModal').modal('show');
+                }
+            });
+        });
+
+        $('#redirect-button').click(function(){
+            window.location.replace("{{ path('codebender_library_new_external', {'authorizationKey': authorizationKey}) }}");
+        });
+    });
 
 </script>
 

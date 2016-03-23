@@ -15,6 +15,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use DirectoryIterator;
 
 class DefaultHandler
 {
@@ -386,7 +387,7 @@ class DefaultHandler
     {
         foreach ($dir['contents'] as $file) {
             if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
-                return json_encode(array('success' => true, 'directory' => $dir));
+                return ['success' => true, 'directory' => $dir];
 
         }
 
@@ -395,7 +396,7 @@ class DefaultHandler
                 foreach ($file['contents'] as $f) {
                     if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
                         $file = $this->fixDirName($file);
-                        return json_encode(array('success' => true, 'directory' => $file));
+                        return ['success' => true, 'directory' => $file];
                     }
                 }
             }
@@ -714,6 +715,38 @@ class DefaultHandler
         }
 
         return $gitResponse['description'];
+    }
+
+    /**
+     * Recursively removes a directory and its contents.
+     *
+     * @param string $directory
+     * @throws \Exception
+     */
+    public function removeDirectory($directory)
+    {
+        $directory = realpath($directory);
+        if (!file_exists($directory)) {
+            return;
+        }
+        $directoryIterator = new DirectoryIterator($directory);
+        foreach ($directoryIterator as $directoryElement) {
+            if ($directoryElement->isDot()) {
+                continue;
+            }
+            if ($directoryElement->isDir()) {
+                $this->removeDirectory($directoryElement->getRealPath());
+                continue;
+            }
+            if (unlink($directoryElement->getRealPath()) !== true) {
+                throw new \Exception(
+                    'Cannot delete file: ' . $directoryElement->getRealPath()
+                );
+            }
+        }
+        if (rmdir($directory) !== true) {
+            throw new \Exception('Cannot delete directory: ' . $directory);
+        }
     }
 
 }
