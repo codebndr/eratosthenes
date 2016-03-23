@@ -57,7 +57,7 @@ class DefaultHandler
             $filename = "Robot_Control";
         else if ($filename == "ArduinoRobotMotorBoard")
             $filename = "Robot_Motor";
-        if ($filename == 'BlynkSimpleSerial') {
+        if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
             $filename = 'BlynkSimpleEthernet';
         }
 
@@ -387,7 +387,7 @@ class DefaultHandler
     {
         foreach ($dir['contents'] as $file) {
             if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false)
-                return json_encode(array('success' => true, 'directory' => $dir));
+                return ['success' => true, 'directory' => $dir];
 
         }
 
@@ -396,7 +396,7 @@ class DefaultHandler
                 foreach ($file['contents'] as $f) {
                     if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
                         $file = $this->fixDirName($file);
-                        return json_encode(array('success' => true, 'directory' => $file));
+                        return ['success' => true, 'directory' => $file];
                     }
                 }
             }
