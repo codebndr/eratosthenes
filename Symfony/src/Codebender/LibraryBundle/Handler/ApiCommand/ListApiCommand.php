@@ -12,7 +12,7 @@ class ListApiCommand extends AbstractApiCommand
          * External libraries list is fetched from the database, because we need to list
          * active libraries only
          */
-        $externalLibraries = $this->getLibraryList();
+        $externalLibraries = $this->getLibraryList($content);
 
         $arduinoLibraryFiles = $this->container->getParameter('builtin_libraries') . "/";
         $builtinExamples = $this->getLibariesListFromDir($arduinoLibraryFiles . "examples");
@@ -52,7 +52,7 @@ class ListApiCommand extends AbstractApiCommand
         return $libraries;
     }
 
-    private function getLibraryList()
+    private function getLibraryList($content)
     {
         $entityManager = $this->getDoctrine()->getManager();
         $externalMeta = $entityManager
@@ -71,9 +71,14 @@ class ListApiCommand extends AbstractApiCommand
 
             $libraries[$category][$defaultHeader] = array();
 
-            $versions = $library->getVersions();
-            foreach ($versions as $version) {
-                $libraries[$category][$defaultHeader][$version->getVersion()] = array(
+            if ($content['v1']) {
+                $handler = $this->get('codebender_library.apiHandler');
+                $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $defaultHeader);
+                if (is_null($version)) {
+                    continue;
+                }
+
+                $libraries[$category][$defaultHeader] = array(
                     "description" => $library->getDescription(),
                     "name" => $library->getName(),
                     "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
@@ -91,7 +96,31 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$category][$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
+                    $libraries[$category][$defaultHeader]['examples'][] = $names['example_name'];
+                }
+            } else {
+                $versions = $library->getVersions();
+                foreach ($versions as $version) {
+                    $libraries[$category][$defaultHeader][$version->getVersion()] = array(
+                        "description" => $library->getDescription(),
+                        "name" => $library->getName(),
+                        "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
+                        "examples" => array()
+                    );
+
+                    $examples = $entityManager
+                        ->getRepository('CodebenderLibraryBundle:LibraryExample')
+                        ->findBy(array('version' => $version->getId()));
+
+                    foreach ($examples as $example) {
+                        $names = $this
+                            ->getExampleAndLibNameFromRelativePath(
+                                pathinfo($example->getPath(), PATHINFO_DIRNAME),
+                                $example->getName()
+                            );
+
+                        $libraries[$category][$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
+                    }
                 }
             }
         }

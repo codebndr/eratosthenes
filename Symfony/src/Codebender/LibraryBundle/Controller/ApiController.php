@@ -22,6 +22,7 @@ class ApiController extends Controller
         $content = $request->getContent();
 
         $content = json_decode($content, true);
+        $content['v1'] = false;
         if ($content === null || !array_key_exists("type", $content)) {
             return new JsonResponse(['success' => false, 'message' => 'Wrong data']);
         }

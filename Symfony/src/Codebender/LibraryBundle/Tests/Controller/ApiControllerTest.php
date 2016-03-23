@@ -579,6 +579,8 @@ class ApiControllerTest extends WebTestCase
 
         $this->assertTrue($response['success']);
         $this->assertEquals('No external libraries need to be updated', $response['message']);
+
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
     }
 
     /**

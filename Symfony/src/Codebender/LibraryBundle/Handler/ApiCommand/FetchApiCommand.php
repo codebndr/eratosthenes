@@ -68,17 +68,20 @@ class FetchApiCommand extends AbstractApiCommand
             $versions = [$lib->getLatestVersion()];
         }
 
-        // fetch library files for each version
-        $response = [];
-        $examples = [];
-        foreach ($versions as $version) {
+        if ($content['v1']) {
+            // fetch library files for each version
+            $response = [];
+            $examples = [];
+
+            $version = $apiHandler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $filename);
+
             /* @var Version $version */
             $libraryPath = $externalLibrariesPath . "/" . $filename . "/" . $version->getFolderName();
 
             // fetch library files for this version
             $fetchResponse = $apiHandler->fetchLibraryFiles($finder->create(), $libraryPath);
             if (!empty($fetchResponse)) {
-                $response[$version->getVersion()] = $fetchResponse;
+                $response = $fetchResponse;
             }
 
             if ($content['renderView']) {
@@ -88,30 +91,69 @@ class FetchApiCommand extends AbstractApiCommand
                     $examples[$version->getVersion()] = $exampleResponse;
                 }
             }
-        }
 
-        if ($content['renderView']) {
-            $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
-                ->findOneBy(array('default_header' => $filename));
-            $filename = $externalLibrary->getDefaultHeader();
-            $meta = $externalLibrary->getLibraryMeta();
-            $versions = array_map(
-                function ($version) {
-                    return $version->getVersion();
-                },
-                $versions
-            );
+            if ($content['renderView']) {
+                $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
+                    ->findOneBy(array('default_header' => $filename));
+                $filename = $externalLibrary->getDefaultHeader();
+                $meta = $externalLibrary->getLibraryMeta();
 
-            $result = [
-                'success' => true,
-                'library' => $filename,
-                'versions' => $versions,
-                'files' => $response,
-                'examples' => $examples,
-                'meta' => $meta
-            ];
+                $result = [
+                    'success' => true,
+                    'library' => $filename,
+                    'files' => $response,
+                    'examples' => $examples,
+                    'meta' => $meta
+                ];
+            } else {
+                $result = ['success' => true, 'message' => 'Library found', 'files' => $response];
+            }
         } else {
-            $result = ['success' => true, 'message' => 'Library found', 'files' => $response];
+            // fetch library files for each version
+            $response = [];
+            $examples = [];
+            foreach ($versions as $version) {
+                /* @var Version $version */
+                $libraryPath = $externalLibrariesPath . "/" . $filename . "/" . $version->getFolderName();
+
+                // fetch library files for this version
+                $fetchResponse = $apiHandler->fetchLibraryFiles($finder->create(), $libraryPath);
+                if (!empty($fetchResponse)) {
+                    $response[$version->getVersion()] = $fetchResponse;
+                }
+
+                if ($content['renderView']) {
+                    // fetch example files for this version if it's rendering view
+                    $exampleResponse = $apiHandler->fetchLibraryExamples($exampleFinder->create(), $libraryPath);
+                    if (!empty($exampleResponse)) {
+                        $examples[$version->getVersion()] = $exampleResponse;
+                    }
+                }
+            }
+
+            if ($content['renderView']) {
+                $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')
+                    ->findOneBy(array('default_header' => $filename));
+                $filename = $externalLibrary->getDefaultHeader();
+                $meta = $externalLibrary->getLibraryMeta();
+                $versions = array_map(
+                    function ($version) {
+                        return $version->getVersion();
+                    },
+                    $versions
+                );
+
+                $result = [
+                    'success' => true,
+                    'library' => $filename,
+                    'versions' => $versions,
+                    'files' => $response,
+                    'examples' => $examples,
+                    'meta' => $meta
+                ];
+            } else {
+                $result = ['success' => true, 'message' => 'Library found', 'files' => $response];
+            }
         }
 
         return $result;
