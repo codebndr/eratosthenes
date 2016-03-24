@@ -68,7 +68,7 @@ class FetchApiCommand extends AbstractApiCommand
             $versions = [$lib->getLatestVersion()];
         }
 
-        if ($content['v1']) {
+        if (array_key_exists('v1', $content) && $content['v1']) {
             // fetch library files for each version
             $response = [];
             $examples = [];

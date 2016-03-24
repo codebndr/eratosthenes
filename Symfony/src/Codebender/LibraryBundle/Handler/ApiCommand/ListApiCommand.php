@@ -71,7 +71,7 @@ class ListApiCommand extends AbstractApiCommand
 
             $libraries[$category][$defaultHeader] = array();
 
-            if ($content['v1']) {
+            if (array_key_exists('v1', $content) && $content['v1']) {
                 $handler = $this->get('codebender_library.apiHandler');
                 $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $defaultHeader);
                 if (is_null($version)) {
