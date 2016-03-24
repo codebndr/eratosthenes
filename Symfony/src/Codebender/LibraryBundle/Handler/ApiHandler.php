@@ -448,6 +448,116 @@ class ApiHandler
         return $partner;
     }
 
+    public function findBaseDir($dir)
+    {
+        foreach ($dir['contents'] as $file) {
+            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
+                return json_encode(array('success' => true, 'directory' => $dir));
+            }
+        }
+
+        foreach ($dir['contents'] as $file) {
+            if ($file['type'] == 'dir') {
+                foreach ($file['contents'] as $f) {
+                    if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
+                        $file = $this->fixDirName($file);
+                        return json_encode(array('success' => true, 'directory' => $file));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get contents from the name of the commit/branch/tag
+     * @param $owner String
+     * @param $repo String
+     * @param $ref String The name of the commit/branch/tag
+     * @param $path String
+     * @return array
+     */
+    public function getGithubRepoCode($owner, $repo, $ref, $path)
+    {
+        $urlEncodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
+        $url = "https://api.github.com/repos/$owner/$repo/contents/$urlEncodedPath";
+        $queryParams = "?ref=$ref";
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/contents/
+         * for more info on the json returned.
+         */
+        $contents = $this->curlGitRequest($url, $queryParams);
+
+        // When something goes wrong during a Git API request, a `message` key exists in the response.
+        // Thus we have to return `success => false`.
+        if (array_key_exists('message', $contents)) {
+            return ['success' => false, 'message' => $contents['message']];
+        }
+
+        if ($path == '') {
+            $path = $repo;
+        }
+        $libraryContents = array(
+            'name' => pathinfo($path, PATHINFO_BASENAME),
+            'type' => 'dir',
+            'contents' => array()
+        );
+        foreach ($contents as $element) {
+            if ($element['type'] == 'file') {
+                $code = $this->getGithubFileCode($owner, $repo, $element['path'], $element['sha']);
+                if ($code['success'] == false) {
+                    return $code;
+                }
+                $libraryContents['contents'][] = $code['file'];
+            } elseif ($element['type'] == 'dir') {
+                $directoryContents = $this->getGithubRepoCode($owner, $repo, $ref, $element['path']);
+                if ($directoryContents['success'] !== true) {
+                    return $directoryContents;
+                }
+                $libraryContents['contents'][] = $directoryContents['library'];
+            }
+        }
+
+        return array('success' => true, 'library' => $libraryContents);
+    }
+
+    private function getGithubFileCode($owner, $repo, $path, $blobSha)
+    {
+        $url = "https://api.github.com/repos/$owner/$repo/git/blobs/$blobSha";
+
+        /*
+         * See the docs here https://developer.github.com/v3/git/blobs/
+         * for more info on the json returned.
+         */
+        $jsonDecodedContent = $this->curlGitRequest($url);
+
+        if (json_last_error() != JSON_ERROR_NONE) {
+            return array('success' => false, 'message' => 'Invalid Git API response (cannot decode)');
+        }
+
+        if (array_key_exists('message', $jsonDecodedContent)) {
+            return array('success' => false, 'message' => $jsonDecodedContent['message']);
+        }
+
+        if ($jsonDecodedContent['encoding'] != 'base64') {
+            return array('success' => false, 'message' => 'Received ' . $path . ' file from Github encoded in ' . $jsonDecodedContent['encoding'] . 'encoding, which cannot be handled.');
+        }
+
+        return array('success' => true, 'file' => array('name' => pathinfo($path, PATHINFO_BASENAME), 'type' => 'file', 'contents' => base64_decode($jsonDecodedContent['content'])));
+    }
+
+    private function fixDirName($dir)
+    {
+        foreach ($dir['contents'] as &$f) {
+            if ($f['type'] == 'dir') {
+                $first_slash = strpos($f['name'], "/");
+                $f['name'] = substr($f['name'], $first_slash + 1);
+                $f = $this->fixDirName($f);
+            }
+        }
+        return $dir;
+    }
+
     /**
      * Create a new Preference entity and save it in the database
      * @param $partner Partner
@@ -540,7 +650,7 @@ class ApiHandler
      * @param string $path
      * @return mixed
      */
-    private function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = '', $path = '')
+    public function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = '', $path = '')
     {
         /*
          * See the docs here https://developer.github.com/v3/repos/commits/

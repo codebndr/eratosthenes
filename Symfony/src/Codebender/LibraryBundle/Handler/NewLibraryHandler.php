@@ -44,7 +44,7 @@ class NewLibraryHandler
          * Then get the files of the library (either from extracting the zip,
          * or fetching them from Githib) and proceed
          */
-        $handler = $this->container->get('codebender_library.handler');
+        $handler = $this->container->get('codebender_library.apiHandler');
         $path = '';
         $lastCommit = null;
 
@@ -270,7 +270,7 @@ class NewLibraryHandler
      */
     private function saveExamples($data, $lib, $version)
     {
-        $handler = $this->container->get('codebender_library.handler');
+        $handler = $this->container->get('codebender_library.apiHandler');
 
         $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
         $versionPath = $externalLibrariesPath . '/' . $lib->getFolderName() . '/' . $version->getFolderName();
@@ -345,7 +345,7 @@ class NewLibraryHandler
         $opened = $zip->open($file);
 
         if ($opened === true) {
-            $handler = $this->container->get('codebender_library.handler');
+            $handler = $this->container->get('codebender_library.apiHandler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
