@@ -77,7 +77,7 @@ class ViewsController extends Controller
          * Then get the files of the library (either from extracting the zip,
          * or fetching them from Githib) and proceed
          */
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.apiHandler');
         $path = '';
         $lastCommit = null;
         switch ($uploadType['type']) {
@@ -192,7 +192,7 @@ class ViewsController extends Controller
 
     public function viewLibraryAction()
     {
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.apiHandler');
 
         $request = $this->getRequest();
         $library = $request->get('library');
@@ -230,7 +230,7 @@ class ViewsController extends Controller
 
     public function gitUpdatesAction()
     {
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.apiHandler');
 
         $handlerResponse = $handler->checkGithubUpdates();
 
@@ -274,21 +274,14 @@ class ViewsController extends Controller
             return new JsonResponse(['success' => false, 'message' => 'POST method required']);
         }
 
-        $handler = $this->get('codebender_library.handler');
-        $exists = json_decode($handler->checkIfExternalExists($library, true), true);
+        $apiHandler = $this->get('codebender_library.apiHandler');
+        $exists = $apiHandler->isExternalLibrary($library, true);
 
-        if ($exists['success'] === false) {
+        if (!$exists) {
             return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $lib = $em->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('machineName' => $library));
-        if ($lib[0]->getActive())
-            $lib[0]->setActive(0);
-        else
-            $lib[0]->setActive(1);
-        $em->persist($lib[0]);
-        $em->flush();
+        $apiHandler->toggleLibraryStatus($library);
 
         return new JsonResponse(['success' => true]);
     }
@@ -309,12 +302,12 @@ class ViewsController extends Controller
             $vendor = substr($library, 0, $last_slash);
         }
 
-        $handler = $this->get('codebender_library.handler');
-        $isBuiltIn = json_decode($handler->checkIfBuiltInExists($filename), true);
+        $handler = $this->get('codebender_library.apiHandler');
+        $isBuiltIn = json_decode($handler->isBuiltInLibrary($filename), true);
         if ($isBuiltIn["success"])
             $path = $builtinLibraryFilesPath . "/libraries/" . $filename;
         else {
-            $isExternal = json_decode($handler->checkIfExternalExists($filename), true);
+            $isExternal = json_decode($handler->isExternalLibrary($filename), true);
             if ($isExternal["success"]) {
                 $path = $externalLibraryFilesPath . '/' . $filename;
             } else {
@@ -360,8 +353,8 @@ class ViewsController extends Controller
 
     private function saveNewLibrary($humanName, $machineName, $gitOwner, $gitRepo, $description, $lastCommit, $url, $branch, $sourceUrl, $notes, $inRepoPath, $libfiles)
     {
-        $handler = $this->get('codebender_library.handler');
-        $exists = json_decode($handler->checkIfExternalExists($machineName), true);
+        $handler = $this->get('codebender_library.apiHandler');
+        $exists = json_decode($handler->isExternalLibrary($machineName), true);
         if ($exists['success'])
             return json_encode(array("success" => false, "message" => "Library named " . $machineName . " already exists."));
 
@@ -451,7 +444,7 @@ class ViewsController extends Controller
         $opened = $zip->open($file);
 
         if ($opened === true) {
-            $handler = $this->get('codebender_library.handler');
+            $handler = $this->get('codebender_library.apiHandler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
             $dir = json_decode($this->processZipDir('/tmp/lib'), true);
