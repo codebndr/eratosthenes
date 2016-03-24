@@ -670,6 +670,324 @@ class ApiHandler
         return $lastCommitResponse[0]['sha'];
     }
 
+    public function processGithubUrl($url)
+    {
+        $urlParts = parse_url($url);
+        /*
+         * If hostname is other than github.com, the url is invalid
+         */
+        if ($urlParts['host'] != 'github.com') {
+            return array('success' => false);
+        }
+
+        $path = $urlParts['path'];
+        if ($path == '') {
+            return array('success' => false);
+        }
+
+        $path = $this->cleanPrependingSlash($path);
+        $pathComponents = explode('/', $path);
+
+        $owner = $pathComponents[0]; // The first part of the path is always the author
+        $repo = $pathComponents[1]; // The next part of the path is always the repo name
+        $folder = str_replace("$owner/$repo", '', $path); // Return the rest of the path, if any
+
+        $folder = $this->cleanPrependingSlash($folder);
+
+        $branch = 'master';
+        if (preg_match("/tree\/(\w+)\//", $path, $matches)) {
+            $branch = $matches[1];
+            $folder = str_replace("tree/$branch", '', $folder);
+        }
+
+        $folder = $this->cleanPrependingSlash($folder);
+
+        return array('success' => true, 'owner' => $owner, 'repo' => $repo, 'branch' => $branch, 'folder' => $folder);
+    }
+
+    public function cleanPrependingSlash($path)
+    {
+        if (substr($path, 0, 1) == '/') {
+            $path = substr($path, 1);
+        }
+
+        return $path;
+    }
+
+    public function fetchRepoRefsFromGit($owner, $repo)
+    {
+        $url = "https://api.github.com/repos/$owner/$repo/git/refs/heads";
+
+        /*
+         * See the docs here https://developer.github.com/v3/git/refs/
+         * for more info on the json returned.
+         */
+        $gitResponse = $this->curlGitRequest($url);
+
+        if (array_key_exists('message', $gitResponse)) {
+            return array('success' => false, 'message' => $gitResponse['message']);
+        }
+
+        $headRefs = array();
+        foreach ($gitResponse as $ref) {
+            $headRefs[] = str_replace('refs/heads/', '', $ref['ref']);
+        }
+
+        return array('success' => true, 'headRefs' => $headRefs);
+    }
+
+    /**
+     * Fetch all releases from the Github repo
+     * @param $owner String
+     * @param $repo String
+     * @return array
+     */
+    public function fetchRepoReleasesFromGit($owner, $repo)
+    {
+        $url = "https://api.github.com/repos/$owner/$repo/releases";
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/releases/
+         * for more info on the json returned.
+         */
+        $gitResponse = $this->curlGitRequest($url);
+
+        if (array_key_exists('message', $gitResponse)) {
+            return array('success' => false, 'message' => $gitResponse['message']);
+        }
+
+        $releases = array();
+        foreach ($gitResponse as $release) {
+            $releases[] = [
+                'name' => $release['name'],
+                'tag' => $release['tag_name'],
+                'branch' => $release['target_commitish'],
+                'source' => $release['zipball_url']
+            ];
+        }
+
+        return array('success' => true, 'releases' => $releases);
+    }
+
+    /**
+     * Get a Github repo's tree structure
+     * @param $owner
+     * @param $repo
+     * @param $ref String could be a commit sha, a branch, or a tag
+     * @param $requestedFolder
+     * @return string
+     */
+    public function getRepoTreeStructure($owner, $repo, $ref, $requestedFolder)
+    {
+        $currentUrl = "https://api.github.com/repos/$owner/$repo/git/trees/$ref";
+
+        $queryParams = "?recursive=1";
+
+        /*
+         * See the docs here https://developer.github.com/v3/git/trees/
+         * for more info on the json returned.
+         */
+        $gitResponse = $this->curlGitRequest($currentUrl, $queryParams);
+
+        if (array_key_exists('message', $gitResponse)) {
+            return json_encode(array('success' => false, 'message' => $gitResponse['message']));
+        }
+        // TODO: Could try some recursive call to all tree nodes of the response, instead of just quitting
+        if ($gitResponse['truncated'] != false) {
+            return json_encode(array('success' => false, 'message' => 'Truncated data. Try using a subtree of the repo'));
+        }
+
+        $fileStructure = $this->createJsTreeStructure($gitResponse['tree'], $repo, '.', array('sha' => $gitResponse['sha'], 'type' => 'tree'));
+
+        $fileStructure = $this->findSelectedNode($repo . '/' . $requestedFolder, $fileStructure);
+
+        return json_encode(array('success' => true, 'files' => $fileStructure));
+    }
+
+    /**
+     * @param array $repoTree The tree of blobs and sub-trees returned from Github's API
+     * @param string $nodeName The name of the file tree node processed in the current iteration of the function
+     * @param string $path The root node of the file structure on each iteration of the function
+     * @param array $gitMeta The git metadata of the tree node processed in the current iteration
+     * @return array The file structure in a format that can be viewed by jsTree jQuery plugin
+     * @url for more info on jsTree, check this out https://www.jstree.com/
+     */
+    public function createJsTreeStructure($repoTree, $nodeName, $path, $gitMeta)
+    {
+        $fileStructure = array_merge(array('text' => $nodeName, 'icon' => 'fa fa-folder', 'children' => array()), $gitMeta);
+
+        /*
+         * Create two separate arrays, one containing the files found in the treee,
+         * and one containing the nodes (folders).
+         * Remember that files are listed as `blobs` and directories are listed as `trees`
+         * array_values is used to re-index the two arrays
+         */
+        $subtreeNodes = array_values(
+            array_filter(
+                $repoTree,
+                function ($element) {
+                    if ($element['type'] == 'tree') {
+                        return true;
+                    }
+                    return false;
+                }
+            )
+        );
+
+        $files = array_values(
+            array_filter(
+                $repoTree,
+                function ($element) {
+                    if ($element['type'] == 'blob') {
+                        return true;
+                    }
+                    return false;
+                }
+            )
+        );
+
+        foreach ($files as $file) {
+            if (pathinfo($file['path'], PATHINFO_DIRNAME) != $path) {
+                continue;
+            }
+            $fileStructure['children'][] = array_merge(
+                array('text' => pathinfo($file['path'], PATHINFO_BASENAME), 'icon' => 'fa fa-file', 'state' => array('disabled' => true)),
+                $file
+            );
+        }
+
+        foreach ($subtreeNodes as $directory) {
+            if (pathinfo($directory['path'], PATHINFO_DIRNAME) != $path) {
+                continue;
+            }
+            $treeUnderCurrentDir = $this->getTreeUnderProvidedDirectory($repoTree, $directory['path']);
+            $result = $this->createJsTreeStructure($treeUnderCurrentDir, pathinfo($directory['path'], PATHINFO_BASENAME), $directory['path'], $directory);
+            $fileStructure['children'][] = $result;
+        }
+
+        /*
+         * If any headers exist among the children of a node,
+         * they should be listed as possible machine names of the library,
+         * in case this node is the root directory of a library
+         */
+        $fileStructure['machineNames'] = $this->getMachineNamesFromChildren($fileStructure['children']);
+
+        return  $fileStructure;
+    }
+
+    /**
+     * Returns the description of a Github repository
+     *
+     * @param string $owner The owner of the repository
+     * @param string $repo The repository name
+     * @return string The description of the repo, if any
+     */
+    public function getRepoDefaultDescription($owner, $repo)
+    {
+        $url = "https://api.github.com/repos/$owner/$repo";
+
+        /*
+         * See the docs here https://developer.github.com/v3/repos/
+         * for more info on the json returned.
+         */
+        $gitResponse = $this->curlGitRequest($url);
+
+        if (!array_key_exists('description', $gitResponse)) {
+            return '';
+        }
+
+        return $gitResponse['description'];
+    }
+
+    /**
+     * Returns the blobs and trees of a provided tree that belong to
+     * a specific directory.
+     * Uses a regular expression in order to strictly check if the
+     * provided directory is the beginning of each of the tree elements.
+     *
+     * @param array $initialTree
+     * @param string $directory
+     * @return array
+     */
+    private function getTreeUnderProvidedDirectory($initialTree, $directory)
+    {
+        $subtree = array();
+
+        foreach ($initialTree as $element) {
+            if (!preg_match('/^' . preg_quote($directory, '/') . '/', pathinfo($element['path'], PATHINFO_DIRNAME))) {
+                continue;
+            }
+
+            $subtree[] = $element;
+        }
+        return $subtree;
+    }
+
+    /**
+     * Detects header files within the provided array and
+     * returns a list containing the names of these files.
+     *
+     * @param array $children
+     * @return array
+     */
+    private function getMachineNamesFromChildren($children)
+    {
+        $machineNames = array();
+
+        foreach ($children as $child) {
+            if ($child['type'] == 'blob' && pathinfo($child['path'], PATHINFO_EXTENSION) == 'h') {
+                $machineNames[] = pathinfo($child['path'], PATHINFO_FILENAME);
+            }
+        }
+
+        return $machineNames;
+    }
+
+    /**
+     * Iterates over a generated JS-tree structure and finds the selected node (and
+     * its selected sub-nodes and so on) based on the provided path. Each node can either
+     * be of type `blob` (file) or type `tree` (directory).
+     * The method will recursively be called until all the nodes of the path are marked as
+     * `selected`.
+     *
+     * @param string $path
+     * @param array $files
+     * @return array
+     */
+    private function findSelectedNode($path, $files)
+    {
+        // Remove trailing slashes
+        $path = rtrim($path, '/');
+        // Then split the provided path in slashes
+        $path = explode('/', $path);
+
+        $files['state'] = ['opened' => true];
+        if (count($path) == 1) {
+            $files['state'] += ['selected' => true];
+            return $files;
+        }
+
+        // Since the current node ($path[0]) is marked as selected, remove it from the path
+        // and call the method again providing the rest of the path
+        unset($path[0]);
+        $path = array_values($path);
+        if (count($path) == 0) {
+            // Getting here means we've reached the final selection node in the tree structure
+            return $files;
+        }
+
+        // Find the next directory node that mathes the provided path, repeat the process,
+        // marking its sub-nodes as selected.
+        foreach ($files['children'] as $key => $childNode) {
+            if ($childNode['type'] == 'tree' && array_key_exists('children', $childNode) && $childNode['text'] == $path[0]) {
+                $files['children'][$key] = $this->findSelectedNode(implode('/', $path), $childNode);
+                break;
+            }
+        }
+
+        return $files;
+    }
+
     private function curlRequest($url, $post_request_data = null, $http_header = null)
     {
         $curl_req = curl_init();

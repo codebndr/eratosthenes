@@ -167,7 +167,7 @@ class ApiViewsController extends Controller
             return new JsonResponse(['success' => false, 'message' => 'POST method required']);
         }
 
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.apiHandler');
 
         $githubUrl = $this->getRequest()->request->get('githubUrl');
         $processedGitUrl = $handler->processGithubUrl($githubUrl);
@@ -191,7 +191,7 @@ class ApiViewsController extends Controller
 
     public function getRepoGitTreeAndMetaAction()
     {
-        $handler = $this->get('codebender_library.handler');
+        $handler = $this->get('codebender_library.apiHandler');
 
         $githubUrl = $this->getRequest()->request->get('githubUrl');
         $processedGitUrl = $handler->processGithubUrl($githubUrl);
