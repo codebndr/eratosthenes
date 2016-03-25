@@ -2,32 +2,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-{% include 'CodebenderLibraryBundle:Default:includes.html.twig' %}
-
-
-    <title></title>
-    <script>
-        $(function() {
-            $( "#filesAccordion" ).accordion({
-                collapsible: true,
-                active: false,
-                heightStyle: "content"
-            });
-            $( "#examplesAccordion").accordion({
-                collapsible: true,
-                active: false,
-                heightStyle: "content"
-            });
-        });
-    </script>
+{% include 'CodebenderLibraryBundle:V2:includes.html.twig' %}
+    {% if meta.name is defined %}
+        <title>{{ meta.name }}</title>
+    {% else %}
+        <title>{{ library }}</title>
+    {% endif %}
 </head>
 <body>
 <div class="container-fluid">
     <div class="span1"></div>
     <div class="span10"></div>
         <div style="text-align: left;">
-            {% if meta.humanName is defined %}
-                <h2>{{ meta.humanName }}</h2>
+            {% if meta.name is defined %}
+                <h2>{{ meta.name }}</h2>
             {% else %}
                 <h2>{{ library }}</h2>
             {% endif %}
@@ -51,14 +39,25 @@
                     {% endif %}
                     <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Github repo hosting the library code">Github Repository</a>
                 {% elseif meta.url and meta.url != '' %}
-                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.humanName }} is hosted here</a>
+                    <a class="btn btn-primary" target="_blank" href = "{{ meta.url }}" title="Reference page of the library">{{ meta.name }} is hosted here</a>
                 {% endif %}
-                {% if meta.sourceUrl and meta.sourceUrl != '' %}
-                    <a class="btn btn-primary" target="_blank" href = "{{ meta.sourceUrl }}" title="The original source code of the library">{{ meta.humanName }} source code</a>
+                {% if versions %}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Download from <strong>Eratosthenes</strong> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for version in versions %}
+                                {% set download_hash = { 'version' : (version), 'defaultHeaderFile' : (library),  'authorizationKey': (authorizationKey) } %}
+                                <li><a href="{{ path('codebender_library_download_v2', download_hash) }}">Version - {{ version }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
+                    <a id="download" class="btn btn-success" target="_blank"
+                       href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
                 {% endif %}
-                {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
-                <a id="download" class="btn btn-success" target="_blank"
-                   href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
                 <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
                     {% if inSyncWithGit == true %}
@@ -91,51 +90,16 @@
                 </div>
             {% endif %}
         {% endif %}
+        {% if versions %}
+            <h3>Library Files</h3>
+            <p>Showing {{ versions|length }} version(s).</p>
+        {% endif %}
         <div>
-            <h3>Files:</h3>
-
-            <div class="accordion" id="files_accordion">
-                {% set get_example_hash = { 'authorizationKey':   (authorizationKey)  , 'version': 'v1' } %}
-                {% for file in files %}
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}">
-                            {{ file.filename }} <label class = 'icon-chevron-down'></label>
-                        </a>
-                        {#TODO make it work for multifiled examples#}
-                    </div>
-                    <div id="files_collapse{{ loop.index }}" class="accordion-body collapse">
-                        <div class="accordion-inner">
-                            <pre>{{ file.content }}</pre>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            {% set exampleCount = examples | length %}
-            <h3>Examples ({{ exampleCount }} found): </h3>
-            <div class="accordion" id="examples_accordion">
-                {% if exampleCount == 0 %}
-                    <h2><small>The library contains no examples.</small></h2>
-                {% else %}
-                    {% for file in examples %}
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" style="display:inline" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}">
-                                    {{ file.filename }} <label class = 'icon-chevron-down'></label>
-                                </a>
-                            </div>
-                            {#TODO make it work for multifiled examples#}
-                            <div id="examples_collapse{{ loop.index }}" class="accordion-body collapse">
-                                <div class="accordion-inner">
-                                    <pre>{{ file.content }}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
+            {% if versions %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
+            {% else %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
+            {% endif %}
         </div>
     <div class="span1"></div>
 </div>
@@ -144,11 +108,10 @@
 
     function changeLibraryStatus(library)
     {
-        var route = "{{ path('codebender_library_status_change', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
+        var route = "{{ path('codebender_library_status_change_v2', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
         $.post( route.replace("LIBRARYNAME", library) )
             .done(function( data ) {
-                var response = jQuery.parseJSON(data);
-                if(response.success)
+                if(data.success)
                 {
                     $("#statusbutton").toggleClass("btn-success");
                     $("#statusbutton").toggleClass("btn-danger");
@@ -162,7 +125,6 @@
                     }
 
                 }
-                console.log(data);
             });
     }
 
