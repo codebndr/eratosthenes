@@ -52,6 +52,7 @@
                 if (data.success) {
                     // header file name collision
                     // ask for user option
+                    $('#modalMessage').html('The header file name "<strong>' + name + '</strong>" of this library already exists in our system.');
                     $('#myModal').modal('show');
                     $('#modal-button-ok').click(function() {
                         $('#myModal').modal('hide');
