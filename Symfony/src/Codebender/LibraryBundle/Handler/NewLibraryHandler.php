@@ -442,13 +442,6 @@ class NewLibraryHandler
         }
     }
 
-    private function editEntity($lib)
-    {
-        $old = $this->getLibrary($lib->getDefaultHeader());
-        $this->entityManager->remove($old);
-        $this->saveEntities(array($lib));
-    }
-
     /**
      * Make folder name based on the number of libraries with the same name.
      * @param $name header name
