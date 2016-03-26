@@ -45,6 +45,30 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     }
 
     /**
+     * This method toggles the active status of a library.
+     *
+     * @param $defaultHeader
+     */
+    public function toggleLibraryStatus($defaultHeader)
+    {
+        $entityManager = $this->entityManager;
+        $library = $entityManager
+            ->getRepository('CodebenderLibraryBundle:Library')
+            ->findBy(array('default_header' => $defaultHeader));
+
+        // Do nothing if the library does not exist
+        if (count($library) < 1) {
+            return;
+        }
+
+        $library = $library[0];
+        $currentStatus = $library->getActive();
+        $library->setActive(!$currentStatus);
+        $entityManager->persist($library);
+        $entityManager->flush();
+    }
+
+    /**
      * This method checks if a given library is updated or not.
      *
      * @param $library
@@ -52,15 +76,13 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
      */
     private function isUpdated($library)
     {
-        $apiHandler = $this->get('codebender_library.apiHandler');
-        $metaData = $library->getLibraryMeta();
-        return $apiHandler->isLibraryInSyncWithGit(
-            $metaData['gitOwner'],
-            $metaData['gitRepo'],
-            $metaData['gitBranch'],
-            $metaData['gitInRepoPath'],
-            $metaData['gitLastCommit']
-        );
+        $gitOwner = $library->getOwner();
+        $gitRepo = $library->getRepo();
+        $branch = (string)$library->getBranch(); // not providing any branch will make git return the commits of the default branch
+        $directoryInRepo = (string)$library->getInRepoPath();
+
+        $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
+        return $lastCommitFromGithub === $library->getLastCommit();
     }
 
     /**
@@ -102,6 +124,100 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
     {
         $gitOwner = $library->getOwner();
         $gitRepo = $library->getRepo();
-        return !is_null($gitOwner) && !is_null($gitRepo);
+        return ($gitOwner !== null && $gitRepo !== null);
+    }
+
+    /**
+     * Fetches the last commit sha of a repo. `sha` parameter can either be the name of a branch, or a commit
+     * sha. In the first case, the commit sha's of the branch are returned. In the second case, the commit sha's
+     * of the default branch are returned, as long as the have been written after the provided commit.
+     * Not providing any sha/branch will make Git API return the list of commits for the default branch.
+     * The API can also use a path parameter, in which case only commits that affect a specific directory are returned.
+     *
+     * @param $gitOwner
+     * @param $gitRepo
+     * @param string $sha
+     * @param string $path
+     * @return mixed
+     */
+    private function getLastCommitFromGithub($gitOwner, $gitRepo, $sha = '', $path = '')
+    {
+        /*
+         * See the docs here https://developer.github.com/v3/repos/commits/
+         * for more info on the json returned.
+         */
+        $url = "https://api.github.com/repos/" . $gitOwner . "/" . $gitRepo . "/commits";
+        $queryParams = '';
+        if ($sha != '') {
+            $queryParams = "?sha=" . $sha;
+        }
+        if ($path != '') {
+            $queryParams .= "&path=$path";
+        }
+
+        $lastCommitResponse = $this->curlGitRequest($url, $queryParams);
+
+        return $lastCommitResponse[0]['sha'];
+    }
+
+    private function curlRequest($url, $post_request_data = null, $http_header = null)
+    {
+        $curl_req = curl_init();
+        curl_setopt_array($curl_req, array(
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ));
+        if ($post_request_data !== null) {
+            curl_setopt($curl_req, CURLOPT_POSTFIELDS, $post_request_data);
+        }
+
+        if ($http_header !== null) {
+            curl_setopt($curl_req, CURLOPT_HTTPHEADER, $http_header);
+        }
+
+        $contents = curl_exec($curl_req);
+
+        curl_close($curl_req);
+        return $contents;
+    }
+
+    /**
+     * A wrapper for the curlRequest function which adds Github authentication
+     * to the Github API request
+     * Returns the json decoded Github response.
+     *
+     * @param string $url The requested url
+     * @param string $queryParams Additional query parameters to be added to the request url
+     * @return mixed
+     */
+    private function curlGitRequest($url, $queryParams = '')
+    {
+        $clientId = $this->container->getParameter('github_app_client_id');
+        $clientSecret = $this->container->getParameter('github_app_client_secret');
+        $githubAppName = $this->container->getParameter('github_app_name');
+
+        $requestUrl = $url . "?client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        if ($queryParams != '') {
+            $requestUrl = $url . $queryParams . "&client_id=" . $clientId . "&client_secret=" . $clientSecret;
+        }
+        /*
+         * Note: The user-agent MUST be set to a valid value, otherwise the request will be rejected. One of the
+         * suggested values is the application name.
+         * One more thing that must be set on the headers, is the version of the API, which will offer stability
+         * to the application, in case of future Github API updates.
+         */
+        $jsonDecodedContent = json_decode(
+            $this->curlRequest(
+                $requestUrl,
+                null,
+                ['User-Agent: ' . $githubAppName, 'Accept: application/vnd.github.v3.json']
+            ),
+            true
+        );
+
+        return $jsonDecodedContent;
     }
 }
