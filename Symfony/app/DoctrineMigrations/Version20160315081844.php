@@ -10,7 +10,7 @@ use Codebender\LibraryBundle\Entity\LibraryExample;
 use Codebender\LibraryBundle\Entity\Partner;
 use Codebender\LibraryBundle\Entity\Preference;
 use Codebender\LibraryBundle\Entity\Version;
-use Codebender\LibraryBundle\Handler\DefaultHandler;
+use Codebender\LibraryBundle\Handler\ApiHandler;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
@@ -155,8 +155,8 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
             $version->setFolderName($builtInVersion);
             $version->addArchitecture($avrArchitecture);
 
-            /* @var DefaultHandler $handler */
-            $handler = $this->container->get('codebender_library.handler');
+            /* @var ApiHandler $handler */
+            $handler = $this->container->get('codebender_library.apiHandler');
             $examples = $handler->fetchLibraryExamples(new Finder(), $builtInLibrary->getPathname());
             foreach ($examples as $example) {
                 $libraryExample = new LibraryExample();
