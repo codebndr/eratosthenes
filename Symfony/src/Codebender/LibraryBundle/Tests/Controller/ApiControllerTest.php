@@ -136,7 +136,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Version 1.0.0 of library named noSuchLib not found.', $response['message']);
+        $this->assertEquals('Couldn\'t find version 1.0.0 of library noSuchLib.', $response['message']);
 
         $client = $this->postApiRequest(
             $client,
@@ -145,7 +145,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Version 9.9.9 of library named default not found.', $response['message']);
+        $this->assertEquals('Couldn\'t find version 9.9.9 of library default.', $response['message']);
 
         // unsupported library
         $client = $this->postApiRequest(
@@ -254,7 +254,6 @@ class ApiControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals('Requested version for library MultiIno not found', $response['message']);
-
     }
 
     /**

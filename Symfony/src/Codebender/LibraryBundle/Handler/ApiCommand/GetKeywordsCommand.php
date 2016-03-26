@@ -35,7 +35,7 @@ class GetKeywordsCommand extends AbstractApiCommand
         $version = $content['version'];
 
         if (!$this->apiHandler->libraryVersionExists($defaultHeader, $version)) {
-            return ['success' => false, 'message' => 'Version ' .$version. ' of library named ' .$defaultHeader. ' not found.'];
+            return ['success' => false, 'message' => "Couldn't find version $version of library $defaultHeader."];
         }
 
         $libraryType = $this->apiHandler->getLibraryType($defaultHeader);
@@ -58,7 +58,7 @@ class GetKeywordsCommand extends AbstractApiCommand
      */
     private function isValidContent($content)
     {
-        return array_key_exists("library", $content);
+        return array_key_exists('library', $content);
     }
 
     /**
@@ -114,7 +114,7 @@ class GetKeywordsCommand extends AbstractApiCommand
 
         $finder = new Finder();
         $finder->in($path);
-        $finder->name('/keywords\.txt/i');
+        $finder->name('/^keywords\.txt$/i');
 
         foreach ($finder as $file) {
             $content = (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents();
