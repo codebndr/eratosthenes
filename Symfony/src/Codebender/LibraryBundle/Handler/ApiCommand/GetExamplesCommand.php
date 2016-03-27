@@ -73,28 +73,27 @@ class GetExamplesCommand extends AbstractApiCommand
 
         foreach ($inoFinder as $example) {
             $files = array();
-
-            $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
+            $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), 'UTF-8') : $example->getContents();
             $pathInfo = pathinfo($example->getBaseName());
             $files[] = array(
-                "filename" => $pathInfo['filename'] . '.ino',
-                "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content
+                'filename' => $pathInfo['filename'] . '.ino',
+                'content' => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, 'UTF-8') : $content
             );
 
             // get non-ino files
-            $notInoFilesFinder->in($path . "/" . $example->getRelativePath());
+            $notInoFilesFinder->in($path . '/' . $example->getRelativePath());
 
             foreach ($notInoFilesFinder as $nonInoFile) {
                 $files[] = array(
-                    "filename" => $nonInoFile->getBaseName(),
-                    "content" => (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), "UTF-8") : $nonInoFile->getContents()
+                    'filename' => $nonInoFile->getBaseName(),
+                    'content' => (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), 'UTF-8') : $nonInoFile->getContents()
                 );
             }
 
             $dir = preg_replace('/[E|e]xamples\//', '', $example->getRelativePath());
             $dir = str_replace($pathInfo['filename'], '', $dir);
             $dir = str_replace('/', ':', $dir);
-            if ($dir != '' && substr($dir, -1) != ':') {
+            if ($dir !== '' && substr($dir, -1) !== ':') {
                 $dir .= ':';
             }
 

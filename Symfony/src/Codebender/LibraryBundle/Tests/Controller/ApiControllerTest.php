@@ -270,7 +270,6 @@ class ApiControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals('Requested version for library MultiIno not found', $response['message']);
-
     }
 
     /**
