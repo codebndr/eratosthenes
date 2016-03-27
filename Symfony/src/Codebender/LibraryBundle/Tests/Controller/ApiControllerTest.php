@@ -458,6 +458,35 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('assembly_file.S', $filenames);
     }
 
+    public function testFetchApiCommandWithoutLibrary()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertFalse($response['success']);
+        $this->assertEquals('You need to specify which library to fetch.', $response['message']);
+    }
+
+    public function testFetchApiCommandWithReservedName()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch", "library": "ArduinoRobot"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $filenames = array_column($response['files'], 'filename');
+        $this->assertContains('Wire.cpp', $filenames);
+        $this->assertContains('Adafruit_GFX.cpp', $filenames);
+        $this->assertContains('EasyTransfer2.cpp', $filenames);
+    }
+
     public function testFetchApiCommandWithoutVersion()
     {
         $client = static::createClient();
@@ -476,6 +505,18 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testFetchApiCommandWithWrongVersion()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default", "version":"1.0.1"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertFalse($response['success']);
+        $this->assertEquals('No files for Library named `default` with version `1.0.1` found.', $response['message']);
     }
 
     public function testFetchLatestApiCommand()
