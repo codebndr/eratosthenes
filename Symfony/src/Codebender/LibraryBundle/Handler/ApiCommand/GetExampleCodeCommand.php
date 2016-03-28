@@ -15,13 +15,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
         }
         $library = $content['library'];
         $example = $content['example'];
-
-        // TODO: use a default version if version is not given in the request
-        $version = '';
-        if (array_key_exists('version', $content)) {
-            $version = $content['version'];
-        }
-
+        
         /* @var ApiHandler $handler */
         $handler = $this->get('codebender_library.apiHandler');
 
@@ -30,14 +24,24 @@ class GetExampleCodeCommand extends AbstractApiCommand
             return ['success' => false, 'message' => "Requested library named $library not found"];
         }
 
+        $version = '';
+        // for external library, fetch default version for partner
+        if ($type === 'external') {
+            $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
+        }
+
+        // use specific requested version if any
+        if (array_key_exists('version', $content)) {
+            $version = $content['version']; // use specific requested version if any
+        }
+
         if ($type === 'external' && !$handler->libraryVersionExists($library, $version)) {
             return ['success' => false, 'message' => 'Requested library (version) does not exist'];
         }
 
         switch ($type) {
             case 'builtin':
-                $dir = $handler->getBuiltInLibraryPath($library);
-                $example = $this->getExampleCodeFromDir($dir, $example);
+                $example = $this->getExternalExampleCode($library, $version, $example);
                 break;
             case 'external':
                 $example = $this->getExternalExampleCode($library, $version, $example);
@@ -68,7 +72,6 @@ class GetExampleCodeCommand extends AbstractApiCommand
         if (count($exampleMeta) === 0) {
             $example = str_replace(':', '/', $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-
             $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $filename);
 
             if (count($exampleMeta) > 1) {

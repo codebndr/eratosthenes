@@ -30,6 +30,7 @@ class NewLibraryFormV2 extends AbstractType{
                     'multiple' => true
                 )
             )
+            ->add('IsLatestVersion', 'checkbox', array('label' => 'Latest Version?', 'required' => false))
             ->add('Url', 'text', array('label' => 'Info Url: ', 'required' => false, 'attr' => array('placeholder' => 'The url where you can find info about the library')))
             ->add('SourceUrl', 'text', array('label' => 'Source Url: ', 'required' => false, 'attr' => array('placeholder' => 'A link to the actual code of the library (i.e. zip, etc)')))
             ->add('Go', 'submit', array('attr' => array('class' => 'btn')));

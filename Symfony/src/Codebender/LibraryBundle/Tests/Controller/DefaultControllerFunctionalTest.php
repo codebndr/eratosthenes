@@ -62,14 +62,15 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $basicExamples = $categories['Examples']['01.Basics']['examples'];
 
-        $this->assertArrayNotHasKey('url', $categories['External Libraries']['MultiIno']);
-        $this->assertArrayHasKey('url', $categories['External Libraries']['DynamicArrayHelper']);
+        $this->assertArrayHasKey('url', $categories['External Libraries']['MultiIno']);
+        $this->assertArrayHasKey('url', $categories['External Libraries']['default']);
 
         // Check for a specific, known example
         $foundExample = array_filter($basicExamples, function($element) {
             if ($element['name'] == 'AnalogReadSerial') {
                 return true;
             }
+            return false;
         });
 
         $foundExample = array_values($foundExample);
@@ -99,7 +100,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertContains('hpp_file.hpp', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
 
-        $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files/default');
+        $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files_new/default/1.1.0');
 
         $contents = array_column($response['files'], 'content');
 
@@ -118,13 +119,13 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExampleCode","library":"EEPROM","example":"eeprom_read"}'
+            '{"type":"getExampleCode","library":"default","example":"example_one"}'
         );
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertTrue($response['success']);
-        $this->assertEquals('eeprom_read.ino', $response['files'][0]['filename']);
+        $this->assertEquals('example_one.ino', $response['files'][0]['filename']);
         $this->assertContains('void setup()', $response['files'][0]['code']);
     }
 
@@ -134,14 +135,14 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
 
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"EEPROM"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getExamples","library":"SubCateg"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertTrue($response['success']);
-        $this->assertArrayHasKey('eeprom_clear', $response['examples']);
-        $this->assertArrayHasKey('eeprom_read', $response['examples']);
-        $this->assertArrayHasKey('eeprom_write', $response['examples']);
+        $this->assertArrayHasKey('subcateg_example_one', $response['examples']);
+        $this->assertArrayHasKey('experienceBased:Beginners:subcateg_example_two', $response['examples']);
+        $this->assertArrayHasKey('experienceBased:Advanced:Experts:subcateg_example_three', $response['examples']);
     }
 
     public function testFetchLibrary()
@@ -184,7 +185,8 @@ class DefaultControllerFunctionalTest extends WebTestCase
         /*
          * Disabling the library should make it not be returned in the list.
          */
-        $client->request('POST', '/' . $authorizationKey . '/toggleStatus/DynamicArrayHelper');
+        $handler = $this->getService('codebender_library.apiHandler');
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
 
         $response = json_decode($client->getResponse()->getContent(), true);
@@ -192,6 +194,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertTrue($response['success']);
         $this->assertEquals('No external libraries need to be updated', $response['message']);
 
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
     }
 
     public function testGetKeywords()
@@ -283,7 +286,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries') . '/Encode/';
+        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries_new') . '/Encode/1.0.0/';
         $headerFile = file_get_contents($encodeLibraryPath . 'Encode.h');
         $exampleFile = file_get_contents($encodeLibraryPath . 'examples/encoded_example/encoded_example.ino');
         $malformedJson = json_encode(['header' => $headerFile, 'example' => $exampleFile]);
@@ -394,4 +397,18 @@ class DefaultControllerFunctionalTest extends WebTestCase
         return $client;
     }
 
+    /**
+     * This method returns a given service from its name.
+     *
+     * @param $service
+     * @return the requested service
+     */
+    private function getService($service)
+    {
+        $kernel = static::createKernel();
+        $kernel->boot();
+
+        $container = $kernel->getContainer();
+        return $container->get($service);
+    }
 }
