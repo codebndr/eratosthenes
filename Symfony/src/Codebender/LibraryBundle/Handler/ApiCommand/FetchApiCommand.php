@@ -16,12 +16,12 @@ class FetchApiCommand extends AbstractApiCommand
         }
 
         $content = $this->setDefault($content);
+        $filename = $content['library'];
 
-        $last_slash = strrpos($content['library'], "/");
+        $last_slash = strrpos($filename, "/");
         if ($last_slash !== false) {
-            $content['library'] = substr($content['library'], $last_slash + 1);
+            $filename = substr($filename, $last_slash + 1);
         }
-
 
         $this->apiHandler = $this->container->get('codebender_library.apiHandler');
 
@@ -29,7 +29,6 @@ class FetchApiCommand extends AbstractApiCommand
 
         $finder = new Finder();
         $exampleFinder = new Finder();
-
 
         //TODO handle the case of different .h filenames and folder names
         $RESERVED_NAMES = ["ArduinoRobot" => "Robot_Control", "ArduinoRobotMotorBoard" => "Robot_Motor",
