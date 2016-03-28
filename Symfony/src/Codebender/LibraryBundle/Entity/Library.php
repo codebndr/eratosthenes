@@ -546,7 +546,8 @@ class Library
             'gitBranch' => $this->getBranch(),
             'gitLastCommit' => $this->getLastCommit(),
             'gitInRepoPath' => $this->getInRepoPath(),
-            'libraryNotes' => $this->getNotes()
+            'libraryNotes' => $this->getNotes(),
+            'isBuiltIn' => $this->isBuiltIn()
         );
     }
 }
