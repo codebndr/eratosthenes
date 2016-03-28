@@ -122,10 +122,15 @@ class Library
     private $versions;
 
     /**
+     * @ORM\Column(name="is_built_in", type="boolean")
+     */
+    private $is_built_in = false;
+
+    /**
      * @var integer
      *
      * @ORM\OneToOne(targetEntity="Version")
-     * @ORM\JoinColumn(name="latest_version", referencedColumnName="id", nullable = false)
+     * @ORM\JoinColumn(name="latest_version_id", referencedColumnName="id", nullable = false)
      */
     private $latest_version;
 
@@ -502,6 +507,28 @@ class Library
     }
 
     /**
+     * Check whether it is built in
+     *
+     * @return boolean
+     */
+    public function isBuiltIn()
+    {
+        return $this->is_built_in;
+    }
+
+    /**
+     * Set whether it is built in
+     *
+     * @return Library
+     */
+    public function setIsBuiltIn($is_built_in)
+    {
+        $this->is_built_in = $is_built_in;
+
+        return $this;
+    }
+
+    /**
      * Get the metadata of the library
      *
      * @return array
@@ -519,7 +546,8 @@ class Library
             'gitBranch' => $this->getBranch(),
             'gitLastCommit' => $this->getLastCommit(),
             'gitInRepoPath' => $this->getInRepoPath(),
-            'libraryNotes' => $this->getNotes()
+            'libraryNotes' => $this->getNotes(),
+            'isBuiltIn' => $this->isBuiltIn()
         );
     }
 }

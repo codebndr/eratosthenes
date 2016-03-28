@@ -32,11 +32,7 @@ class GetKeywordsCommand extends AbstractApiCommand
         $defaultHeader = $content['library'];
         
         $libraryType = $this->apiHandler->getLibraryType($defaultHeader);
-        if ($libraryType === 'example' || $libraryType === 'unknown') {
-            return ['success' => false, 'message' => 'Could not find keywords for requested library version.'];
-        }
-
-        if ($libraryType === 'external') {
+        if ($libraryType === 'external' || $libraryType === 'builtin') {
             $version = $this->getRequestedVersions($content);
 
             if (!$this->apiHandler->libraryVersionExists($defaultHeader, $version)) {
@@ -44,10 +40,8 @@ class GetKeywordsCommand extends AbstractApiCommand
             }
 
             $keywords = $this->getExternalLibraryKeywords($defaultHeader, $version);
-        }
-
-        if ($libraryType === 'builtin') {
-            $keywords = $this->getBuiltInLibraryKeywords($defaultHeader);
+        } else {
+            return ['success' => false, 'message' => 'Could not find keywords for requested library.'];
         }
 
         return ['success' => true, 'keywords' => $keywords];
@@ -92,20 +86,6 @@ class GetKeywordsCommand extends AbstractApiCommand
     private function getExternalLibraryKeywords($defaultHeader, $version)
     {
         $path = $this->apiHandler->getExternalLibraryPath($defaultHeader, $version);
-        $keywords = $this->getKeywordsFromFile($path);
-        return $keywords;
-    }
-
-    /**
-     * This method returns an array of keywords from a given built-in library
-     * specified by its $defaultHeader.
-     *
-     * @param $defaultHeader
-     * @return array
-     */
-    private function getBuiltInLibraryKeywords($defaultHeader)
-    {
-        $path = $this->apiHandler->getBuiltInLibraryPath($defaultHeader);
         $keywords = $this->getKeywordsFromFile($path);
         return $keywords;
     }
