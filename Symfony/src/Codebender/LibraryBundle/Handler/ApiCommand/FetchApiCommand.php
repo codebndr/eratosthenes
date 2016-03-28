@@ -139,7 +139,7 @@ class FetchApiCommand extends AbstractApiCommand
                 $meta = $externalLibrary->getLibraryMeta();
                 $versions = array_map(
                     function ($version) {
-                        return $version->getVersion();
+                        return $version->getVersionMeta();
                     },
                     $versions
                 );
