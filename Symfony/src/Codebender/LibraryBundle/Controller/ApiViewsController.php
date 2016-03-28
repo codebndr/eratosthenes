@@ -161,6 +161,29 @@ class ApiViewsController extends Controller
         return new JsonResponse(['success' => true]);
     }
 
+    /**
+     * Try get the library meta from the system
+     *
+     * @param $library
+     * @return JsonResponse
+     */
+    public function getLibraryMetaAction($library) {
+        if ($this->getRequest()->getMethod() != 'POST') {
+            return new JsonResponse(['success' => false, 'message' => 'POST method required']);
+        }
+
+        $apiHandler = $this->get('codebender_library.apiHandler');
+        $exists = $apiHandler->isExternalLibrary($library, true);
+
+        if (!$exists) {
+            return new JsonResponse(['success' => false, 'message' => 'Library not found.']);
+        }
+
+        $lib = $apiHandler->getLibraryFromDefaultHeader($library);
+
+        return new JsonResponse(['success' => true, 'meta' => $lib->getLibraryMeta()]);
+    }
+
     public function getLibraryGitInfoAction()
     {
         if ($this->getRequest()->getMethod() != 'POST') {
