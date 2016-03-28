@@ -115,15 +115,6 @@ class NewLibraryHandler
             return array('success' => false, 'message' => $creationResponse['message']);
         }
 
-        $lib = $creationResponse["lib"];
-        $version = $creationResponse["version"];
-
-        $this->saveEntities([$version, $lib]);
-        $this->saveExamples($data, $lib, $version);
-
-        // flush all changes if nothing goes wrong
-        $this->entityManager->flush();
-
         return array('success' => true);
     }
 
@@ -219,8 +210,6 @@ class NewLibraryHandler
             return $create;
         }
 
-//        $this->saveEntities(array($lib));
-
         return ["success" => true, "lib" => $lib];
     }
 
@@ -260,19 +249,24 @@ class NewLibraryHandler
             $lib->setLatestVersion($version);
         }
 
-        $this->saveEntities(array($lib, $version));
-        $this->saveArchitecturesForVersion($version, $data['Architectures']);
-        $this->saveExamples($data, $lib, $version);
+        $version = $this->saveArchitecturesForVersion($version, $data['Architectures']);
+        $examples = $this->makeExamples($data, $lib, $version);
+
+        $this->saveEntities([$version, $lib]);
+        $this->saveEntities($examples);
+
+        $this->entityManager->flush();
 
         return ["success" => true, "lib" => $lib, "version" => $version];
     }
 
     /**
      * @param $data
-     * @param $lib Library
-     * @param $version Version
+     * @param $lib
+     * @param $version
+     * @return array
      */
-    private function saveExamples($data, $lib, $version)
+    private function makeExamples($data, $lib, $version)
     {
         $handler = $this->container->get('codebender_library.apiHandler');
 
@@ -280,10 +274,13 @@ class NewLibraryHandler
         $versionPath = $externalLibrariesPath . '/' . $lib->getFolderName() . '/' . $version->getFolderName();
         $examples = $handler->fetchLibraryExamples(new Finder(), $versionPath);
 
+        $exampleMetas = [];
         foreach ($examples as $example) {
             $path_parts = pathinfo($example['filename']);
-            $this->saveExampleMeta($path_parts['filename'], $version, $example['filename'], null);
+            $exampleMetas[] = $this->makeExampleMeta($path_parts['filename'], $version, $example['filename'], null);
         }
+
+        return $exampleMetas;
     }
 
     private function createLibraryDirectory($folderName, $libraryStructure)
@@ -327,7 +324,7 @@ class NewLibraryHandler
         return json_encode(array('success' => true));
     }
 
-    private function saveExampleMeta($name, $version, $path, $boards)
+    private function makeExampleMeta($name, $version, $path, $boards)
     {
         //TODO make it better. You know, return things and shit
         $example = new LibraryExample();
@@ -336,7 +333,7 @@ class NewLibraryHandler
         $example->setPath($path);
         $example->setBoards($boards);
 
-        $this->saveEntities(array($example));
+        return $example;
     }
 
 
@@ -446,18 +443,18 @@ class NewLibraryHandler
 
     /**
      * Save each supported architecture to the given version
-     * @param $version
+     * @param Version $version
      * @param $architectures
+     * @return Version
      */
-    private function saveArchitecturesForVersion($version, $architectures)
+    private function saveArchitecturesForVersion(Version $version, $architectures)
     {
-        if ($architectures->isEmpty()) {
-            return;
+        if (!$architectures->isEmpty()) {
+            foreach ($architectures as $architecture) {
+                $version->addArchitecture($architecture);
+            }
         }
-        foreach ($architectures as $architecture) {
-            $version->addArchitecture($architecture);
-        }
-        $this->saveEntities([$version]);
+        return $version;
     }
 
     /**
