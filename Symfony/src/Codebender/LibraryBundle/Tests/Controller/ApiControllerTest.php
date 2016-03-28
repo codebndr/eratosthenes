@@ -482,7 +482,8 @@ class ApiControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
-        $filenames = array_column($response['files'], 'filename');
+        $this->assertArrayHasKey('default', $response['files']);
+        $filenames = array_column($response['files']['default'], 'filename');
         $this->assertContains('Wire.cpp', $filenames);
         $this->assertContains('Adafruit_GFX.cpp', $filenames);
         $this->assertContains('EasyTransfer2.cpp', $filenames);
