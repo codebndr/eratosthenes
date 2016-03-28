@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-{% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
+{% include 'CodebenderLibraryBundle:V2:includes.html.twig' %}
     {% if meta.name is defined %}
         <title>{{ meta.name }}</title>
     {% else %}
@@ -26,12 +26,15 @@
                 {% else %}
                     <span class="label label-warning" title="Not Verified. Use at your own risk."><label class="icon-warning-sign"></label> Not Verified. Use at your own risk.</span>
                 {% endif %}
-                <br/><br/>
-                {% if meta.active == true %}
-                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
-                {% else %}
-                    <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
-                {% endif %}
+                {% if meta.isBuiltIn == false %}
+                    <br/><br/>
+                    {% if meta.active == true %}
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-danger" value="isEnabled">Library <strong>enabled</strong> on codebender. Click to disable.</button>
+                    {% else %}
+                        <button onclick = "changeLibraryStatus('{{ library }}')" id="statusbutton" class="btn btn-success" value="isDisabled">Library <strong>disabled</strong> on codebender. Click to enable.</button>
+                    {% endif %}
+                {%  endif %}
+
                 <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.url != '' %}
                     {% if meta.gitInRepoPath %}
@@ -96,9 +99,9 @@
         {% endif %}
         <div>
             {% if versions %}
-                {% include 'CodebenderLibraryBundle:Api:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
             {% else %}
-                {% include 'CodebenderLibraryBundle:Api:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
             {% endif %}
         </div>
     <div class="span1"></div>
