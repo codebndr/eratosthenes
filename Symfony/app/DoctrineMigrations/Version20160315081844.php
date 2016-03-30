@@ -48,11 +48,24 @@ class Version20160315081844 extends AbstractMigration implements ContainerAwareI
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
         /*
-         * 1. Create the AVR architecture that is supported by all existing libraries
+         * 1. Create the various Arduino architectures
          */
         $avrArchitecture = new Architecture();
         $avrArchitecture->setName('AVR');
-        $entityManager->persist($avrArchitecture);
+
+        $esp8266Architecture = new Architecture();
+        $esp8266Architecture->setName('ESP8266');
+
+        $edisonArchitecture = new Architecture();
+        $edisonArchitecture->setName('Intel Edison');
+
+        $teensyArchitecture = new Architecture();
+        $teensyArchitecture->setName('Teensy');
+
+        $architectures = [$avrArchitecture, $esp8266Architecture, $edisonArchitecture, $teensyArchitecture];
+        foreach ($architectures as $architecture) {
+            $entityManager->persist($architecture);
+        }
         $entityManager->flush();
 
         /*
