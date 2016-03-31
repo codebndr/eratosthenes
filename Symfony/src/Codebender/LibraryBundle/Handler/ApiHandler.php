@@ -450,22 +450,32 @@ class ApiHandler
 
     public function findBaseDir($dir)
     {
-        foreach ($dir['contents'] as $file) {
-            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
-                return json_encode(array('success' => true, 'directory' => $dir));
-            }
+        $baseDir = $this->getDir($dir);
+        if ($baseDir) {
+            return json_encode(['success' => true, 'directory' => $baseDir]);
         }
 
         foreach ($dir['contents'] as $file) {
             if ($file['type'] == 'dir') {
-                foreach ($file['contents'] as $f) {
-                    if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
-                        $file = $this->fixDirName($file);
-                        return json_encode(array('success' => true, 'directory' => $file));
-                    }
+                $baseDir = $this->getDir($file);
+                if ($baseDir) {
+                    $baseDir = $this->fixDirName($file);
+                    return json_encode(['success' => true, 'directory' => $baseDir]);
                 }
             }
         }
+
+        return json_encode(['success' => false, 'message' => 'Failed to find base dir']);
+    }
+
+    private function getDir($dir)
+    {
+        foreach ($dir['contents'] as $file) {
+            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
+                return $dir;
+            }
+        }
+        return false;
     }
 
     /**
