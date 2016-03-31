@@ -52,7 +52,7 @@ class ApiHandler
      */
     public function getExternalLibraryPath($defaultHeader, $version)
     {
-        $externalLibraryRoot = $this->container->getParameter('external_libraries_new') . "/";
+        $externalLibraryRoot = $this->container->getParameter('external_libraries_v2') . "/";
 
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
         $libraryFolderName = $library->getFolderName();
