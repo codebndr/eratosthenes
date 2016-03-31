@@ -447,7 +447,7 @@ class ApiHandler
     {
         $baseDir = $this->getDir($dir);
         if ($baseDir) {
-            return json_encode(['success' => true, 'directory' => $baseDir]);
+            return ['success' => true, 'directory' => $baseDir];
         }
 
         foreach ($dir['contents'] as $file) {
@@ -455,12 +455,12 @@ class ApiHandler
                 $baseDir = $this->getDir($file);
                 if ($baseDir) {
                     $baseDir = $this->fixDirName($file);
-                    return json_encode(['success' => true, 'directory' => $baseDir]);
+                    return ['success' => true, 'directory' => $baseDir];
                 }
             }
         }
 
-        return json_encode(['success' => false, 'message' => 'Failed to find base dir']);
+        return ['success' => false, 'message' => 'Failed to find base dir'];
     }
 
     private function getDir($dir)
