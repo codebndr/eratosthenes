@@ -154,7 +154,12 @@ class ApiHandler
         if ($library === null || $library->isBuiltIn()) {
             return false;
         }
-        return $getDisabled ? true : $library->getActive();
+
+        if ($getDisabled) {
+            return true;
+        }
+
+        return $library->getActive();
     }
 
     /**
