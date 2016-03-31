@@ -280,7 +280,7 @@ class ApiHandler
     public function isLibraryInSyncWithGit($gitOwner, $gitRepo, $gitBranch, $gitInRepoPath, $gitLastCommit)
     {
         /*
-         * The values below are fetched it the database of the application. If any of them is not set
+         * The values below are fetched from the database of the application. If any of them is not set
          * in the database, the default (null) value will be returned.
          */
         if ($gitOwner === null || $gitRepo === null || $gitBranch === null || $gitLastCommit === null) {
