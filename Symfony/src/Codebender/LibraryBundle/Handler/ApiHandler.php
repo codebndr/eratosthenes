@@ -973,10 +973,9 @@ class ApiHandler
         $finder = new Finder();
         $exampleFinder = new Finder();
 
-        if ($disabled != 1) {
+        $getDisabled = true;
+        if ($disabled !== 1) {
             $getDisabled = false;
-        } else {
-            $getDisabled = true;
         }
 
         $filename = $library;
