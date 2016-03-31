@@ -445,22 +445,32 @@ class ApiHandler
 
     public function findBaseDir($dir)
     {
-        foreach ($dir['contents'] as $file) {
-            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
-                return ['success' => true, 'directory' => $dir];
-            }
+        $baseDir = $this->getDir($dir);
+        if ($baseDir) {
+            return json_encode(['success' => true, 'directory' => $baseDir]);
         }
 
         foreach ($dir['contents'] as $file) {
             if ($file['type'] == 'dir') {
-                foreach ($file['contents'] as $f) {
-                    if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
-                        $file = $this->fixDirName($file);
-                        return ['success' => true, 'directory' => $file];
-                    }
+                $baseDir = $this->getDir($file);
+                if ($baseDir) {
+                    $baseDir = $this->fixDirName($file);
+                    return json_encode(['success' => true, 'directory' => $baseDir]);
                 }
             }
         }
+
+        return json_encode(['success' => false, 'message' => 'Failed to find base dir']);
+    }
+
+    private function getDir($dir)
+    {
+        foreach ($dir['contents'] as $file) {
+            if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
+                return $dir;
+            }
+        }
+        return false;
     }
 
     /**
@@ -892,6 +902,76 @@ class ApiHandler
         }
 
         return $gitResponse['description'];
+    }
+
+    public function getLibraryCode($library, $disabled, $renderView = false)
+    {
+        $builtinLibrariesPath = $this->container->getParameter('builtin_libraries') . "/";
+        $externalLibrariesPath = $this->container->getParameter('external_libraries') . "/";
+
+        $finder = new Finder();
+        $exampleFinder = new Finder();
+
+        $getDisabled = true;
+        if ($disabled !== 1) {
+            $getDisabled = false;
+        }
+
+        $filename = $library;
+
+        $last_slash = strrpos($library, "/");
+        if ($last_slash !== false) {
+            $filename = substr($library, $last_slash + 1);
+        }
+
+        //TODO handle the case of different .h filenames and folder names
+        if ($filename == "ArduinoRobot") {
+            $filename = "Robot_Control";
+        }
+        if ($filename == "ArduinoRobotMotorBoard") {
+            $filename = "Robot_Motor";
+        }
+        if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
+            $filename = 'BlynkSimpleEthernet';
+        }
+
+        if ($this->isBuiltInLibrary($filename)) {
+            $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
+
+            if ($renderView) {
+                $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
+                $meta = [];
+            }
+        } else {
+            if (!$this->isExternalLibrary($filename, $getDisabled)) {
+                return ["success" => false, "message" => "No Library named " . $filename . " found."];
+            } else {
+                $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename);
+                if (empty($response)) {
+                    return ['success' => false, 'message' => 'No files for Library named ' . $library . ' found.'];
+                }
+
+                if ($renderView) {
+                    $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
+
+                    $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+                        ->findOneBy(array('machineName' => $filename));
+                    $filename = $externalLibrary->getMachineName();
+                    $meta = $externalLibrary->getLiraryMeta();
+                }
+            }
+        }
+        if (!$renderView) {
+            return ['success' => true, 'message' => 'Library found', 'files' => $response];
+        }
+
+        return [
+            'success' => true,
+            'library' => $filename,
+            'files' => $response,
+            'examples' => $examples,
+            'meta' => $meta
+        ];
     }
 
     /**
