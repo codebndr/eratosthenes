@@ -46,7 +46,7 @@ class LoadExternalLibraryFilesCommand extends ContainerAwareCommand
     {
         /* @var ContainerInterface $container */
         $container = $this->getContainer();
-        $path = 'external_libraries_new';
+        $path = 'external_libraries_v2';
         $source = 'library_files_new';
         $externalLibrariesPath = $container->getParameter($path);
         if ($externalLibrariesPath === null || $externalLibrariesPath === '') {

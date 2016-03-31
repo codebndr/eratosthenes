@@ -270,7 +270,7 @@ class NewLibraryHandler
     {
         $handler = $this->container->get('codebender_library.apiHandler');
 
-        $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
+        $externalLibrariesPath = $this->container->getParameter('external_libraries_v2');
         $versionPath = $externalLibrariesPath . '/' . $lib->getFolderName() . '/' . $version->getFolderName();
         $examples = $handler->fetchLibraryExamples(new Finder(), $versionPath);
 
@@ -285,7 +285,7 @@ class NewLibraryHandler
 
     private function createLibraryDirectory($folderName, $libraryStructure)
     {
-        $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
+        $path = $this->container->getParameter('external_libraries_v2') . '/' . $folderName . '/';
         if (is_dir($path)) {
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
         }
@@ -297,7 +297,7 @@ class NewLibraryHandler
 
     private function createVersionDirectory($libraryFolderName, $versionFolderName, $libraryStructure)
     {
-        $base = $path = $this->container->getParameter('external_libraries_new') . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
+        $base = $path = $this->container->getParameter('external_libraries_v2') . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
         return ($this->createVersionDirectoryRecur($base, $path, $libraryStructure['contents']));
     }
 
