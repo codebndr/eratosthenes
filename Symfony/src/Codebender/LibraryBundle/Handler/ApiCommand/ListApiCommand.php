@@ -79,11 +79,18 @@ class ListApiCommand extends AbstractApiCommand
                 }
 
                 $libraries[$category][$defaultHeader] = array(
-                    "description" => $library->getDescription(),
-                    "name" => $library->getName(),
-                    "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
-                    "examples" => array()
+                    'description' => ''
                 );
+
+                if ($category === 'External Libraries') {
+                    $libraries[$category][$defaultHeader]['description'] = $library->getDescription();
+                    $libraries[$category][$defaultHeader]['humanName'] = $library->getName();
+                    if ($library->getOwner() !== null && $library->getRepo() !== null) {
+                        $libraries[$category][$defaultHeader]['url'] = "http://github.com/" . $library->getOwner() . "/" . $library->getRepo();
+                    }
+                }
+
+                $libraries[$category][$defaultHeader]['examples'] = array();
 
                 $examples = $entityManager
                     ->getRepository('CodebenderLibraryBundle:LibraryExample')
@@ -96,7 +103,7 @@ class ListApiCommand extends AbstractApiCommand
                             $example->getName()
                         );
 
-                    $libraries[$category][$defaultHeader]['examples'][] = $names['example_name'];
+                    $libraries[$category][$defaultHeader]['examples'][] = array('name' => $names['example_name']);
                 }
             } else {
                 $versions = $library->getVersions();
