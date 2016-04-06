@@ -26,7 +26,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $version = '';
         // for external library, fetch default version for partner
-        if ($type === 'external') {
+        if ($type !== 'example') {
             $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
         }
 
