@@ -151,7 +151,7 @@ class ListApiCommand extends AbstractApiCommand
         }
 
         while ($tmp !== "" && !($tmp === false)) {
-            if ($tmp !== 'examples' && $tmp !== 'Examples' && $tmp !== $filename) {
+            if ($tmp !== '.' && $tmp !== 'examples' && $tmp !== 'Examples' && $tmp !== $filename) {
                 if ($type === "") {
                     $type = $tmp;
                 } else {
