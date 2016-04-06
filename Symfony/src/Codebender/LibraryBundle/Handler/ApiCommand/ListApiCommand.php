@@ -39,15 +39,16 @@ class ListApiCommand extends AbstractApiCommand
         $finder->in($path);
         $libraries = array();
         foreach ($finder as $file) {
-            $names = $this
+            $exampleInfo = $this
                 ->getExampleAndLibNameFromRelativePath(
                     $file->getRelativePath(),
-                    $file->getBasename("." . $file->getExtension())
+                    $file->getBasename("." . $file->getExtension()),
+                    true
                 );
-            if (!isset($libraries[$names['library_name']])) {
-                $libraries[$names['library_name']] = array("description" => "", "examples" => array());
+            if (!isset($libraries[$exampleInfo['library_name']])) {
+                $libraries[$exampleInfo['library_name']] = array("description" => "", "examples" => array());
             }
-            $libraries[$names['library_name']]['examples'][] = array('name' => $names['example_name']);
+            $libraries[$exampleInfo['library_name']]['examples'][] = array('name' => $exampleInfo['example_name']);
         }
         return $libraries;
     }
@@ -79,24 +80,31 @@ class ListApiCommand extends AbstractApiCommand
                 }
 
                 $libraries[$category][$defaultHeader] = array(
-                    "description" => $library->getDescription(),
-                    "name" => $library->getName(),
-                    "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(),
-                    "examples" => array()
+                    'description' => ''
                 );
+
+                if ($category === 'External Libraries') {
+                    $libraries[$category][$defaultHeader]['description'] = $library->getDescription();
+                    $libraries[$category][$defaultHeader]['humanName'] = $library->getName();
+                    if ($library->getOwner() !== null && $library->getRepo() !== null) {
+                        $libraries[$category][$defaultHeader]['url'] = "http://github.com/" . $library->getOwner() . "/" . $library->getRepo();
+                    }
+                }
+
+                $libraries[$category][$defaultHeader]['examples'] = array();
 
                 $examples = $entityManager
                     ->getRepository('CodebenderLibraryBundle:LibraryExample')
                     ->findBy(array('version' => $version->getId()));
 
                 foreach ($examples as $example) {
-                    $names = $this
+                    $exampleInfo = $this
                         ->getExampleAndLibNameFromRelativePath(
                             pathinfo($example->getPath(), PATHINFO_DIRNAME),
                             $example->getName()
                         );
 
-                    $libraries[$category][$defaultHeader]['examples'][] = $names['example_name'];
+                    $libraries[$category][$defaultHeader]['examples'][] = array('name' => $exampleInfo['example_name']);
                 }
             } else {
                 $versions = $library->getVersions();
@@ -113,13 +121,13 @@ class ListApiCommand extends AbstractApiCommand
                         ->findBy(array('version' => $version->getId()));
 
                     foreach ($examples as $example) {
-                        $names = $this
+                        $exampleInfo = $this
                             ->getExampleAndLibNameFromRelativePath(
                                 pathinfo($example->getPath(), PATHINFO_DIRNAME),
                                 $example->getName()
                             );
 
-                        $libraries[$category][$defaultHeader][$version->getVersion()]['examples'][] = $names['example_name'];
+                        $libraries[$category][$defaultHeader][$version->getVersion()]['examples'][] = $exampleInfo['example_name'];
                     }
                 }
             }
@@ -131,16 +139,20 @@ class ListApiCommand extends AbstractApiCommand
     /*
      * Copied from DefaultController.php
      */
-    private function getExampleAndLibNameFromRelativePath($path, $filename)
+    private function getExampleAndLibNameFromRelativePath($path, $filename, $isBasicExamples = false)
     {
         $type = "";
-        $libraryName = strtok($path, "/");
+        $tmp = strtok($path, "/");
 
-        $tmp = strtok("/");
+        $result = [];
+        if ($isBasicExamples) {
+            $result['library_name'] = $tmp;
+            $tmp = strtok("/");
+        }
 
-        while ($tmp != "" && !($tmp === false)) {
-            if ($tmp != 'examples' && $tmp != 'Examples' && $tmp != $filename) {
-                if ($type == "") {
+        while ($tmp !== "" && !($tmp === false)) {
+            if ($tmp !== 'examples' && $tmp !== 'Examples' && $tmp !== $filename) {
+                if ($type === "") {
                     $type = $tmp;
                 } else {
                     $type = $type . ":" . $tmp;
@@ -148,7 +160,12 @@ class ListApiCommand extends AbstractApiCommand
             }
             $tmp = strtok("/");
         }
-        $exampleName = ($type == "" ? $filename : $type . ":" . $filename);
-        return (array('library_name' => $libraryName, 'example_name' => $exampleName));
+
+        $result['example_name'] = $filename;
+        if ($type !== "") {
+            $result['example_name'] = $type . ":" . $filename;
+        }
+
+        return $result;
     }
 }
