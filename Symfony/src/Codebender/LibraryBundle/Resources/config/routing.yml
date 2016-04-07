@@ -42,6 +42,11 @@ codebender_library_get_repo_tree_meta_v2:
     defaults: {_controller:CodebenderLibraryBundle:ApiViews:getRepoGitTreeAndMeta}
     methods:  [POST]
 
+codebender_library_get_library_meta:
+    pattern: /{authorizationKey}/v2/getLibMeta/{library}
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getLibraryMeta}
+    methods:  [POST]
+
 codebender_library_view_library:
     pattern:  /{authorizationKey}/view
     defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }

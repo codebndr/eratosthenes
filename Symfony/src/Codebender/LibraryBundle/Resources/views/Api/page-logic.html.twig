@@ -6,8 +6,8 @@
         $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching file tree..');
         var $url = $("#githubUrl").val();
         var $ref = isFromRelease ? $("#gitReleases").val() : $("#gitBranches").val();
-        $.post( "{{ path('codebender_library_get_repo_tree_meta_v2', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, gitRef : $ref })
-            .done(function( data ) {
+        $.post("{{ path('codebender_library_get_repo_tree_meta_v2', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url, gitRef : $ref })
+            .done(function(data) {
                 if(!data.success) {
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> There is no such library');
                     return;
@@ -34,7 +34,7 @@
                     $("#newLibMessage").html('<span><i class="fa fa-times-circle"></i></span> Failed to fetch the repository correctly. Please try again.');
                     return;
                 }
-                update_git(data.owner, data.repo, data.ref, data.description, isFromRelease)
+                update_git(data.owner, data.repo, data.ref, data.description, isFromRelease);
             });
     }
 
@@ -42,6 +42,56 @@
     {
         $('#jstreeDiv').jstree(true).settings.core.data = data;
         $('#jstreeDiv').jstree(true).refresh(false, true);
+    }
+
+    function updateLibraryMeta(name)
+    {
+        var route = "{{ path('codebender_library_get_library_meta', {'authorizationKey': authorizationKey, 'library': "LIBRARYNAME"}) }}";
+        $.post(route.replace("LIBRARYNAME", name))
+            .done(function(data) {
+                if (data.success) {
+                    // header file name collision
+                    // ask for user option
+                    $('#modalMessage').html('The header file name "<strong>' + name + '</strong>" of this library already exists in our system.');
+                    $('#myModal').modal('show');
+                    $('#modal-button-ok').click(function() {
+                        $('#myModal').modal('hide');
+                        populateLibraryMeta(data.meta);
+                        $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Default header found in system: add as new version');
+                    });
+                    $('#modal-cancel').click(function() {
+                        location.reload(); // reset the progress
+                    });
+                } else {
+                    enableLibraryMetaInput();
+                    $("#newLibMessage").html('<span><i class="fa fa-exclamation-triangle"></i></span> Add new library');
+                }
+            });
+    }
+
+    function enableLibraryMetaInput() {
+        $("#newLibrary_Name").removeAttr("disabled");
+        $("#newLibrary_Description").removeAttr("disabled");
+        $("#newLibrary_Notes").removeAttr("disabled");
+        $("#newLibrary_Url").removeAttr("disabled");
+
+        $("#newLibrary_Name").val('');
+        $("#newLibrary_Description").val('');
+        $("#newLibrary_Notes").val('');
+        $("#newLibrary_Url").val('');
+    }
+
+    function populateLibraryMeta(meta) {
+        // disabled fields
+        $("#newLibrary_Name").attr("disabled", "disabled");
+        $("#newLibrary_Description").attr("disabled", "disabled");
+        $("#newLibrary_Notes").attr("disabled", "disabled");
+        $("#newLibrary_Url").attr("disabled", "disabled");
+        // populate fields
+        $("#newLibrary_Name").val(meta.name);
+        $("#newLibrary_Description").val(meta.description);
+        $("#newLibrary_Notes").val(meta.libraryNotes);
+        $("#newLibrary_Url").val(meta.url);
     }
 
     function get_github_info()
@@ -54,8 +104,8 @@
         }
 
         $("#newLibMessage").html('<span><i class="fa fa-cog fa-spin"></i></span> Fetching data..');
-        $.post( "{{ path('codebender_library_get_library_git_info', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
-            .done(function( data ) {
+        $.post("{{ path('codebender_library_get_library_git_info', {'authorizationKey' : authorizationKey}) }}", { githubUrl: $url })
+            .done(function(data) {
                 if(data.success)
                 {
                     if (data.branches && data.releases) {
@@ -97,7 +147,10 @@
 
     function update_machineName()
     {
-        $("#newLibrary_DefaultHeader").val($("#machineNames").val());
+        var machineName = $("#machineNames").val();
+        $("#newLibrary_DefaultHeader").val(machineName);
+        // check if the machine name exists in the databse
+        updateLibraryMeta(machineName);
     }
 
     function update_git(owner, repo, ref, description, isFromRelease)
@@ -332,6 +385,13 @@
                 $('#orDiv').show();
                 $('#zipDiv').show();
             }
+        });
+
+        // set up modal
+        $('#myModal').modal({
+            keyboard: false,
+            show: false,
+            backdrop: 'static'
         });
 
         /*
