@@ -16,7 +16,7 @@ parameters:
     codebender_api.fetch.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchApiCommand
     codebender_api.fetchLatest.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchLatestApiCommand
     codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
-
+    codebender_api.getDefaultVersion.class: Codebender\LibraryBundle\Handler\ApiCommand\GetDefaultVersionCommand
 
 services:
 #    codebender_library.example:
@@ -107,3 +107,9 @@ services:
             arguments:
                 entityManager: "@doctrine.orm.entity_manager"
                 containerInterface: "@service_container"
+
+    codebender_api.getDefaultVersion:
+                class:  %codebender_api.getDefaultVersion.class%
+                arguments:
+                    entityManager: "@doctrine.orm.entity_manager"
+                    containerInterface: "@service_container"

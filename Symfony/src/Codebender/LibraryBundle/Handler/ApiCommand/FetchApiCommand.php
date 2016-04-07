@@ -31,9 +31,15 @@ class FetchApiCommand extends AbstractApiCommand
             $content['library'] = $reservedNames[$content['library']];
         }
 
+
         if ($this->apiHandler->isBuiltInLibrary($content['library'])) {
             return $this->fetchBuiltInLibrary($content);
         }
+
+        if (!$this->apiHandler->isExternalLibrary($content['library'], $content['disabled'])) {
+            return ["success" => false, "message" => "No Library named " . $content['library'] . " found."];
+        }
+
         return $this->fetchExternalLibrary($content);
     }
 
@@ -44,23 +50,33 @@ class FetchApiCommand extends AbstractApiCommand
         $exampleFinder = new Finder();
         $filename = $content['library'];
 
-        if (!$this->apiHandler->isExternalLibrary($filename, $content['disabled'])) {
-            return ["success" => false, "message" => "No Library named " . $filename . " found."];
+        // check if the provided version is valid
+        if ($content['version'] !== null && !$this->apiHandler->libraryVersionExists($filename, $content['version'])) {
+            return [
+                'success' => false,
+                'message' => 'No files for Library named `' . $filename . '` with version `' . $content['version'] . '` found.'
+            ];
         }
 
-        $lib = $this->apiHandler->getLibraryFromDefaultHeader($filename);
         $versionObjects = $this->apiHandler->getAllVersionsFromDefaultHeader($filename);
 
-        // use the requested version (if any) for fetching data
-        // else fetch data for all versions
-        $versions = $versionObjects->toArray();
-        if ($content['latest']) {
-            $versions = [$lib->getLatestVersion()];
-        } else if ($content['version'] !== null) {
+        // fetch default version
+        // if rendering view, fetch all versions
+        // if specifically asked for a certain version, fetch that version
+        // else if specifically asked for latest version, fetch latest version
+        $versions = [$this->apiHandler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $filename)];
+        if ($content['renderView'] && $content['version'] === null) {
+            $versions = $versionObjects->toArray();
+        }
+        if ($content['version'] !== null) {
             $versionsCollection = $versionObjects->filter(function ($version) use ($content) {
                 return $version->getVersion() === $content['version'];
             });
             $versions = $versionsCollection->toArray();
+        }
+        if ($content['latest']) {
+            $lib = $this->apiHandler->getLibraryFromDefaultHeader($filename);
+            $versions = [$lib->getLatestVersion()];
         }
 
         // fetch library files for each version
