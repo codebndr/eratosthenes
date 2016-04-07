@@ -171,7 +171,7 @@ class ApiViewsControllerTest extends WebTestCase
          * Check the files of the library have been stored on the filesystem.
          * TODO: Add a test for the validity of the files' contents.
          */
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
@@ -301,7 +301,7 @@ class ApiViewsControllerTest extends WebTestCase
          * Check the files of the library have been stored on the filesystem.
          * TODO: Add a test for the validity of the files' contents.
          */
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
@@ -469,7 +469,7 @@ class ApiViewsControllerTest extends WebTestCase
             'max_size.h'
         ];
 
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
@@ -561,11 +561,11 @@ class ApiViewsControllerTest extends WebTestCase
 
         $this->assertEquals(1, $crawler->filter('h2:contains("EEPROM")')->count());
         $this->assertEquals(1, $crawler->filter('h3:contains("main header: EEPROM.h")')->count());
-
+        $this->assertEquals(0, $crawler->filter('#statusbutton')->count()); // no toggle status button for built-in libs
         $this->assertEquals(
             1,
             $crawler->filter(
-                'a[href="/' . $authorizationKey . '/download/EEPROM"]:contains("Download from Eratosthenes")'
+                'a[href="/' . $authorizationKey . '/v2/download/EEPROM/default"]:contains("Version - default")'
             )->count());
 
         $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("EEPROM.h")')->count());

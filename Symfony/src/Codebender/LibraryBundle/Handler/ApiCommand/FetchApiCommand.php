@@ -31,6 +31,7 @@ class FetchApiCommand extends AbstractApiCommand
             $content['library'] = $reservedNames[$content['library']];
         }
 
+
         if ($this->apiHandler->isBuiltInLibrary($content['library'])) {
             return $this->fetchBuiltInLibrary($content);
         }
