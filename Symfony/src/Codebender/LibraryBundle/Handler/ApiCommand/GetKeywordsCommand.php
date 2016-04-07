@@ -41,7 +41,7 @@ class GetKeywordsCommand extends AbstractApiCommand
 
             $keywords = $this->getExternalLibraryKeywords($defaultHeader, $version);
         } else {
-            return ['success' => false, 'message' => 'Could not find keywords for requested library.'];
+            return ['success' => false, 'message' => "Library named $defaultHeader not found."];
         }
 
         return ['success' => true, 'keywords' => $keywords];

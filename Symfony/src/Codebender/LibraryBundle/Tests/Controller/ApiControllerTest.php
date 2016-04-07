@@ -151,7 +151,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Could not find keywords for requested library.', $response['message']);
+        $this->assertEquals("Library named noSuchLib not found.", $response['message']);
 
         $client = $this->postApiRequest(
             $client,
