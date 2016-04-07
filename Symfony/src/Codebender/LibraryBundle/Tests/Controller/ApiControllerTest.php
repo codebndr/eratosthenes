@@ -269,7 +269,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Requested library named NoSuchLib not found', $response['message']);
+        $this->assertEquals('Library named NoSuchLib not found', $response['message']);
 
         // Invalid library version
         $client = $this->postApiRequest(
@@ -415,7 +415,7 @@ class ApiControllerTest extends WebTestCase
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals('Requested library named NoSuchLibrary not found', $response['message']);
+        $this->assertEquals('Library named NoSuchLibrary not found', $response['message']);
 
         // Invalid example of built-in library in request data
         $client = $this->postApiRequest(
