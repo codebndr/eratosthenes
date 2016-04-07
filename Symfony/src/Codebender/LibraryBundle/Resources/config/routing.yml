@@ -42,20 +42,6 @@ codebender_library_get_repo_tree_meta_v2:
     defaults: {_controller:CodebenderLibraryBundle:ApiViews:getRepoGitTreeAndMeta}
     methods:  [POST]
 
-codebender_library_get_repo_tree_meta:
-    pattern: /{authorizationKey}/get_repo_tree_meta
-    defaults: {_controller:CodebenderLibraryBundle:Default:getRepoGitTreeAndMeta}
-    methods:  [POST]
-
-codebender_library_get_library_git_branches:
-    pattern: /{authorizationKey}/getlibgitbranches
-    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
-    methods:  [POST]
-
-codebender_library_get_keywords:
-    pattern:  /{authorizationKey}/{version}/getKeywords
-    defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
-
 codebender_api_handler_v2:
     pattern:  /{authorizationKey}/v2
     defaults: { _controller: CodebenderLibraryBundle:Api:apiHandler }
