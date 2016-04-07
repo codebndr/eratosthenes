@@ -21,7 +21,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $type = $handler->getLibraryType($library);
         if ($type === 'unknown') {
-            return ['success' => false, 'message' => "Library named $library not found"];
+            return ['success' => false, 'message' => "Library named $library not found."];
         }
 
         $version = '';
