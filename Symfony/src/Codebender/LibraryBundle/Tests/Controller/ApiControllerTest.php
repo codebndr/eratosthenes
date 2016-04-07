@@ -80,6 +80,10 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('1.0.0', $categories['External Libraries']['MultiIno']);
         $this->assertArrayHasKey('2.0.0', $categories['External Libraries']['MultiIno']);
         $this->assertTrue(in_array('multi_ino_example', $categories['External Libraries']['MultiIno']['1.0.0']['examples']));
+
+        // Check examples outside 'Examples' folder
+        $this->assertArrayHasKey('SubCateg', $categories['External Libraries']);
+        $this->assertTrue(in_array('experienceBased:Beginners:subcateg_example_two', $categories['External Libraries']['SubCateg']['1.0.0']['examples']));
     }
 
     /**
@@ -579,6 +583,8 @@ class ApiControllerTest extends WebTestCase
 
         $this->assertTrue($response['success']);
         $this->assertEquals('No external libraries need to be updated', $response['message']);
+
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
     }
 
     /**

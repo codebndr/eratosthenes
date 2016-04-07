@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-{% include 'CodebenderLibraryBundle:Api:includes.html.twig' %}
+{% include 'CodebenderLibraryBundle:V2:includes.html.twig' %}
     {% if meta.name is defined %}
         <title>{{ meta.name }}</title>
     {% else %}
@@ -99,9 +99,9 @@
         {% endif %}
         <div>
             {% if versions %}
-                {% include 'CodebenderLibraryBundle:Api:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_version.html.twig' with {'versions': versions, 'files': files, 'examples': examples} %}
             {% else %}
-                {% include 'CodebenderLibraryBundle:Api:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
+                {% include 'CodebenderLibraryBundle:V2:template/libraryView_default.html.twig' with {'files': files, 'examples': examples} %}
             {% endif %}
         </div>
     <div class="span1"></div>

@@ -171,7 +171,7 @@ class ApiViewsControllerTest extends WebTestCase
          * Check the files of the library have been stored on the filesystem.
          * TODO: Add a test for the validity of the files' contents.
          */
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
@@ -301,7 +301,7 @@ class ApiViewsControllerTest extends WebTestCase
          * Check the files of the library have been stored on the filesystem.
          * TODO: Add a test for the validity of the files' contents.
          */
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
@@ -469,7 +469,7 @@ class ApiViewsControllerTest extends WebTestCase
             'max_size.h'
         ];
 
-        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_new');
+        $externalLibrariesPath = $client->getContainer()->getParameter('external_libraries_v2');
         $libraryFolderName = $libraryEntity->getFolderName();
         $versionFolderName = $versionEntity->getFolderName();
         $versionPath = $externalLibrariesPath . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
