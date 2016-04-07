@@ -29,7 +29,7 @@ class ApiViewsController extends Controller
         $form->handleRequest($this->getRequest());
 
         if (!$form->isValid()) {
-            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', array(
+            return $this->render('CodebenderLibraryBundle:V2:newLibForm.html.twig', array(
                 'authorizationKey' => $authorizationKey,
                 'form' => $form->createView()
             ));
@@ -43,7 +43,7 @@ class ApiViewsController extends Controller
             $flashBag->add('error', 'Error: ' . $libraryAdded['message']);
             $form = $this->createForm(new NewLibraryFormV2());
 
-            return $this->render('CodebenderLibraryBundle:Api:newLibForm.html.twig', [
+            return $this->render('CodebenderLibraryBundle:V2:newLibForm.html.twig', [
                 'authorizationKey' => $authorizationKey,
                 'form' => $form->createView()
             ]);
@@ -90,7 +90,7 @@ class ApiViewsController extends Controller
             );
         }
 
-        return $this->render('CodebenderLibraryBundle:Api:libraryView.html.twig', array(
+        return $this->render('CodebenderLibraryBundle:V2:libraryView.html.twig', array(
             'library' => $response['library'],
             'versions' => $response['versions'],
             'files' => $response['files'],
@@ -138,7 +138,7 @@ class ApiViewsController extends Controller
             return new JsonResponse(['success' => true, 'libs' => $names]);
         }
         return $this->render(
-            'CodebenderLibraryBundle:Api:search.html.twig',
+            'CodebenderLibraryBundle:V2:search.html.twig',
             ['authorizationKey' => $this->container->getParameter('authorizationKey'), 'libs' => $names]
         );
     }

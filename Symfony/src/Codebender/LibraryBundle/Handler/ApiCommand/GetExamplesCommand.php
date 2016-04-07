@@ -23,8 +23,8 @@ class GetExamplesCommand extends AbstractApiCommand
         }
 
         $version = '';
-        // for external library, fetch default version for partner
-        if ($libraryType === 'external') {
+        // for built-in and external library, fetch default version for partner
+        if ($libraryType !== 'example') {
             $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
         }
 
@@ -37,11 +37,9 @@ class GetExamplesCommand extends AbstractApiCommand
             return ['success' => false, 'message' => "Requested version for library $library not found"];
         }
 
-        $path = '';
-        if ($libraryType === 'external' || $libraryType === 'builtin') {
+        $path = $handler->getBuiltInLibraryExamplePath($library);
+        if ($libraryType !== 'example') {
             $path = $handler->getExternalLibraryPath($library, $version);
-        } else if ($libraryType === 'example') {
-            $path = $handler->getBuiltInLibraryExamplePath($library);
         }
 
         $examples = $this->getExampleFilesFromPath($path);

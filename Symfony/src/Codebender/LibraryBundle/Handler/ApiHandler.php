@@ -52,7 +52,7 @@ class ApiHandler
      */
     public function getExternalLibraryPath($defaultHeader, $version)
     {
-        $externalLibraryRoot = $this->container->getParameter('external_libraries_new') . "/";
+        $externalLibraryRoot = $this->container->getParameter('external_libraries_v2') . "/";
 
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
         $libraryFolderName = $library->getFolderName();
@@ -208,20 +208,6 @@ class ApiHandler
         }
 
         return $result->first();
-    }
-
-    /**
-     * Get the Version entity for the given version id
-     * @param $versionId
-     * @return Version
-     */
-    public function getVersionFromId($versionId)
-    {
-        $version = $this->entityManager
-            ->getRepository('CodebenderLibraryBundle:Version')
-            ->findOneBy(array('id' => $versionId));
-
-        return $version;
     }
 
     /**
@@ -452,7 +438,7 @@ class ApiHandler
     {
         $baseDir = $this->getDir($dir);
         if ($baseDir) {
-            return json_encode(['success' => true, 'directory' => $baseDir]);
+            return ['success' => true, 'directory' => $dir];
         }
 
         foreach ($dir['contents'] as $file) {
@@ -460,12 +446,12 @@ class ApiHandler
                 $baseDir = $this->getDir($file);
                 if ($baseDir) {
                     $baseDir = $this->fixDirName($file);
-                    return json_encode(['success' => true, 'directory' => $baseDir]);
+                    return ['success' => true, 'directory' => $file];
                 }
             }
         }
 
-        return json_encode(['success' => false, 'message' => 'Failed to find base dir']);
+        return ['success' => false, 'message' => 'Failed to find base dir'];
     }
 
     private function getDir($dir)
@@ -529,62 +515,6 @@ class ApiHandler
         }
 
         return array('success' => true, 'library' => $libraryContents);
-    }
-
-    /**
-     * Checks all external libraries that are uploaded from Github, making sure the commit
-     * hash stored in our database is the same as the last commit on the repo origin.
-     * If no branch is stored in the database for a specific library, the default (master) is
-     * used. In case no in-repo path is stored in the database, an empty path is used during the
-     * last commit fetching, that is, the last commit for the root directory of the repo is fethced.
-     * TODO: Enchance the method, making it able to auto-update any outdated libraries.
-     *
-     * @return array
-     */
-    public function checkGithubUpdates()
-    {
-        $needToUpdate = array();
-        $libraries = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findAll();
-
-        foreach ($libraries as $lib) {
-            $gitOwner = $lib->getOwner();
-            $gitRepo = $lib->getRepo();
-
-            if ($lib->getActive() === false || $gitOwner === null || $gitRepo === null) {
-                continue;
-            }
-
-            $branch = $lib->getBranch();
-            if ($branch === null) {
-                $branch = ''; // not providing any branch will make git return the commits of the default branch
-            }
-
-            $directoryInRepo = $lib->getInRepoPath();
-            if ($directoryInRepo === null) {
-                $directoryInRepo = '';
-            }
-
-            $lastCommitFromGithub = $this->getLastCommitFromGithub($gitOwner, $gitRepo, $branch, $directoryInRepo);
-            if ($lastCommitFromGithub !== $lib->getLastCommit()) {
-                $needToUpdate[] = [
-                    'Machine Name' => $lib->getMachineName(),
-                    'Human Name' => $lib->getHumanName(),
-                    'Git Owner' => $lib->getOwner(),
-                    'Git Repo' => $lib->getRepo(),
-                    'Git Branch' => $lib->getBranch(),
-                    'Path in Git Repo' => $lib->getInRepoPath()
-                ];
-            }
-        }
-        if (empty($needToUpdate)) {
-            return ['success' => true, 'message' => 'No external libraries need to be updated'];
-        }
-
-        return [
-            'success' => true,
-            'message' => count($needToUpdate) . " external libraries need to be updated",
-            'libraries' => $needToUpdate
-        ];
     }
 
     private function getGithubFileCode($owner, $repo, $path, $blobSha)
@@ -963,76 +893,6 @@ class ApiHandler
         }
 
         return $gitResponse['description'];
-    }
-
-    public function getLibraryCode($library, $disabled, $renderView = false)
-    {
-        $builtinLibrariesPath = $this->container->getParameter('builtin_libraries') . "/";
-        $externalLibrariesPath = $this->container->getParameter('external_libraries') . "/";
-
-        $finder = new Finder();
-        $exampleFinder = new Finder();
-
-        $getDisabled = true;
-        if ($disabled !== 1) {
-            $getDisabled = false;
-        }
-
-        $filename = $library;
-
-        $last_slash = strrpos($library, "/");
-        if ($last_slash !== false) {
-            $filename = substr($library, $last_slash + 1);
-        }
-
-        //TODO handle the case of different .h filenames and folder names
-        if ($filename == "ArduinoRobot") {
-            $filename = "Robot_Control";
-        }
-        if ($filename == "ArduinoRobotMotorBoard") {
-            $filename = "Robot_Motor";
-        }
-        if ($filename == 'BlynkSimpleSerial' || $filename == 'BlynkSimpleCC3000') {
-            $filename = 'BlynkSimpleEthernet';
-        }
-
-        if ($this->isBuiltInLibrary($filename)) {
-            $response = $this->fetchLibraryFiles($finder, $builtinLibrariesPath . "/libraries/" . $filename);
-
-            if ($renderView) {
-                $examples = $this->fetchLibraryExamples($exampleFinder, $builtinLibrariesPath . "/libraries/" . $filename);
-                $meta = [];
-            }
-        } else {
-            if (!$this->isExternalLibrary($filename, $getDisabled)) {
-                return ["success" => false, "message" => "No Library named " . $filename . " found."];
-            } else {
-                $response = $this->fetchLibraryFiles($finder, $externalLibrariesPath . "/" . $filename);
-                if (empty($response)) {
-                    return ['success' => false, 'message' => 'No files for Library named ' . $library . ' found.'];
-                }
-
-                if ($renderView) {
-                    $examples = $this->fetchLibraryExamples($exampleFinder, $externalLibrariesPath . "/" . $filename);
-
-                    $externalLibrary = $this->entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
-                        ->findOneBy(array('machineName' => $filename));
-                    $filename = $externalLibrary->getMachineName();
-                    $meta = $externalLibrary->getLiraryMeta();
-                }
-            }
-        }
-        if (!$renderView) {
-            return ['success' => true, 'message' => 'Library found', 'files' => $response];
-        }
-
-        return [
-            'success' => true,
-            'library' => $filename,
-            'files' => $response,
-            'examples' => $examples,
-            'meta' => $meta
-        ];
     }
 
     /**

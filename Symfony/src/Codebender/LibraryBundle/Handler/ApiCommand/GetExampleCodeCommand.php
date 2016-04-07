@@ -26,7 +26,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $version = '';
         // for external library, fetch default version for partner
-        if ($type === 'external') {
+        if ($type !== 'example') {
             $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
         }
 
@@ -183,7 +183,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
      */
     private function getPathForExternalExample($example)
     {
-        $externalLibraryPath = $this->container->getParameter('external_libraries_new');
+        $externalLibraryPath = $this->container->getParameter('external_libraries_v2');
         $libraryFolder = $example->getVersion()->getLibrary()->getFolderName();
         $versionFolder = $example->getVersion()->getFolderName();
 

@@ -100,7 +100,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
         $this->assertContains('hpp_file.hpp', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
 
-        $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files/default');
+        $baseLibraryPath = $client->getKernel()->locateResource('@CodebenderLibraryBundle/Resources/library_files_new/default/1.1.0');
 
         $contents = array_column($response['files'], 'content');
 
@@ -286,7 +286,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries') . '/Encode/';
+        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries_v2') . '/Encode/1.0.0/';
         $headerFile = file_get_contents($encodeLibraryPath . 'Encode.h');
         $exampleFile = file_get_contents($encodeLibraryPath . 'examples/encoded_example/encoded_example.ino');
         $malformedJson = json_encode(['header' => $headerFile, 'example' => $exampleFile]);

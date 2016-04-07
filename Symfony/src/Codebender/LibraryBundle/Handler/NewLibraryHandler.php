@@ -59,7 +59,7 @@ class NewLibraryHandler
                 $lastCommit = $handler->getLastCommitFromGithub($data['GitOwner'], $data['GitRepo'], $gitRef, $path);
                 break;
             case 'zip':
-                $libraryStructure = json_decode($this->getLibFromZipFile($data["Zip"]), true);
+                $libraryStructure = $this->getLibFromZipFile($data["Zip"]);
                 break;
             default:
                 return array('success' => false, 'message' => 'Unknown upload type.');
@@ -272,7 +272,7 @@ class NewLibraryHandler
     {
         $handler = $this->container->get('codebender_library.apiHandler');
 
-        $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
+        $externalLibrariesPath = $this->container->getParameter('external_libraries_v2');
         $versionPath = $externalLibrariesPath . '/' . $lib->getFolderName() . '/' . $version->getFolderName();
         $examples = $handler->fetchLibraryExamples(new Finder(), $versionPath);
 
@@ -284,7 +284,7 @@ class NewLibraryHandler
 
     private function createLibraryDirectory($folderName, $libraryStructure)
     {
-        $path = $this->container->getParameter('external_libraries_new') . '/' . $folderName . '/';
+        $path = $this->container->getParameter('external_libraries_v2') . '/' . $folderName . '/';
         if (is_dir($path)) {
             return json_encode(array("success" => false, "message" => "Library directory already exists"));
         }
@@ -296,7 +296,7 @@ class NewLibraryHandler
 
     private function createVersionDirectory($libraryFolderName, $versionFolderName, $libraryStructure)
     {
-        $base = $path = $this->container->getParameter('external_libraries_new') . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
+        $base = $path = $this->container->getParameter('external_libraries_v2') . '/' . $libraryFolderName . '/' . $versionFolderName . '/';
         return ($this->createVersionDirectoryRecur($base, $path, $libraryStructure['contents']));
     }
 
@@ -348,23 +348,23 @@ class NewLibraryHandler
             $handler = $this->container->get('codebender_library.apiHandler');
             $zip->extractTo('/tmp/lib/');
             $zip->close();
-            $dir = json_decode($this->processZipDir('/tmp/lib'), true);
+            $dir = $this->processZipDir('/tmp/lib');
 
             if (!$dir['success']) {
                 return json_encode($dir);
             }
 
             $dir = $dir['directory'];
-            $baseDir = json_decode($handler->findBaseDir($dir), true);
+            $baseDir = $handler->findBaseDir($dir);
             if ($baseDir['success'] !== true) {
-                return json_encode($baseDir);
+                return $baseDir;
             }
 
             $baseDir = $baseDir['directory'];
 
-            return json_encode(['success' => true, 'library' => $baseDir]);
+            return ['success' => true, 'library' => $baseDir];
         } else {
-            return json_encode(['success' => false, 'message' => 'Could not unzip Archive. Code: ' . $opened]);
+            return ['success' => false, 'message' => 'Could not unzip Archive. Code: ' . $opened];
         }
     }
 
@@ -378,23 +378,21 @@ class NewLibraryHandler
             }
 
             if (is_dir($path . '/' . $file)) {
-                $subdir = json_decode($this->processZipDir($path . '/' . $file), true);
+                $subdir = $this->processZipDir($path . '/' . $file);
                 if ($subdir['success'] !== true) {
-                    return json_encode($subdir);
+                    return $subdir;
                 }
                 array_push($files, $subdir['directory']);
             } else {
-                $file = json_decode($this->processZipFile($path . '/' . $file), true);
+                $file = $this->processZipFile($path . '/' . $file);
                 if ($file['success'] === true) {
                     array_push($files, $file['file']);
                 } elseif ($file['message'] != "Bad Encoding") {
-                    return json_encode($file);
+                    return $file;
                 }
             }
         }
-        return json_encode(
-            ['success' => true, 'directory' => ['name' => substr($path, 9), 'type' => 'dir', 'contents' => $files]]
-        );
+        return ['success' => true, 'directory' => ['name' => substr($path, 9), 'type' => 'dir', 'contents' => $files]];
     }
 
     private function processZipFile($path)
@@ -402,10 +400,10 @@ class NewLibraryHandler
         $contents = file_get_contents($path);
 
         if ($contents === null) {
-            return json_encode(['success' => false, 'message' => 'Could not read file ' . basename($path)]);
+            return ['success' => false, 'message' => 'Could not read file ' . basename($path)];
         }
 
-        return json_encode(['success' => true, 'file' => ['name' => basename($path), 'type' => 'file', 'contents' => $contents]]);
+        return ['success' => true, 'file' => ['name' => basename($path), 'type' => 'file', 'contents' => $contents]];
     }
 
     private function destroyDir($dir)
@@ -440,13 +438,6 @@ class NewLibraryHandler
         foreach ($entities as $entity) {
             $this->entityManager->persist($entity);
         }
-    }
-
-    private function editEntity($lib)
-    {
-        $old = $this->getLibrary($lib->getDefaultHeader());
-        $this->entityManager->remove($old);
-        $this->saveEntities(array($lib));
     }
 
     /**
