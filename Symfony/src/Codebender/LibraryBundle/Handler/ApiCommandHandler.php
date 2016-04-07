@@ -2,6 +2,7 @@
 
 namespace Codebender\LibraryBundle\Handler;
 
+use Codebender\LibraryBundle\Handler\ApiCommand\AbstractApiCommand;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,7 +29,7 @@ class ApiCommandHandler
      * public.
      *
      * @param $content
-     * @return InvalidApiCommand
+     * @return AbstractApiCommand
      */
     public function getService($content)
     {
