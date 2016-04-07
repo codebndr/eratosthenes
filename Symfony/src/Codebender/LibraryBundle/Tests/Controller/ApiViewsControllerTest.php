@@ -561,7 +561,7 @@ class ApiViewsControllerTest extends WebTestCase
 
         $this->assertEquals(1, $crawler->filter('h2:contains("EEPROM")')->count());
         $this->assertEquals(1, $crawler->filter('h3:contains("main header: EEPROM.h")')->count());
-
+        $this->assertEquals(0, $crawler->filter('#statusbutton')->count()); // no toggle status button for built-in libs
         $this->assertEquals(
             1,
             $crawler->filter(
