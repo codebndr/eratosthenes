@@ -286,7 +286,7 @@ class DefaultControllerFunctionalTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries_new') . '/Encode/1.0.0/';
+        $encodeLibraryPath = $client->getContainer()->getParameter('external_libraries_v2') . '/Encode/1.0.0/';
         $headerFile = file_get_contents($encodeLibraryPath . 'Encode.h');
         $exampleFile = file_get_contents($encodeLibraryPath . 'examples/encoded_example/encoded_example.ino');
         $malformedJson = json_encode(['header' => $headerFile, 'example' => $exampleFile]);

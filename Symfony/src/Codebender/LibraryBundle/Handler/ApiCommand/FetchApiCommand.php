@@ -23,7 +23,7 @@ class FetchApiCommand extends AbstractApiCommand
 
         $apiHandler = $this->container->get('codebender_library.apiHandler');
 
-        $externalLibrariesPath = $this->container->getParameter('external_libraries_new');
+        $externalLibrariesPath = $this->container->getParameter('external_libraries_v2');
 
         $finder = new Finder();
         $exampleFinder = new Finder();
