@@ -31,11 +31,11 @@ class FetchApiCommand extends AbstractApiCommand
         $exampleFinder = new Finder();
 
         //TODO handle the case of different .h filenames and folder names
-        $RESERVED_NAMES = ["ArduinoRobot" => "Robot_Control", "ArduinoRobotMotorBoard" => "Robot_Motor",
+        $reservedNames = ["ArduinoRobot" => "Robot_Control", "ArduinoRobotMotorBoard" => "Robot_Motor",
             "BlynkSimpleSerial" => "BlynkSimpleEthernet", "BlynkSimpleCC3000" => "BlynkSimpleEthernet"];
 
-        if (array_key_exists($filename, $RESERVED_NAMES)) {
-            $filename = $RESERVED_NAMES[$filename];
+        if (array_key_exists($filename, $reservedNames)) {
+            $filename = $reservedNames[$filename];
         }
 
         if (!$this->apiHandler->isLibrary($filename, $content['disabled'])) {
