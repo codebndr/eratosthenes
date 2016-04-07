@@ -58,7 +58,7 @@ class ApiHandler
 
         $versions = $library->getVersions();
         $version = $versions->filter(
-            function ($ver) use ($version) {
+            function (Version $ver) use ($version) {
                 return $ver->getVersion() === $version;
             },
             $versions
@@ -172,8 +172,10 @@ class ApiHandler
     public function getAllVersionsFromDefaultHeader($defaultHeader)
     {
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
-        $versionObjects = $library->getVersions();
-        return $versionObjects;
+        if ($library === null) {
+            return new ArrayCollection();
+        }
+        return $library->getVersions();
     }
 
     /**
@@ -189,7 +191,7 @@ class ApiHandler
 
         // check if this library contains requested version
         $result = $versionCollection->filter(
-            function ($versionObject) use ($version) {
+            function (Version $versionObject) use ($version) {
                 return $versionObject->getVersion() === $version;
             }
         );
@@ -234,7 +236,7 @@ class ApiHandler
         $examplenMeta = array_values(
             array_filter(
                 $versionMeta->getLibraryExamples()->toArray(),
-                function ($exampleObject) use ($example) {
+                function (LibraryExample $exampleObject) use ($example) {
                     return $exampleObject->getName() === $example;
                 }
             )

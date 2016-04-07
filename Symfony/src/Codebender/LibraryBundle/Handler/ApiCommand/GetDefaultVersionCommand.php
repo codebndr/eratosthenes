@@ -18,7 +18,7 @@ class GetDefaultVersionCommand extends AbstractApiCommand
         $handler = $this->get('codebender_library.apiHandler');
         // check library exists
         if (!$handler->isExternalLibrary($defaultHeader, true)) {
-            return ['success' => false, 'message' => 'No library named ' . $defaultHeader . ' was found.'];
+            return ['success' => false, 'message' => "No library named $defaultHeader was found."];
         }
         $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $defaultHeader);
 

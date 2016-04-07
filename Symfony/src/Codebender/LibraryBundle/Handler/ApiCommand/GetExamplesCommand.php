@@ -14,23 +14,28 @@ class GetExamplesCommand extends AbstractApiCommand
         }
         $library = $content['library'];
 
-        // TODO: use a default version if version is not given in the request
-        $version = array_key_exists('version', $content) ? $content['version'] : '';
-
         /* @var ApiHandler $handler */
         $handler = $this->get('codebender_library.apiHandler');
         $type = $handler->getLibraryType($library);
-
         if ($type === 'unknown') {
-            return ['success' => false, 'message' => 'Requested library named ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested library named $library not found"];
         }
 
+        $version = '';
+        // for external library, fetch default version for partner
+        if ($type === 'external') {
+            $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
+        }
+
+        // use specific requested version if any
+        if (array_key_exists('version', $content)) {
+            $version = $content['version']; // use specific requested version if any
+        }
 
         if (!$handler->libraryVersionExists($library, $version)) {
-            return ['success' => false, 'message' => 'Requested version for library ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested version for library $library not found"];
         }
 
-        $path = "";
         /*
          * Assume the requested library is an example
          */
@@ -68,28 +73,27 @@ class GetExamplesCommand extends AbstractApiCommand
 
         foreach ($inoFinder as $example) {
             $files = array();
-
-            $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), "UTF-8") : $example->getContents();
+            $content = (!mb_check_encoding($example->getContents(), 'UTF-8')) ? mb_convert_encoding($example->getContents(), 'UTF-8') : $example->getContents();
             $pathInfo = pathinfo($example->getBaseName());
             $files[] = array(
-                "filename" => $pathInfo['filename'] . '.ino',
-                "content" => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, "UTF-8") : $content
+                'filename' => $pathInfo['filename'] . '.ino',
+                'content' => (!mb_check_encoding($content, 'UTF-8')) ? mb_convert_encoding($content, 'UTF-8') : $content
             );
 
             // get non-ino files
-            $notInoFilesFinder->in($path . "/" . $example->getRelativePath());
+            $notInoFilesFinder->in($path . '/' . $example->getRelativePath());
 
             foreach ($notInoFilesFinder as $nonInoFile) {
                 $files[] = array(
-                    "filename" => $nonInoFile->getBaseName(),
-                    "content" => (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), "UTF-8") : $nonInoFile->getContents()
+                    'filename' => $nonInoFile->getBaseName(),
+                    'content' => (!mb_check_encoding($nonInoFile->getContents(), 'UTF-8')) ? mb_convert_encoding($nonInoFile->getContents(), 'UTF-8') : $nonInoFile->getContents()
                 );
             }
 
             $dir = preg_replace('/[E|e]xamples\//', '', $example->getRelativePath());
             $dir = str_replace($pathInfo['filename'], '', $dir);
             $dir = str_replace('/', ':', $dir);
-            if ($dir != '' && substr($dir, -1) != ':') {
+            if ($dir !== '' && substr($dir, -1) !== ':') {
                 $dir .= ':';
             }
 

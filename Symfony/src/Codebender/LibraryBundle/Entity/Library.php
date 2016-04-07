@@ -125,6 +125,7 @@ class Library
      * @var integer
      *
      * @ORM\OneToOne(targetEntity="Version")
+     * @ORM\JoinColumn(name="latest_version", referencedColumnName="id", nullable = false)
      */
     private $latest_version;
 
@@ -478,7 +479,7 @@ class Library
     }
 
     /**
-     * Return latest version id
+     * Return latest version
      *
      * @return Version
      */

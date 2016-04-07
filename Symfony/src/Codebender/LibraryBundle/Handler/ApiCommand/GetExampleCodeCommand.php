@@ -15,16 +15,24 @@ class GetExampleCodeCommand extends AbstractApiCommand
         }
         $library = $content['library'];
         $example = $content['example'];
-
-        // TODO: use a default version if version is not given in the request
-        $version = array_key_exists('version', $content) ? $content['version'] : '';
-
+        
         /* @var ApiHandler $handler */
         $handler = $this->get('codebender_library.apiHandler');
 
         $type = $handler->getLibraryType($library);
         if ($type === 'unknown') {
-            return ['success' => false, 'message' => 'Requested library named ' . $library . ' not found'];
+            return ['success' => false, 'message' => "Requested library named $library not found"];
+        }
+
+        $version = '';
+        // for external library, fetch default version for partner
+        if ($type === 'external') {
+            $version = $handler->fetchPartnerDefaultVersion($this->getRequest()->get('authorizationKey'), $library)->getVersion();
+        }
+
+        // use specific requested version if any
+        if (array_key_exists('version', $content)) {
+            $version = $content['version']; // use specific requested version if any
         }
 
         if ($type === 'external' && !$handler->libraryVersionExists($library, $version)) {
@@ -63,7 +71,7 @@ class GetExampleCodeCommand extends AbstractApiCommand
         $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $example);
 
         if (count($exampleMeta) === 0) {
-            $example = str_replace(":", "/", $example);
+            $example = str_replace(':', '/', $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
 
             $exampleMeta = $handler->getExampleForExternalLibrary($library, $version, $filename);
@@ -107,12 +115,12 @@ class GetExampleCodeCommand extends AbstractApiCommand
     {
         $finder = new Finder();
         $finder->in($dir);
-        $finder->name($example . ".ino", $example . ".pde");
+        $finder->name($example . '.ino', $example . '.pde');
 
         if (iterator_count($finder) === 0) {
-            $example = str_replace(":", "/", $example);
+            $example = str_replace(':', '/', $example);
             $filename = pathinfo($example, PATHINFO_FILENAME);
-            $finder->name($filename . ".ino", $filename . ".pde");
+            $finder->name($filename . '.ino', $filename . '.pde');
             if (iterator_count($finder) > 1) {
                 $filesPath = null;
                 foreach ($finder as $e) {
@@ -153,20 +161,20 @@ class GetExampleCodeCommand extends AbstractApiCommand
 
         $files = array();
         foreach ($filesFinder as $file) {
-            if ($file->getExtension() === "pde") {
-                $name = $file->getBasename("pde") . "ino";
+            if ($file->getExtension() === 'pde') {
+                $name = $file->getBasename('pde') . 'ino';
             } else {
                 $name = $file->getFilename();
             }
 
             $files[] = array(
-                "filename" => $name,
-                "code" => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), "UTF-8") : $file->getContents()
+                'filename' => $name,
+                'code' => (!mb_check_encoding($file->getContents(), 'UTF-8')) ? mb_convert_encoding($file->getContents(), 'UTF-8') : $file->getContents()
             );
 
         }
 
-        return ['success' => true, "files" => $files];
+        return ['success' => true, 'files' => $files];
     }
 
     /**
@@ -180,8 +188,8 @@ class GetExampleCodeCommand extends AbstractApiCommand
         $externalLibraryPath = $this->container->getParameter('external_libraries_new');
         $libraryFolder = $example->getVersion()->getLibrary()->getFolderName();
         $versionFolder = $example->getVersion()->getFolderName();
+        $examplePath = $example->getPath();
 
-        $fullPath = $externalLibraryPath . '/' . $libraryFolder . '/' . $versionFolder . '/' . $example->getPath();
-        return $fullPath;
+        return "$externalLibraryPath/$libraryFolder/$versionFolder/$examplePath";
     }
 }
