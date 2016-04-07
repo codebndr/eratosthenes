@@ -4,19 +4,23 @@ namespace Codebender\LibraryBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AuthenticationListener
 {
-    private $authorizationKey;
+    private $v1AuthorizationKey;
+    private $container;
 
     /**
      * AuthenticationListener constructor.
      *
      * @param string $authorizationKey
+     * @param ContainerInterface $container
      */
-    public function __construct($authorizationKey)
+    public function __construct($authorizationKey, ContainerInterface $container)
     {
-        $this->authorizationKey = $authorizationKey;
+        $this->v1AuthorizationKey = $authorizationKey;
+        $this->container = $container;
     }
 
     /**
@@ -28,12 +32,16 @@ class AuthenticationListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        /* @var \Codebender\LibraryBundle\Handler\ApiHandler $apiHandler */
+        $apiHandler = $this->container->get('codebender_library.apiHandler');
 
         $routeParameters = $request->attributes->get('_route_params');
 
         if (!empty($routeParameters)
             && array_key_exists('authorizationKey', $routeParameters)
-            && $routeParameters['authorizationKey'] != $this->authorizationKey
+            // Support both v1 and v2 authentication methods
+            && $routeParameters['authorizationKey'] != $this->v1AuthorizationKey
+            && !$apiHandler->isAuthenticatedPartner($routeParameters['authorizationKey'])
         ) {
             $event->setResponse(new Response(
                 json_encode(['success' => false, 'message' => '[eratosthenes] Invalid authorization key.'])

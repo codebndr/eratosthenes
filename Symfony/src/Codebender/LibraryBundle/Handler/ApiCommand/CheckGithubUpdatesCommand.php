@@ -24,7 +24,7 @@ class CheckGithubUpdatesCommand extends AbstractApiCommand
         $libraries = $this->entityManager->getRepository('CodebenderLibraryBundle:Library')->findAll();
 
         foreach ($libraries as $lib) {
-            if (!$this->isActive($lib) || !$this->hasGit($lib)){
+            if (!$this->isActive($lib) || !$this->hasGit($lib)) {
                 continue;
             }
 

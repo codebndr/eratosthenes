@@ -37,10 +37,13 @@ class ApiCommandHandler
         $apiName = $this->removeNonAlphabetic($content['type']);
         $serviceName = $apiPrefix . $apiName;
 
-        if (!$this->container->has($serviceName)) {
-            return $this->container->get($apiPrefix . 'invalidApi');
+        if ($this->container->has($serviceName)) {
+            $service = $this->container->get($serviceName);
+        } else {
+            $service = $this->container->get($apiPrefix . 'invalidApi');
         }
-        return $this->container->get($serviceName);
+
+        return $service;
     }
 
     /**

@@ -6,45 +6,41 @@ codebender_unit_test:
     pattern:  /{authorizationKey}/test
     defaults: { _controller: CodebenderLibraryBundle:Test:test }
 
-codebender_library_view_library:
-    pattern:  /{authorizationKey}/view
-    defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
+codebender_library_view_library_v2:
+    pattern:  /{authorizationKey}/v2/view
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:viewLibrary }
 
-codebender_library_get_repo_tree_meta:
-    pattern: /{authorizationKey}/get_repo_tree_meta
-    defaults: {_controller:CodebenderLibraryBundle:Default:getRepoGitTreeAndMeta}
-    methods:  [POST]
+codebender_library_download_v2:
+    pattern: /{authorizationKey}/v2/download/{defaultHeaderFile}/{version}
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:download }
 
-codebender_library_get_library_git_branches:
-    pattern: /{authorizationKey}/getlibgitbranches
-    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
-    methods:  [POST]
-
-codebender_library_download:
-    pattern: /{authorizationKey}/download/{library}
-    defaults: { _controller: CodebenderLibraryBundle:Views:download }
-
-codebender_library_new_external:
-    pattern: /{authorizationKey}/new
-    defaults: {_controller:CodebenderLibraryBundle:Views:newLibrary}
+codebender_library_new_external_v2:
+    pattern: /{authorizationKey}/v2/new
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:newLibrary}
     methods:  [GET, POST]
 
-codebender_library_check_github_updates:
-    pattern: /{authorizationKey}/gitUpdates
-    defaults: {_controller:CodebenderLibraryBundle:Views:gitUpdates}
+codebender_library_check_github_updates_v2:
+    pattern: /{authorizationKey}/v2/gitUpdates
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:gitUpdates}
 
-codebender_library_search:
-    pattern: /{authorizationKey}/search
-    defaults: { _controller: CodebenderLibraryBundle:Views:search }
+codebender_library_search_v2:
+    pattern: /{authorizationKey}/v2/search
+    defaults: { _controller: CodebenderLibraryBundle:ApiViews:search }
 
-codebender_library_status_change:
-    pattern: /{authorizationKey}/toggleStatus/{library}
-    defaults: {_controller:CodebenderLibraryBundle:Views:changeLibraryStatus}
+codebender_library_status_change_v2:
+    pattern: /{authorizationKey}/v2/toggleStatus/{library}
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:changeLibraryStatus}
     methods:  [POST]
 
-codebender_library_get_keywords:
-    pattern:  /{authorizationKey}/{version}/getKeywords
-    defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
+codebender_library_get_library_git_info:
+    pattern: /{authorizationKey}/v2/getLibGitInfo
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getLibraryGitInfo}
+    methods:  [POST]
+
+codebender_library_get_repo_tree_meta_v2:
+    pattern: /{authorizationKey}/v2/get_repo_tree_meta
+    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getRepoGitTreeAndMeta}
+    methods:  [POST]
 
 codebender_api_handler_v2:
     pattern:  /{authorizationKey}/v2

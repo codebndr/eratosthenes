@@ -333,4 +333,20 @@ class Version
     {
         return $this->architectures;
     }
+
+    /**
+     * Get the metadata of the version
+     *
+     * @return array
+     */
+    public function getVersionMeta()
+    {
+        return array(
+            'version' => $this->getVersion(),
+            'description' => $this->getDescription(),
+            'notes' => $this->getNotes(),
+            'sourceUrl' => $this->getSourceUrl(),
+            'architectures' => $this->getArchitectures()->toArray()
+        );
+    }
 }

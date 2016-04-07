@@ -1,0 +1,45 @@
+<h3>Files:</h3>
+<div class="panel-group" id="files_accordion" role="tablist" aria-multiselectable="true">
+    {% set get_example_hash = { 'authorizationKey':   (authorizationKey)  , 'version': 'v1' } %}
+    {% for file in files %}
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading{{ loop.index }}">
+                <h4 class="panel-title">
+                    <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#files_accordion" href="#files_collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                        {{ file.filename }} <i class="fa fa-chevron-down"></i>
+                    </a>
+                </h4>
+            </div>
+            <div id="files_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ loop.index }}">
+                <div class="panel-body">
+                    <pre>{{ file.content }}</pre>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% set exampleCount = examples | length %}
+<h3>Examples ({{ exampleCount }} found): </h3>
+<div class="panel-group" id="examples_accordion" role="tablist" aria-multiselectable="true">
+    {% if exampleCount == 0 %}
+        <h2><small>The library contains no examples.</small></h2>
+    {% else %}
+        {% for file in examples %}
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="heading{{ loop.index }}">
+                    <h4 class="panel-title">
+                        <a class="collapsed" style="color:#337ab7" role="button" data-toggle="collapse" data-parent="#examples_accordion" href="#examples_collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                            {{ file.filename }} <i class="fa fa-chevron-down"></i>
+                        </a>
+                    </h4>
+                </div>
+                <div id="examples_collapse{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ loop.index }}">
+                    <div class="panel-body">
+                        <pre>{{ file.content }}</pre>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>

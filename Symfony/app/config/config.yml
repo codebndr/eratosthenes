@@ -25,7 +25,7 @@ services:
         class: Codebender\LibraryBundle\EventListener\AuthenticationListener
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-        arguments: [ %authorizationKey% ]
+        arguments: [ %authorizationKey%, @service_container ]
 
 # Twig Configuration
 twig:

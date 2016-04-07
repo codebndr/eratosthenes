@@ -22,8 +22,14 @@ class ApiControllerTest extends WebTestCase
 
         $response = $this->postApiType('98am(DW*340D(#*5$%');
         $this->assertFalse($response['success']);
-    }
 
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{}'); // no request data
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+    }
+    
     public function testList()
     {
         $client = static::createClient();
@@ -41,33 +47,129 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('categories', $response);
         $categories = $response['categories'];
 
+        // Check Examples
         $this->assertArrayHasKey('Examples', $categories);
         $this->assertNotEmpty($categories['Examples']);
 
-        $this->assertArrayHasKey('Builtin Libraries', $categories);
-        $this->assertNotEmpty($categories['Builtin Libraries']);
-
         $basicExamples = $categories['Examples']['01.Basics']['examples'];
-
         // Check for a specific, known example
         $foundExample = array_filter($basicExamples, function($element) {
             if ($element['name'] == 'AnalogReadSerial') {
                 return true;
             }
+            return false;
         });
-
         $foundExample = array_values($foundExample);
 
         // Make sure the example was found
         $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
 
+        // Check Builtin Libraries
+        $this->assertArrayHasKey('Builtin Libraries', $categories);
+        $this->assertNotEmpty($categories['Builtin Libraries']);
+
+        $this->assertArrayHasKey('EEPROM', $categories['Builtin Libraries']);
+        $this->assertArrayHasKey('default', $categories['Builtin Libraries']['EEPROM']);
+        $this->assertTrue(in_array('eeprom_clear', $categories['Builtin Libraries']['EEPROM']['default']['examples']));
+
+        // Check External Libraries
         $this->assertArrayHasKey('External Libraries', $categories);
         $this->assertNotEmpty($categories['External Libraries']);
 
+        $this->assertArrayHasKey('MultiIno', $categories['External Libraries']);
         $this->assertArrayHasKey('1.0.0', $categories['External Libraries']['MultiIno']);
         $this->assertArrayHasKey('2.0.0', $categories['External Libraries']['MultiIno']);
-
         $this->assertTrue(in_array('multi_ino_example', $categories['External Libraries']['MultiIno']['1.0.0']['examples']));
+
+        // Check examples outside 'Examples' folder
+        $this->assertArrayHasKey('SubCateg', $categories['External Libraries']);
+        $this->assertTrue(in_array('experienceBased:Beginners:subcateg_example_two', $categories['External Libraries']['SubCateg']['1.0.0']['examples']));
+    }
+
+    /**
+     * This method tests the getVersions API.
+     */
+    public function testGetVersions()
+    {
+        // Test successful getVersions calls
+        $this->assertSuccessfulGetVersions('default', ['1.0.0', '1.1.0']);
+        $this->assertSuccessfulGetVersions('DynamicArrayHelper', ['1.0.0']);
+
+        // Test invalid getVersions calls
+        $this->assertFailedGetVersions('nonExistentLib');
+        $this->assertFailedGetVersions('');
+        $this->assertFailedGetVersions(null);
+    }
+    
+    /**
+     * This method test the getKeywords API.
+     */
+    public function testGetKeywords()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM", "version":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+        $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
+        $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"default", "version" : "1.0.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
+        $this->assertArrayHasKey('keywords', $response);
+    }
+
+    /**
+     * This method test the failure cases of getKeywords API.
+     */
+    public function testGetKeywordsInvalidRequest()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        // no library in the request
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Incorrect request fields', $response['message']);
+
+        // library version not found
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "noSuchLib", "version": "1.0.0"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Could not find keywords for requested library.', $response['message']);
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "default", "version": "9.9.9"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Could not find keywords for requested library version.', $response['message']);
+
+        // unsupported library
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getKeywords", "library" : "01.Basics"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
     }
 
     /**
@@ -77,6 +179,17 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getExamples", "library" : "MultiIno"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('multi_ino_example:methods', $response['examples']);
+        $this->assertArrayHasKey('multi_ino_example', $response['examples']);
+
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
@@ -98,7 +211,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExamples", "library" : "EEPROM"}'
+            '{"type":"getExamples", "library" : "EEPROM", "version":"default"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -169,73 +282,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('Requested version for library MultiIno not found', $response['message']);
     }
 
-    /*
-     * This method tests the getVersions API.
-     */
-    public function testGetVersions()
-    {
-        // Test successful getVersions calls
-        $this->assertSuccessfulGetVersions('default', ['1.0.0', '1.1.0']);
-        $this->assertSuccessfulGetVersions('DynamicArrayHelper', ['1.0.0']);
-        $this->assertSuccessfulGetVersions('HtmlLib', []);
-
-        // Test invalid getVersions calls
-        $this->assertFailedGetVersions('nonExistentLib');
-        $this->assertFailedGetVersions('');
-        $this->assertFailedGetVersions(null);
-    }
-
-    /*
-     * This method test the getKeywords API.
-     */
-    public function testGetKeywords()
-    {
-        $client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getKeywords", "library":"EEPROM"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(true, $response['success']);
-        $this->assertArrayHasKey('keywords', $response);
-        $this->assertArrayHasKey('KEYWORD1', $response['keywords']);
-        $this->assertEquals('EEPROM', $response['keywords']['KEYWORD1'][0]);
-    }
-
-    /*
-     * This method tests the checkGithubUpdates API.
-     */
-    public function testCheckGithubUpdates()
-    {
-        $client = static::createClient();
-
-        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertTrue($response['success']);
-        $this->assertEquals('1 external libraries need to be updated', $response['message']);
-        /*
-         * DynamicArrayHelper library's last commit is not the same as its origin.
-         */
-        $this->assertEquals('DynamicArrayHelper', $response['libraries'][0]['Machine Name']);
-
-        /*
-         * Disabling the library should make it not be returned in the list.
-         */
-        $handler = $this->getService('codebender_api.checkGithubUpdates');
-        $handler->toggleLibraryStatus('DynamicArrayHelper');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertTrue($response['success']);
-        $this->assertEquals('No external libraries need to be updated', $response['message']);
-    }
-
     /**
      * Test getting external example code for getExampleCode API
      */
@@ -243,6 +289,16 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest(
+            $client,
+            $authorizationKey,
+            '{"type":"getExampleCode", "library":"SubCateg", "example":"subcateg_example_one"}'
+        );
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('subcateg_example_one.ino', $response['files'][0]['filename']);
+        $this->assertContains('void setup()', $response['files'][0]['code']);
 
         $client = $this->postApiRequest(
             $client,
@@ -276,7 +332,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExampleCode", "library":"EEPROM", "example":"eeprom_read"}'
+            '{"type":"getExampleCode", "library":"EEPROM", "version":"default", "example":"eeprom_read"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
@@ -286,7 +342,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest(
             $client,
             $authorizationKey,
-            '{"type":"getExampleCode", "library":"WiFi", "example":"WiFiWebClient"}'
+            '{"type":"getExampleCode", "library":"WiFi", "version":"default", "example":"WiFiWebClient"}'
         );
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
@@ -397,14 +453,190 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default","version":"1.1.0"}');
+
         $response = json_decode($client->getResponse()->getContent(), true);
+
         $this->assertTrue($response['success']);
         $this->assertEquals('Library found', $response['message']);
-        $filenames = array_column($response['files'], 'filename');
+
+        $this->assertArrayHasKey('1.1.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.1.0'], 'filename');
         $this->assertContains('default.cpp', $filenames);
         $this->assertContains('default.h', $filenames);
         $this->assertContains('inc_file.inc', $filenames);
         $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testFetchApiCommandWithoutLibrary()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertFalse($response['success']);
+        $this->assertEquals('You need to specify which library to fetch.', $response['message']);
+    }
+
+    public function testFetchApiCommandWithReservedName()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch", "library": "ArduinoRobot"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $filenames = array_column($response['files'], 'filename');
+        $this->assertContains('Wire.cpp', $filenames);
+        $this->assertContains('Adafruit_GFX.cpp', $filenames);
+        $this->assertContains('EasyTransfer2.cpp', $filenames);
+    }
+
+    public function testFetchApiCommandWithoutVersion()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $this->assertEquals(1, sizeof($response['files']));
+        $this->assertArrayHasKey('1.0.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.0.0'], 'filename');
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testFetchApiCommandWithWrongVersion()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetch","library":"default", "version":"1.0.1"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertFalse($response['success']);
+        $this->assertEquals('No files for Library named `default` with version `1.0.1` found.', $response['message']);
+    }
+
+    public function testFetchLatestApiCommand()
+    {
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"fetchLatest","library":"default"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Library found', $response['message']);
+
+        $this->assertEquals(1, count($response['files']));
+        $this->assertArrayHasKey('1.1.0', $response['files']);
+
+        $filenames = array_column($response['files']['1.1.0'], 'filename');
+        $this->assertContains('default.cpp', $filenames);
+        $this->assertContains('default.h', $filenames);
+        $this->assertContains('inc_file.inc', $filenames);
+        $this->assertContains('assembly_file.S', $filenames);
+    }
+
+    public function testGetDefaultVersionCommand()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('Wrong data', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion", "library":"NoSuchLib"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals('No library named NoSuchLib was found.', $response['message']);
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"getDefaultVersion","library":"default"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('1.0.0', $response['version']);
+    }
+
+    /**
+     * This method tests the checkGithubUpdates API.
+     */
+    public function testCheckGithubUpdates()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('1 external libraries need to be updated', $response['message']);
+        /*
+         * DynamicArrayHelper library's last commit is not the same as its origin.
+         */
+        $this->assertEquals('DynamicArrayHelper', $response['libraries'][0]['Machine Name']);
+
+        /*
+         * Disabling the library should make it not be returned in the list.
+         */
+        $handler = $this->getService('codebender_library.apiHandler');
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"checkGithubUpdates"}');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertTrue($response['success']);
+        $this->assertEquals('No external libraries need to be updated', $response['message']);
+
+        $handler->toggleLibraryStatus('DynamicArrayHelper');
+    }
+
+    /**
+     * This method tests the authentication mechanism of Eratosthenes
+     */
+    public function testApiAuthentication()
+    {
+        $client = static::createClient();
+        $invalidAuthorizationKey = 'thisIsAnInvalidAuthorizationKey';
+        $validV1AuthorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $validV2AuthorizationKey = $client->getContainer()->get('Doctrine')
+            ->getRepository('CodebenderLibraryBundle:Partner')
+            ->findOneBy(['name' => 'arduino.cc'])
+            ->getAuthKey();
+        $this->assertFailAuthorization($invalidAuthorizationKey);
+        $this->assertPassAuthorization($validV1AuthorizationKey);
+        $this->assertPassAuthorization($validV2AuthorizationKey);
+    }
+
+    private function assertFailAuthorization($authorizationKey) {
+        $client = static::createClient();
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"status"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(false, $response['success']);
+    }
+
+    private function assertPassAuthorization($authorizationKey) {
+        $client = static::createClient();
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"status"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $response['success']);
     }
 
     /**
@@ -492,12 +724,14 @@ class ApiControllerTest extends WebTestCase
      */
     private function areSimilarArrays($array1, $array2)
     {
-        sort($array1);
-        sort($array2);
-        return $array1 === $array2;
+        $arrayDiff1 = array_diff($array1, $array2);
+        $arrayDiff2 = array_diff($array2, $array1);
+        $totalDifferences = array_merge($arrayDiff1, $arrayDiff2);
+
+        return empty($totalDifferences);
     }
 
-    /*
+    /**
      * This method returns a given service from its name.
      *
      * @param $service
