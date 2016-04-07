@@ -42,51 +42,6 @@ codebender_library_get_repo_tree_meta_v2:
     defaults: {_controller:CodebenderLibraryBundle:ApiViews:getRepoGitTreeAndMeta}
     methods:  [POST]
 
-codebender_library_get_library_meta:
-    pattern: /{authorizationKey}/v2/getLibMeta/{library}
-    defaults: {_controller:CodebenderLibraryBundle:ApiViews:getLibraryMeta}
-    methods:  [POST]
-
-codebender_library_view_library:
-    pattern:  /{authorizationKey}/view
-    defaults: { _controller: CodebenderLibraryBundle:Views:viewLibrary }
-
-codebender_library_get_repo_tree_meta:
-    pattern: /{authorizationKey}/get_repo_tree_meta
-    defaults: {_controller:CodebenderLibraryBundle:Default:getRepoGitTreeAndMeta}
-    methods:  [POST]
-
-codebender_library_get_library_git_branches:
-    pattern: /{authorizationKey}/getlibgitbranches
-    defaults: {_controller:CodebenderLibraryBundle:Default:getLibraryGitBranches}
-    methods:  [POST]
-
-codebender_library_download:
-    pattern: /{authorizationKey}/download/{library}
-    defaults: { _controller: CodebenderLibraryBundle:Views:download }
-
-codebender_library_new_external:
-    pattern: /{authorizationKey}/new
-    defaults: {_controller:CodebenderLibraryBundle:Views:newLibrary}
-    methods:  [GET, POST]
-
-codebender_library_check_github_updates:
-    pattern: /{authorizationKey}/gitUpdates
-    defaults: {_controller:CodebenderLibraryBundle:Views:gitUpdates}
-
-codebender_library_search:
-    pattern: /{authorizationKey}/search
-    defaults: { _controller: CodebenderLibraryBundle:Views:search }
-
-codebender_library_status_change:
-    pattern: /{authorizationKey}/toggleStatus/{library}
-    defaults: {_controller:CodebenderLibraryBundle:Views:changeLibraryStatus}
-    methods:  [POST]
-
-codebender_library_get_keywords:
-    pattern:  /{authorizationKey}/{version}/getKeywords
-    defaults: { _controller: CodebenderLibraryBundle:Default:getKeywords}
-
 codebender_api_handler_v2:
     pattern:  /{authorizationKey}/v2
     defaults: { _controller: CodebenderLibraryBundle:Api:apiHandler }
