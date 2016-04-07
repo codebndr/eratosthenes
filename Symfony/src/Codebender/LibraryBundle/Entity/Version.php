@@ -345,7 +345,8 @@ class Version
             'version' => $this->getVersion(),
             'description' => $this->getDescription(),
             'notes' => $this->getNotes(),
-            'sourceUrl' => $this->getSourceUrl()
+            'sourceUrl' => $this->getSourceUrl(),
+            'architectures' => $this->getArchitectures()->toArray()
         );
     }
 }

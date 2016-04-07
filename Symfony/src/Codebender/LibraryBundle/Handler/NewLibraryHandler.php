@@ -242,6 +242,7 @@ class NewLibraryHandler
         }
 
         $this->saveEntities(array($lib, $version));
+        $this->saveArchitecturesForVersion($version, $data['Architectures']);
         $this->saveExamples($data, $lib, $version);
 
         return json_encode(array("success" => true));
@@ -425,6 +426,22 @@ class NewLibraryHandler
             $this->entityManager->persist($entity);
         }
         $this->entityManager->flush();
+    }
+
+    /**
+     * Save each supported architecture to the given version
+     * @param $version
+     * @param $architectures
+     */
+    private function saveArchitecturesForVersion($version, $architectures)
+    {
+        if ($architectures->isEmpty()) {
+            return;
+        }
+        foreach ($architectures as $architecture) {
+            $version->addArchitecture($architecture);
+        }
+        $this->saveEntities([$version]);
     }
 
     /**

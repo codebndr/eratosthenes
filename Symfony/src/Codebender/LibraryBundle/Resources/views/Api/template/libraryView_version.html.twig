@@ -22,6 +22,15 @@
                        href="{{ path('codebender_library_download_v2', download_hash) }}">Download this version</a>
                     <br/>
                     <br/>
+                    {% if version.architectures %}
+                        <h3>Supported architecture for this version</h3>
+                        <ul>
+                            {% for architecture in version.architectures %}
+                                <li>{{ architecture }}</li>
+                            {% endfor %}
+                        </ul>
+                        <br/>
+                    {% endif %}
                     <h3>Files:</h3>
                     <div class="panel-group" id="files_{{ versionId }}_accordion" role="tablist" aria-multiselectable="true">
                         {% for file in attribute(files, version.version) %}

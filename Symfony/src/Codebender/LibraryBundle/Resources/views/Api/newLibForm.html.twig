@@ -96,6 +96,8 @@
                                 <h3 class="labelcontent"><span><i class="fa fa-caret-right"></i> Version:</span> {{ form_widget(form.Version) }}</h3>
                                 <h3 class="labelcontent clearfix"><span><i class="fa fa-caret-right"></i> Version Description:</span> {{ form_widget(form.VersionDescription) }}</h3>
                                 <h3 class="labelcontent"><span><i class="fa fa-caret-right"></i> Notes for the version:</span><br/> {{ form_widget(form.VersionNotes) }}</h3>
+                                <h3 class="labelcontent"><span><i class="fa fa-caret-right"></i> Architecture:</span></h3>
+                                {{ form_widget(form.Architectures) }}
                                 <h3 id="urlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Info Url:</span> {{ form_widget(form.Url) }}</h3>
                                 <h3 id="sourceUrlDiv" class="labelcontent"><span><i class="fa fa-caret-right"></i> Source Url:</span> {{ form_widget(form.SourceUrl) }}</h3>
                                 {{ form_end(form) }}

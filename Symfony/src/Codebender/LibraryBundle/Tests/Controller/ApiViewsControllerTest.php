@@ -105,6 +105,7 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals(2, $crawler->filter('a.collapsed:contains("example_one.ino")')->count());
         $this->assertEquals(2, $crawler->filter('h3:contains("Files:")')->count());
         $this->assertEquals(2, $crawler->filter('h3:contains("Examples (1 found): ")')->count());
+        $this->assertEquals(2, $crawler->filter('h3:contains("Supported architecture for this version")')->count());
     }
 
     public function testAddGitLibrary()
@@ -148,6 +149,10 @@ class ApiViewsControllerTest extends WebTestCase
             'https://api.github.com/repos/nus-fboa2016-CB/WebSerial/zipball/v1.0.0',
             $versionEntity->getSourceUrl()
         );
+        /*
+         * Check that architectures are correctly set
+         */
+        $this->assertEquals(4, $versionEntity->getArchitectures()->count());
 
         /*
          * Check the examples' metadata have been stored correctly in the database
@@ -244,6 +249,7 @@ class ApiViewsControllerTest extends WebTestCase
             'newLibrary[Version]' => '1.0.0',
             'newLibrary[VersionDescription]' => 'The very first version',
             'newLibrary[VersionNotes]' => 'Some notes about EMIC2 v1.0.0',
+            'newLibrary[Architectures]' => ['1', '2', '3', '4'], // id of 4 architectures
             'newLibrary[_token]' => $token
         ];
 
@@ -279,6 +285,11 @@ class ApiViewsControllerTest extends WebTestCase
         $this->assertEquals('The very first version', $versionEntity->getDescription());
         $this->assertEquals('Some notes about EMIC2 v1.0.0', $versionEntity->getNotes());
         $this->assertNull($versionEntity->getSourceUrl());
+
+        /*
+         * Check that architectures are correctly set
+         */
+        $this->assertEquals(4, $versionEntity->getArchitectures()->count());
 
         /*
          * Check the examples' metadata have been stored correctly in the database
@@ -339,6 +350,7 @@ class ApiViewsControllerTest extends WebTestCase
             'newLibrary[Version]' => '1.0.0',
             'newLibrary[VersionDescription]' => 'The very first version',
             'newLibrary[VersionNotes]' => 'Some notes about EEPROM2 v1.0.0',
+            'newLibrary[Architectures]' => ['1', '2', '3', '4'], // id of 4 architectures
             'newLibrary[Url]' => 'https://github.com/codebendercc/arduino-library-files',
             'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/arduino-library-files/archive/testing.zip',
             'newLibrary[_token]' => $token
@@ -385,6 +397,11 @@ class ApiViewsControllerTest extends WebTestCase
         );
 
         /*
+         * Check that architectures are correctly set
+         */
+        $this->assertEquals(4, $versionEntity->getArchitectures()->count());
+
+        /*
          * The same applies to the library example
          */
         /* @var \Codebender\LibraryBundle\Entity\LibraryExample $example */
@@ -417,6 +434,7 @@ class ApiViewsControllerTest extends WebTestCase
             'newLibrary[Description]' => 'A repo used for testing fetching files with size > 1MB from Github API',
             'newLibrary[Version]' => '1.0.0',
             'newLibrary[VersionDescription]' => 'The very first version',
+            'newLibrary[Architectures]' => ['1', '2', '3', '4'], // id of 4 architectures
             'newLibrary[Url]' => 'https://github.com/codebendercc/maxFileSize',
             'newLibrary[SourceUrl]' => 'https://github.com/codebendercc/maxFileSize/archive/master.zip',
             'newLibrary[_token]' => $token
@@ -461,6 +479,11 @@ class ApiViewsControllerTest extends WebTestCase
             'https://github.com/codebendercc/maxFileSize/archive/master.zip',
             $versionEntity->getSourceUrl()
         );
+
+        /*
+         * Check that architectures are correctly set
+         */
+        $this->assertEquals(4, $versionEntity->getArchitectures()->count());
 
         $filesAndExamples = [
             'code.cpp',
@@ -544,6 +567,7 @@ class ApiViewsControllerTest extends WebTestCase
             'newLibrary[Version]' => $release,
             'newLibrary[VersionDescription]' => 'WebSerial ' . $release,
             'newLibrary[VersionNotes]' => 'Some notes about Arduino WebSerial ' . $release,
+            'newLibrary[Architectures]' => ['1', '2', '3', '4'], // id of 4 architectures
             'newLibrary[SourceUrl]' => 'https://api.github.com/repos/nus-fboa2016-CB/WebSerial/zipball/' . $release,
             'newLibrary[_token]' => $token
         ];
