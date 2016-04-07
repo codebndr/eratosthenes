@@ -698,4 +698,42 @@ class ApiViewsControllerTest extends WebTestCase
             $this->assertEquals(1, $crawler->filter('a[class="collapsed"]:contains("' . $file . '")')->count());
         }
     }
+
+    public function testGetGitInformation()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client->request(
+            'POST',
+            '/' . $authorizationKey . '/v2/getLibGitInfo',
+            ['githubUrl' => 'https://github.com/nus-fboa2016-CB/WebSerial']
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals(2, count($response['releases']));
+        $this->assertArrayHasKey('name', $response['releases'][0]);
+        $this->assertArrayHasKey('tag', $response['releases'][0]);
+        $this->assertArrayHasKey('branch', $response['releases'][0]);
+        $this->assertArrayHasKey('source', $response['releases'][0]);
+    }
+
+    public function testChangeLibraryStatus()
+    {
+        $client = static::createClient();
+
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+
+        $client->request('POST', '/' . $authorizationKey . '/v2/toggleStatus/SubCateg');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+
+        $client->request('POST', '/' . $authorizationKey . '/v2/toggleStatus/SubCateg');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+    }
 }

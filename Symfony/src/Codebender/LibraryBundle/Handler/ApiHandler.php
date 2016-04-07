@@ -4,6 +4,7 @@ namespace Codebender\LibraryBundle\Handler;
 
 use Codebender\LibraryBundle\Entity\Library;
 use Codebender\LibraryBundle\Entity\LibraryExample;
+use Codebender\LibraryBundle\Entity\Partner;
 use Codebender\LibraryBundle\Entity\Version;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -354,6 +355,15 @@ class ApiHandler
         $reponse = $this->curlGitRequest($url);
         $dateString = $reponse['committer']['date'];
         return strtotime($dateString);
+    }
+
+    public function isAuthenticatedPartner($auth_key)
+    {
+        /* @var Partner $partner */
+        $partner = $this->entityManager
+            ->getRepository('CodebenderLibraryBundle:Partner')
+            ->findOneBy(array('auth_key' => $auth_key));
+        return $partner !== null;
     }
 
     /**
