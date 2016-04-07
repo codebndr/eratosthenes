@@ -52,7 +52,7 @@ class ApiHandler
      */
     public function getExternalLibraryPath($defaultHeader, $version)
     {
-        $externalLibraryRoot = $this->container->getParameter('external_libraries_new') . "/";
+        $externalLibraryRoot = $this->container->getParameter('external_libraries_v2') . "/";
 
         $library = $this->getLibraryFromDefaultHeader($defaultHeader);
         $libraryFolderName = $library->getFolderName();
@@ -438,7 +438,7 @@ class ApiHandler
     {
         foreach ($dir['contents'] as $file) {
             if ($file['type'] == 'file' && strpos($file['name'], ".h") !== false) {
-                return json_encode(array('success' => true, 'directory' => $dir));
+                return ['success' => true, 'directory' => $dir];
             }
         }
 
@@ -447,7 +447,7 @@ class ApiHandler
                 foreach ($file['contents'] as $f) {
                     if ($f['type'] == 'file' && strpos($f['name'], ".h") !== false) {
                         $file = $this->fixDirName($file);
-                        return json_encode(array('success' => true, 'directory' => $file));
+                        return ['success' => true, 'directory' => $file];
                     }
                 }
             }
