@@ -236,6 +236,45 @@ class LoadLibraryExamplesData extends AbstractFixture implements OrderedFixtureI
          */
         $objectManager->persist($encodeLibraryExample);
 
+        /*
+         * Get Version 1.0.0 of deleteMe Library
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $encodeLibraryVersion1 */
+        $deleteMeLibraryVersion1 = $this->getReference('deleteMeLibraryVersion1');
+
+        /*
+         * Mock a new library example
+         */
+        $deleteMeLibraryExample1 = new LibraryExample();
+        $deleteMeLibraryExample1->setName('deleteMe_example');
+        $deleteMeLibraryExample1->setVersion($deleteMeLibraryVersion1);
+        $deleteMeLibraryExample1->setPath('examples/deleteMe_example/deleteMe_example.ino');
+        $deleteMeLibraryExample1->setBoards(null);
+
+        /*
+         * Add newly created example to the database using the object manager interface
+         */
+        $objectManager->persist($deleteMeLibraryExample1);
+
+        /*
+         * Get Version 1.1.0 of deleteMe Library
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $encodeLibraryVersion2 */
+        $deleteMeLibraryVersion2 = $this->getReference('deleteMeLibraryVersion2');
+
+        /*
+         * Mock a new library example
+         */
+        $deleteMeLibraryExample2 = new LibraryExample();
+        $deleteMeLibraryExample2->setName('deleteMe_example');
+        $deleteMeLibraryExample2->setVersion($deleteMeLibraryVersion2);
+        $deleteMeLibraryExample2->setPath('examples/deleteMe_example/deleteMe_example.ino');
+        $deleteMeLibraryExample2->setBoards(null);
+
+        /*
+         * Add newly created example to the database using the object manager interface
+         */
+        $objectManager->persist($deleteMeLibraryExample2);
 
         // From here on add the internal library examples. Only few are added.
         $builtInLibs = [

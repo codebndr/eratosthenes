@@ -328,6 +328,51 @@ class LoadLibraryAndVersionData extends AbstractFixture implements OrderedFixtur
         $objectManager->persist($binaryLbraryVersion1);
 
 
+        // Fake libraries to be used for testing delete API
+        $deleteMeLibrary = new Library();
+        $deleteMeLibrary->setName('deleteMeLibrary');
+        $deleteMeLibrary->setDefaultHeader('deleteMe');
+        $deleteMeLibrary->setActive(true);
+        $deleteMeLibrary->setVerified(false);
+        $deleteMeLibrary->setDescription('Fake library for delete test');
+        $deleteMeLibrary->setNotes('No one shall read this note.');
+        $deleteMeLibrary->setUrl('http://localhost/library/url');
+        $deleteMeLibrary->setFolderName('delete');
+
+        /*
+         * Create mock version 1.0.0 for delete library
+         */
+        $deleteMeLibraryVersion1 = new Version();
+        $deleteMeLibraryVersion1->setVersion('1.0.0');
+        $deleteMeLibraryVersion1->setLibrary($deleteMeLibrary);
+        $deleteMeLibraryVersion1->setDescription('Version 1.0.0');
+        $deleteMeLibraryVersion1->setFolderName('1.0.0');
+
+        /*
+         * Create mock version 1.1.0 for delete library
+         */
+        $deleteMeLibraryVersion2 = new Version();
+        $deleteMeLibraryVersion2->setVersion('1.1.0');
+        $deleteMeLibraryVersion2->setLibrary($deleteMeLibrary);
+        $deleteMeLibraryVersion2->setDescription('Version 1.1.0');
+        $deleteMeLibraryVersion2->setFolderName('1.1.0');
+
+        /*
+         * Set the latest version for the library
+         */
+        $deleteMeLibrary->setLatestVersion($deleteMeLibraryVersion2);
+
+        /*
+         * Set references and persist
+         */
+        $this->setReference('deleteMeLibrary', $deleteMeLibrary);
+        $this->setReference('deleteMeLibraryVersion1', $deleteMeLibraryVersion1);
+        $this->setReference('deleteMeLibraryVersion2', $deleteMeLibraryVersion2);
+        $objectManager->persist($deleteMeLibraryVersion1);
+        $objectManager->persist($deleteMeLibraryVersion2);
+        $objectManager->persist($deleteMeLibrary);
+
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
