@@ -638,9 +638,18 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals("You need to specify which library version to delete.", $response['message']);
+
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
+
+        $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
@@ -654,6 +663,9 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
+
+        $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
+        $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe'));
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
