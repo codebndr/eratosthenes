@@ -634,8 +634,12 @@ class ApiControllerTest extends WebTestCase
         $this->assertPassAuthorization($validV2AuthorizationKey);
     }
 
+    /**
+     * This method tests the deleteLibrary API
+     */
     public function testDeleteLibraryCommand()
     {
+        // Test deleting without specifying a version: this should fail
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe"}');
@@ -643,15 +647,16 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
         $this->assertEquals("You need to specify which library version to delete.", $response['message']);
 
+        // Test deleting with a correct version specified: this should succeed
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.0.0 of the library deleteMe has been deleted successfully.", $response['message']);
-
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
 
+        // Test deleting with an invalid version specified: this should fail
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.0.0"}');
@@ -659,16 +664,17 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
         $this->assertEquals("There is no version 1.0.0 for library called deleteMe to delete.", $response['message']);
 
+        // Test deleting the only version left: this should succeed and the entire library should be deleted
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.1.0 of the library deleteMe has been deleted successfully.", $response['message']);
-
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe'));
 
+        // Test deleting a library that does not exist: this should fail
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.1.0"}');
@@ -676,8 +682,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
         $this->assertEquals("There is no library called deleteMe to delete.", $response['message']);
 
-
-
+        // Test deleting the latest version of a library without specifying the next latest version of the library: this should fail
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0"}');
@@ -685,6 +690,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
         $this->assertEquals("You need to specify the next latest version of the library deleteLatestMe.", $response['message']);
 
+        // Test deleting the latest version of a library by specifying an invalid next latest version: this should fail
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "nextLatestVersion":"1.0"}');
@@ -692,13 +698,13 @@ class ApiControllerTest extends WebTestCase
         $this->assertFalse($response['success']);
         $this->assertEquals("The next latest version 1.0 does not exist.", $response['message']);
 
+        // Test deleting the latest version of a library with a valid next latest version specified: this should succeed
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "nextLatestVersion":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.1.0 of the library deleteLatestMe has been deleted successfully.", $response['message']);
-
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteLatestMe/1.1.0'));
     }
 
