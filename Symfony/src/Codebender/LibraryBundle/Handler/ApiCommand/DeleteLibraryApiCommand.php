@@ -39,12 +39,12 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         $libraryFolderName = $library->getFolderName();
         $versionFolderName = $version->getFolderName();
 
-        $this->setNullToVersionLibrary($version);
-
-        $this->removeVersionExamples($version);
-        $this->removeRelatedPreference($version);
+        $enitiesToPersist = [];
+        $entitiesToRemove = [];
+        $entitiesToRemove = array_merge($entitiesToRemove, $this->getVersionExamples($version));
+        $entitiesToRemove = array_merge($entitiesToRemove, $this->getRelatedPreferences($version));
         if (sizeof($library->getVersions()) === 1) {
-            $this->removeLibrary($library);
+            $entitiesToRemove[] = $library;
             $dir = $libraryFolderName;
         } else {
             if ($this->isLatestVersion($library, $version)) {
@@ -52,16 +52,23 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
                     return ["success" => false, "message" => "You are deleting the latest version of this library. Please specify a new latest version."];
                 }
                 try {
-                    $this->setNewLatestLibrary($library, $content['latest_version']);
+                    $enitiesToPersist[] = $this->getEntityWithNewLatestLibrary($library, $content['latest_version']);
                 } catch (InvalidArgumentException $e) {
                     return ["success" => false, "message" => $e->getMessage()];
                 }
             }
             $dir = "$libraryFolderName/$versionFolderName";
         }
-        $this->removeVersion($version);
+        $entitiesToRemove[] = $version;
 
         try {
+            $this->setNullToVersionLibrary($version);
+            foreach ($enitiesToPersist as $entity) {
+                $this->entityManager->persist($entity);
+            }
+            foreach ($entitiesToRemove as $entity) {
+                $this->entityManager->remove($entity);
+            }
             $this->entityManager->flush();
         } catch (Exception $e) {
             return ["success" => false, "message" => $e->getMessage()];
@@ -76,22 +83,14 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         return ["success" => true, "message" => "Version $versionName of the library $libraryName has been deleted successfully."];
     }
 
-    private function removeVersionExamples($version)
+    private function getVersionExamples($version)
     {
+        $array = [];
         $examples = $version->getLibraryExamples();
         foreach ($examples as $example) {
-            $this->entityManager->remove($example);
+            $array[] = $example;
         }
-    }
-
-    private function removeVersion($version)
-    {
-        $this->entityManager->remove($version);
-    }
-
-    private function removeLibrary($library)
-    {
-        $this->entityManager->remove($library);
+        return $array;
     }
 
     private function setNullToVersionLibrary($version)
@@ -107,7 +106,7 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         return $library->getLatestVersion()->getId() === $version->getId();
     }
 
-    private function setNewLatestLibrary($library, $newVersionName)
+    private function getEntityWithNewLatestLibrary($library, $newVersionName)
     {
         $hasSpecifiedVersion = false;
         $versions = $library->getVersions();
@@ -122,10 +121,10 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         if (!$hasSpecifiedVersion) {
             throw new InvalidArgumentException("The new latest version $newVersionName is not found.");
         }
-        $this->entityManager->persist($library);
+        return $library;
     }
 
-    private function removeRelatedPreference($version)
+    private function getRelatedPreferences($version)
     {
         $preferences = $this->entityManager
             ->getRepository('CodebenderLibraryBundle:Preference')
@@ -135,9 +134,7 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
             ->getQuery()
             ->getResult();
 
-        foreach ($preferences as $preference) {
-            $this->entityManager->remove($preference);
-        }
+        return $preferences;
     }
 
     private function removeLibraryDirectory($dir) {
