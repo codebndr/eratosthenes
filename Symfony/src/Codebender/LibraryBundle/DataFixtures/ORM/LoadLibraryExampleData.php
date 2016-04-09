@@ -276,6 +276,46 @@ class LoadLibraryExamplesData extends AbstractFixture implements OrderedFixtureI
          */
         $objectManager->persist($deleteMeLibraryExample2);
 
+        /*
+         * Get Version 1.0.0 of deleteLatestMe Library
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $encodeLibraryVersion1 */
+        $deleteLatestMeLibraryVersion1 = $this->getReference('deleteLatestMeLibraryVersion1');
+
+        /*
+         * Mock a new library example
+         */
+        $deleteLatestMeLibraryExample1 = new LibraryExample();
+        $deleteLatestMeLibraryExample1->setName('deleteLatestMe_example');
+        $deleteLatestMeLibraryExample1->setVersion($deleteLatestMeLibraryVersion1);
+        $deleteLatestMeLibraryExample1->setPath('examples/deleteLatestMe_example/deleteLatestMe_example.ino');
+        $deleteLatestMeLibraryExample1->setBoards(null);
+
+        /*
+         * Add newly created example to the database using the object manager interface
+         */
+        $objectManager->persist($deleteLatestMeLibraryExample1);
+
+        /*
+         * Get Version 1.1.0 of deleteLatestMe Library
+         */
+        /* @var \Codebender\LibraryBundle\Entity\Version $encodeLibraryVersion2 */
+        $deleteLatestMeLibraryVersion2 = $this->getReference('deleteLatestMeLibraryVersion2');
+
+        /*
+         * Mock a new library example
+         */
+        $deleteLatestMeLibraryExample2 = new LibraryExample();
+        $deleteLatestMeLibraryExample2->setName('deleteLatestMe_example');
+        $deleteLatestMeLibraryExample2->setVersion($deleteLatestMeLibraryVersion2);
+        $deleteLatestMeLibraryExample2->setPath('examples/deleteLatestMe_example/deleteLatestMe_example.ino');
+        $deleteLatestMeLibraryExample2->setBoards(null);
+
+        /*
+         * Add newly created example to the database using the object manager interface
+         */
+        $objectManager->persist($deleteLatestMeLibraryExample2);
+
         // From here on add the internal library examples. Only few are added.
         $builtInLibs = [
             "EEPROM" => ["eeprom_clear", "eeprom_read", "eeprom_write"],

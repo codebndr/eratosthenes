@@ -372,6 +372,49 @@ class LoadLibraryAndVersionData extends AbstractFixture implements OrderedFixtur
         $objectManager->persist($deleteMeLibraryVersion2);
         $objectManager->persist($deleteMeLibrary);
 
+        // Fake libraries to be used for testing delete API
+        $deleteLatestMeLibrary = new Library();
+        $deleteLatestMeLibrary->setName('deleteLatestMeLibrary');
+        $deleteLatestMeLibrary->setDefaultHeader('deleteLatestMe');
+        $deleteLatestMeLibrary->setActive(true);
+        $deleteLatestMeLibrary->setVerified(false);
+        $deleteLatestMeLibrary->setDescription('Fake library for delete test');
+        $deleteLatestMeLibrary->setNotes('No one shall read this note.');
+        $deleteLatestMeLibrary->setUrl('http://localhost/library/url');
+        $deleteLatestMeLibrary->setFolderName('deleteLatest');
+
+        /*
+         * Create mock version 1.0.0 for delete library
+         */
+        $deleteLatestMeLibraryVersion1 = new Version();
+        $deleteLatestMeLibraryVersion1->setVersion('1.0.0');
+        $deleteLatestMeLibraryVersion1->setLibrary($deleteLatestMeLibrary);
+        $deleteLatestMeLibraryVersion1->setDescription('Version 1.0.0');
+        $deleteLatestMeLibraryVersion1->setFolderName('1.0.0');
+
+        /*
+         * Create mock version 1.1.0 for delete library
+         */
+        $deleteLatestMeLibraryVersion2 = new Version();
+        $deleteLatestMeLibraryVersion2->setVersion('1.1.0');
+        $deleteLatestMeLibraryVersion2->setLibrary($deleteLatestMeLibrary);
+        $deleteLatestMeLibraryVersion2->setDescription('Version 1.1.0');
+        $deleteLatestMeLibraryVersion2->setFolderName('1.1.0');
+
+        /*
+         * Set the latest version for the library
+         */
+        $deleteLatestMeLibrary->setLatestVersion($deleteLatestMeLibraryVersion2);
+
+        /*
+         * Set references and persist
+         */
+        $this->setReference('deleteLatestMeLibrary', $deleteLatestMeLibrary);
+        $this->setReference('deleteLatestMeLibraryVersion1', $deleteLatestMeLibraryVersion1);
+        $this->setReference('deleteLatestMeLibraryVersion2', $deleteLatestMeLibraryVersion2);
+        $objectManager->persist($deleteLatestMeLibraryVersion1);
+        $objectManager->persist($deleteLatestMeLibraryVersion2);
+        $objectManager->persist($deleteLatestMeLibrary);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),

@@ -53,8 +53,11 @@ class LoadPreferenceData extends AbstractFixture implements OrderedFixtureInterf
         /* @var \Codebender\LibraryBundle\Entity\Version $encodeLibraryVersion1 */
         $encodeLibraryVersion1 = $this->getReference('EncodeLibraryVersion1');
 
-        /* @var \Codebender\LibraryBundle\Entity\Version $deleteLibraryVersion2 */
+        /* @var \Codebender\LibraryBundle\Entity\Version $deleteMeLibraryVersion2 */
         $deleteMeLibraryVersion2 = $this->getReference('deleteMeLibraryVersion2');
+
+        /* @var \Codebender\LibraryBundle\Entity\Version $deleteLatestMeLibraryVersion2 */
+        $deleteLatestMeLibraryVersion2 = $this->getReference('deleteLatestMeLibraryVersion2');
 
         /*
          * Add mock preference for partner: codebender
@@ -139,6 +142,12 @@ class LoadPreferenceData extends AbstractFixture implements OrderedFixtureInterf
         $preference13->setVersion($deleteMeLibraryVersion2);
         $preference13->setPartner($arduinoCc);
         $objectManager->persist($preference13);
+
+        $preference14 = new Preference();
+        $preference14->setLibrary($deleteLatestMeLibraryVersion2->getLibrary());
+        $preference14->setVersion($deleteLatestMeLibraryVersion2);
+        $preference14->setPartner($arduinoCc);
+        $objectManager->persist($preference14);
 
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),

@@ -675,7 +675,34 @@ class ApiControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals("There is no library called deleteMe to delete.", $response['message']);
+
+
+
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals("You are deleting the latest version of this library. Please specify a new latest version.", $response['message']);
+
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "latest_version":"1.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($response['success']);
+        $this->assertEquals("The new latest version 1.0 is not found.", $response['message']);
+
+        $client = static::createClient();
+        $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "latest_version":"1.0.0"}');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals("Version 1.1.0 of the library deleteLatestMe has been deleted successfully.", $response['message']);
+
+        $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteLatestMe/1.1.0'));
     }
+
+
 
     private function assertFailAuthorization($authorizationKey) {
         $client = static::createClient();
