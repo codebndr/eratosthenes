@@ -683,18 +683,18 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals("You are deleting the latest version of this library. Please specify a new latest version.", $response['message']);
+        $this->assertEquals("You need to specify the next latest version of the library deleteLatestMe.", $response['message']);
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "latest_version":"1.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "nextLatestVersion":"1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
-        $this->assertEquals("The new latest version 1.0 is not found.", $response['message']);
+        $this->assertEquals("The next latest version 1.0 does not exist.", $response['message']);
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "latest_version":"1.0.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteLatestMe", "version":"1.1.0", "nextLatestVersion":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.1.0 of the library deleteLatestMe has been deleted successfully.", $response['message']);
