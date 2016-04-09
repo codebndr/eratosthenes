@@ -648,6 +648,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
+        $this->assertEquals("Version 1.0.0 of the library deleteMe has been deleted successfully.", $response['message']);
 
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
 
@@ -663,6 +664,7 @@ class ApiControllerTest extends WebTestCase
         $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
+        $this->assertEquals("Version 1.1.0 of the library deleteMe has been deleted successfully.", $response['message']);
 
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe/1.0.0'));
         $this->assertFalse(is_dir('/opt/codebender/codebender-external-library-files-new/deleteMe'));

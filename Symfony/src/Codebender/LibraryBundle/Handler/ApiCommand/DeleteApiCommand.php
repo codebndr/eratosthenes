@@ -59,7 +59,7 @@ class DeleteApiCommand extends AbstractApiCommand
             return ["success" => false, "message" => $e->getMessage()];
         }
 
-        return ["success" => true];
+        return ["success" => true, "message" => "Version $versionName of the library $libraryName has been deleted successfully."];
     }
 
     private function removeVersionExamples($version)
