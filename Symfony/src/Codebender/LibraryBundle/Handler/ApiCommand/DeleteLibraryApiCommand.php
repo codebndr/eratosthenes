@@ -47,13 +47,27 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
             $this->removeLibrary($library);
             $dir = $libraryFolderName;
         } else {
-            $this->setNewLatestLibrary($library);
+            if ($this->isLatestVersion($library, $version)) {
+                if (!array_key_exists('latest_version', $content)) {
+                    return ["success" => false, "message" => "You are deleting the latest version of this library. Please specify a new latest version."];
+                }
+                try {
+                    $this->setNewLatestLibrary($library, $content['latest_version']);
+                } catch (InvalidArgumentException $e) {
+                    return ["success" => false, "message" => $e->getMessage()];
+                }
+            }
             $dir = "$libraryFolderName/$versionFolderName";
         }
         $this->removeVersion($version);
 
         try {
             $this->entityManager->flush();
+        } catch (Exception $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+
+        try {
             $this->removeLibraryDirectory($dir);
         } catch (Exception $e) {
             return ["success" => false, "message" => $e->getMessage()];
@@ -88,9 +102,27 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         $this->entityManager->flush();
     }
 
-    private function setNewLatestLibrary($library)
+    private function isLatestVersion($library, $version)
     {
+        return $library->getLatestVersion()->getId() === $version->getId();
+    }
 
+    private function setNewLatestLibrary($library, $newVersionName)
+    {
+        $hasSpecifiedVersion = false;
+        $versions = $library->getVersions();
+        foreach ($versions as $version) {
+            if ($version->getVersion() !== $newVersionName) {
+                continue;
+            }
+            $library->setLatestVersion($version);
+            $hasSpecifiedVersion = true;
+            break;
+        }
+        if (!$hasSpecifiedVersion) {
+            throw new InvalidArgumentException("The new latest version $newVersionName is not found.");
+        }
+        $this->entityManager->persist($library);
     }
 
     private function removeRelatedPreference($version)
