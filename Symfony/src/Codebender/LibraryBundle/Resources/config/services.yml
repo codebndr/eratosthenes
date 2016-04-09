@@ -17,7 +17,7 @@ parameters:
     codebender_api.fetchLatest.class: Codebender\LibraryBundle\Handler\ApiCommand\FetchLatestApiCommand
     codebender_api.checkGithubUpdates.class: Codebender\LibraryBundle\Handler\ApiCommand\CheckGithubUpdatesCommand
     codebender_api.getDefaultVersion.class: Codebender\LibraryBundle\Handler\ApiCommand\GetDefaultVersionCommand
-    codebender_api.delete.class: Codebender\LibraryBundle\Handler\ApiCommand\DeleteApiCommand
+    codebender_api.deleteLibrary.class: Codebender\LibraryBundle\Handler\ApiCommand\DeleteLibraryApiCommand
 
 services:
 #    codebender_library.example:
@@ -115,8 +115,8 @@ services:
                     entityManager: "@doctrine.orm.entity_manager"
                     containerInterface: "@service_container"
 
-    codebender_api.delete:
-                class:  %codebender_api.delete.class%
+    codebender_api.deleteLibrary:
+                class:  %codebender_api.deleteLibrary.class%
                 arguments:
                     entityManager: "@doctrine.orm.entity_manager"
                     containerInterface: "@service_container"

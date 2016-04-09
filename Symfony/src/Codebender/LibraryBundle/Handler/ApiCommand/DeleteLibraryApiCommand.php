@@ -9,7 +9,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Validator\Constraints\Null;
 
-class DeleteApiCommand extends AbstractApiCommand
+class DeleteLibraryApiCommand extends AbstractApiCommand
 {
     protected $apiHandler;
     protected $fileSystem;

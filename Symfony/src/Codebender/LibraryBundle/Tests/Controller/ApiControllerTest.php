@@ -634,18 +634,18 @@ class ApiControllerTest extends WebTestCase
         $this->assertPassAuthorization($validV2AuthorizationKey);
     }
 
-    public function testDeleteCommand()
+    public function testDeleteLibraryCommand()
     {
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals("You need to specify which library version to delete.", $response['message']);
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.0.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.0.0 of the library deleteMe has been deleted successfully.", $response['message']);
@@ -654,14 +654,14 @@ class ApiControllerTest extends WebTestCase
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.0.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.0.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals("There is no version 1.0.0 for library called deleteMe to delete.", $response['message']);
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.1.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($response['success']);
         $this->assertEquals("Version 1.1.0 of the library deleteMe has been deleted successfully.", $response['message']);
@@ -671,7 +671,7 @@ class ApiControllerTest extends WebTestCase
 
         $client = static::createClient();
         $authorizationKey = $client->getContainer()->getParameter('authorizationKey');
-        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"delete","library":"deleteMe", "version":"1.1.0"}');
+        $client = $this->postApiRequest($client, $authorizationKey, '{"type":"deleteLibrary","library":"deleteMe", "version":"1.1.0"}');
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($response['success']);
         $this->assertEquals("There is no library called deleteMe to delete.", $response['message']);
