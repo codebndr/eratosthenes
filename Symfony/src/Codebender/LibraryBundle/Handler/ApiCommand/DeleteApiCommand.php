@@ -109,7 +109,7 @@ class DeleteApiCommand extends AbstractApiCommand
     }
 
     private function removeLibraryDirectory($dir) {
-        $baseDir = $this->container->getParameter('external_libraries_new');
+        $baseDir = $this->container->getParameter('external_libraries_v2');
         $targetDir = "$baseDir/$dir";
         if (!is_dir($targetDir)) {
             throw new InvalidArgumentException("$targetDir does not exist.");
