@@ -39,8 +39,8 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
             return ["success" => false, "message" => "There is no version $versionName for library called $libraryName to delete."];
         }
 
-        // If the user is deleting the latest version of the library
-        if ($version === $library->getLatestVersion()) {
+        // If the user is deleting the latest version of the library and we need to re-assign the latest version
+        if ($version === $library->getLatestVersion() && sizeof($library->getVersions()) > 1) {
 
             // The user did not specify the next latest version
             if (!array_key_exists('nextLatestVersion', $content)) {
@@ -112,6 +112,7 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
     private function setNewLatestLibrary(Library $library, Version $nextLatestVersion)
     {
         $library->setLatestVersion($nextLatestVersion);
+        $library->setLastCommit($nextLatestVersion->getReleaseCommit());
         $this->entityManager->persist($library);
     }
 
