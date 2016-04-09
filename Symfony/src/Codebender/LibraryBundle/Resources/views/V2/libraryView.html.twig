@@ -56,10 +56,17 @@
                             {% endfor %}
                         </ul>
                     </div>
-                {% else %}
-                    {% set download_hash = { 'library' : (library),  'authorizationKey': (authorizationKey) } %}
-                    <a id="download" class="btn btn-success" target="_blank"
-                       href="{{ path('codebender_library_download', download_hash) }}">Download from <strong>Eratosthenes</strong></a>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Delete versions from library<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for version in versions %}
+                                <li><a class="delete-library-version" data-version="{{ version.version }}">Version - {{ version.version }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <span id="delete-library-output"></span>
                 {% endif %}
                 <br/><br/>
                 {% if meta.gitOwner and meta.gitRepo and meta.gitLastCommit %}
@@ -105,6 +112,53 @@
             {% endif %}
         </div>
     <div class="span1"></div>
+    <!-- Library Deletion Modal -->
+    <div id="deletionModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete version <span class="modal_library_version"></span>
+                        from
+                        {% if meta.name is defined %}
+                            {{ meta.name }}
+                        {% else %}
+                            {{ library }}
+                        {% endif %}
+                        library
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to permanently delete version <span class="modal_library_version"></span>
+                        {% if meta.name is defined %}
+                            {{ meta.name }}
+                        {% else %}
+                            {{ library }}
+                        {% endif %}
+                        library. Are you sure?</p>
+                    <button id="yes-button" class="btn btn-danger">Do it!</button>
+                    <button id="no-button" class="btn btn-default" data-dismiss="modal">God no..</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Library Deleted Modal -->
+    <div id="deletedModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Library <span id="modal_library_name"></span> deleted!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Click on the button below to get redirected to the library addition page.</p>
+                    <button id="redirect-button" class="btn btn-default">Take me there</button>
+                    <p><strong>Don't forget to delete the cached library object files from the compiler!</strong></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -130,6 +184,17 @@
                 }
             });
     }
+
+    $(function() {
+        // add modal handler to each delete button
+        $('a.delete-library-version').each(function() {
+            $(this).on("click", function(){
+                $('#deletionModal').modal('show');
+                var version = $(this).data('version');
+                $('.modal_library_version').text(version);
+            });
+        });
+    });
 
 </script>
 
