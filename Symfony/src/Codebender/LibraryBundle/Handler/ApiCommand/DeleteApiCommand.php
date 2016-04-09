@@ -26,31 +26,33 @@ class DeleteApiCommand extends AbstractApiCommand
         $this->apiHandler = $this->container->get('codebender_library.apiHandler');
         $this->fileSystem = new Filesystem();
 
+        $library = $this->apiHandler->getLibraryFromDefaultHeader($libraryName);
+        if (is_null($library)) {
+            return ["success" => false, "message" => "There is no library called $libraryName to delete."];
+        }
+
+        $version = $this->apiHandler->getVersionFromDefaultHeader($libraryName, $versionName);
+        if (is_null($version)) {
+            return ["success" => false, "message" => "There is no version $versionName for library called $libraryName to delete."];
+        }
+
+        $libraryFolderName = $library->getFolderName();
+        $versionFolderName = $version->getFolderName();
+
+        $this->setNullToVersionLibrary($version);
+
+        $this->removeVersionExamples($version);
+        $this->removeRelatedPreference($version);
+        if (sizeof($library->getVersions()) === 1) {
+            $this->removeLibrary($library);
+            $dir = $libraryFolderName;
+        } else {
+            $this->setNewLatestLibrary($library);
+            $dir = "$libraryFolderName/$versionFolderName";
+        }
+        $this->removeVersion($version);
+
         try {
-            $library = $this->apiHandler->getLibraryFromDefaultHeader($libraryName);
-            if (is_null($library)) {
-                return ["success" => false, "message" => "There is no library called $libraryName to delete."];
-            }
-
-            $version = $this->apiHandler->getVersionFromDefaultHeader($libraryName, $versionName);
-            if (is_null($version)) {
-                return ["success" => false, "message" => "There is no version $versionName for library called $libraryName to delete."];
-            }
-
-            $libraryFolderName = $library->getFolderName();
-            $versionFolderName = $version->getFolderName();
-
-            $this->removeVersionExamples($version);
-            $this->removeRelatedPreference($version);
-            if (sizeof($library->getVersions()) === 1) {
-                $this->removeLibrary($library, $version);
-                $dir = $libraryFolderName;
-            } else {
-                $this->setNewLatestLibrary($library);
-                $dir = "$libraryFolderName/$versionFolderName";
-            }
-
-            $this->removeLibraryVersion($library, $version);
             $this->entityManager->flush();
             $this->removeLibraryDirectory($dir);
         } catch (Exception $e) {
@@ -68,14 +70,18 @@ class DeleteApiCommand extends AbstractApiCommand
         }
     }
 
-    private function removeLibraryVersion($library, $version)
+    private function removeVersion($version)
     {
         $this->entityManager->remove($version);
     }
 
-    private function removeLibrary($library, $version)
+    private function removeLibrary($library)
     {
         $this->entityManager->remove($library);
+    }
+
+    private function setNullToVersionLibrary($version)
+    {
         // This is to escape foreign key constraint.
         $version->setLibrary(null);
         $this->entityManager->persist($version);
