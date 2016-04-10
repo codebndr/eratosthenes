@@ -25,7 +25,7 @@ services:
         class: Codebender\LibraryBundle\EventListener\AuthenticationListener
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-        arguments: [ %authorizationKey% ]
+        arguments: [ %authorizationKey%, @service_container ]
 
 # Twig Configuration
 twig:
@@ -64,6 +64,12 @@ doctrine:
      orm:
          auto_generate_proxy_classes: %kernel.debug%
          auto_mapping: true
+
+doctrine_migrations:
+    dir_name: "%kernel.root_dir%/DoctrineMigrations"
+    namespace: Application\Migrations
+    table_name: migration_versions
+    name: Application Migrations
 
 # Swiftmailer Configuration
 # swiftmailer:

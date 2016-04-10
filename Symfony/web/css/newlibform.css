@@ -38,3 +38,5 @@
 #step3, #step3 #form, #step3 #verify { display: none; }
 
 input[type="file"] { width: 175px; }
+
+#newLibrary_Architectures > label { width: 120px; margin-left: 5px; margin-right: 5px; }
