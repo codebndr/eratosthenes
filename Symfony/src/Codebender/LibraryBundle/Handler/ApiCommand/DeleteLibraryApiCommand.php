@@ -131,7 +131,8 @@ class DeleteLibraryApiCommand extends AbstractApiCommand
         }
     }
 
-    private function removeLibraryDirectory($dir) {
+    private function removeLibraryDirectory($dir)
+    {
         $baseDir = $this->container->getParameter('external_libraries_v2');
         $targetDir = "$baseDir/$dir";
         if (!is_dir($targetDir)) {
