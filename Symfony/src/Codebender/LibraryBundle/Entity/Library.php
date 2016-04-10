@@ -547,7 +547,8 @@ class Library
             'gitLastCommit' => $this->getLastCommit(),
             'gitInRepoPath' => $this->getInRepoPath(),
             'libraryNotes' => $this->getNotes(),
-            'isBuiltIn' => $this->isBuiltIn()
+            'isBuiltIn' => $this->isBuiltIn(),
+            'latestVersionName' => $this->getLatestVersion()->getVersion()
         );
     }
 }
