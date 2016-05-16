@@ -223,12 +223,10 @@ class DefaultHandler
         // $finder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.inc')->name('*.txt');
         $finder->name('*.*');
 
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
         $response = array();
         foreach ($finder as $file) {
             if ($getContent) {
-                $mimeType = finfo_file($finfo, $file);
+                $mimeType = mime_content_type($file->getRealpath());
                 if (strpos($mimeType, "text/") === false)
                     $content = "/*\n *\n * We detected that this is not a text file.\n * Such files are currently not supported by our editor.\n * We're sorry for the inconvenience.\n * \n */";
                 else
