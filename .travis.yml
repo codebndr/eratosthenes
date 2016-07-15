@@ -1,6 +1,6 @@
-language: php
-php:
-  - 5.5.9
+sudo: required
+dist: trusty
+services: mysql
 
 # Add encrypted env variables, used for setting up the test environment
 env:
