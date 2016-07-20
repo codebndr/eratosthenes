@@ -477,25 +477,42 @@ class DefaultController extends Controller
     private function getExternalLibrariesList()
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $externalMeta = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')->findBy(array('active' => true));
+        $librariesEntities = $entityManager->getRepository('CodebenderLibraryBundle:ExternalLibrary')
+            ->findBy(['active' => true]);
 
-        $libraries = array();
-        foreach ($externalMeta as $library) {
+        $libraries = [];
+        foreach ($librariesEntities as $library) {
+            /* @var ExternalLibrary $library */
             $libraryMachineName = $library->getMachineName();
-            if (!isset($libraries[$libraryMachineName])) {
-                $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "examples" => array());
-
-                if ($library->getOwner() !== null && $library->getRepo() !== null) {
-                    $libraries[$libraryMachineName] = array("description" => $library->getDescription(), "humanName" => $library->getHumanName(), "url" => "http://github.com/" . $library->getOwner() . "/" . $library->getRepo(), "examples" => array());
-                }
+            if (isset($libraries[$libraryMachineName])) {
+                continue;
             }
 
-            $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')->findBy(array('library' => $library));
+            $libraries[$libraryMachineName] = [
+                'description' => $library->getDescription(),
+                'humanName' => $library->getHumanName(),
+                'examples' => []
+            ];
+            $libraryUrl = $library->getUrl();
+            if ($libraryUrl != '') {
+                $libraries[$libraryMachineName]['url'] = $libraryUrl;
+            }
+
+            if ($library->getOwner() !== null && $library->getRepo() !== null) {
+                $libraries[$libraryMachineName]['url'] = 'https://github.com/' . $library->getOwner() . '/' . $library->getRepo();
+            }
+
+            $examples = $entityManager->getRepository('CodebenderLibraryBundle:Example')
+                ->findBy(['library' => $library]);
 
             foreach ($examples as $example) {
-                $names = $this->getExampleAndLibNameFromRelativePath(pathinfo($example->getPath(), PATHINFO_DIRNAME), $example->getName());
+                /* @var Example $example */
+                $names = $this->getExampleAndLibNameFromRelativePath(
+                    pathinfo($example->getPath(), PATHINFO_DIRNAME),
+                    $example->getName()
+                );
 
-                $libraries[$libraryMachineName]['examples'][] = array('name' => $names['example_name']);
+                $libraries[$libraryMachineName]['examples'][] = ['name' => $names['example_name']];
             }
 
 

@@ -76,6 +76,18 @@ class DefaultControllerFunctionalTest extends WebTestCase
 
         // Make sure the example was found
         $this->assertEquals('AnalogReadSerial', $foundExample[0]['name']);
+
+        $urlTesterLibrary = $categories['External Libraries']['UrlTester'];
+        $this->assertEquals('https://github.com/owner/repository', $urlTesterLibrary['url']);
+
+        // disable the library in order to avoid making the rest of the tests fail
+        $client->request('POST', '/' . $authorizationKey . '/toggleStatus/UrlTester');
+
+        $binaryLibrary = $categories['External Libraries']['Binary'];
+        $this->assertEquals('https://some/url.com', $binaryLibrary['url']);
+
+        $noUrlLibrary = $categories['External Libraries']['NoUrl'];
+        $this->assertArrayNotHasKey('url', $noUrlLibrary);
     }
 
 

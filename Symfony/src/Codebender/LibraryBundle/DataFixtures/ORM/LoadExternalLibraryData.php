@@ -139,6 +139,26 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         // Persist the new library
         $objectManager->persist($binaryLbrary);
 
+        $urlTestLibrary = new ExternalLibrary();
+        $urlTestLibrary->setHumanName('Url Tester');
+        $urlTestLibrary->setMachineName('UrlTester');
+        $urlTestLibrary->setActive(true);
+        $urlTestLibrary->setVerified(false);
+        $urlTestLibrary->setDescription('A library used for testing that git urls work fine.');
+        $urlTestLibrary->setOwner('owner');
+        $urlTestLibrary->setRepo('repository');
+
+        $objectManager->persist($urlTestLibrary);
+
+        $urlTestLibrary2 = new ExternalLibrary();
+        $urlTestLibrary2->setHumanName('No Url Library');
+        $urlTestLibrary2->setMachineName('NoUrl');
+        $urlTestLibrary2->setActive(true);
+        $urlTestLibrary2->setVerified(false);
+        $urlTestLibrary2->setDescription('Another library used for testing that git urls work fine.');
+
+        $objectManager->persist($urlTestLibrary2);
+
         /*
          * After all fixture objects have been added to the ObjectManager (`persist` operation),
          * it's time to flush the contents of the ObjectManager
