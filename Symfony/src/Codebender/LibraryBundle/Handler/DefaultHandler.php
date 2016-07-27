@@ -618,7 +618,7 @@ class DefaultHandler
         $machineNames = array();
 
         foreach ($children as $child) {
-            if ($child['type'] == 'blob' && pathinfo($child['path'], PATHINFO_EXTENSION) == 'h') {
+            if ($child['type'] == 'blob' && (pathinfo($child['path'], PATHINFO_EXTENSION) == 'h' || pathinfo($child['path'], PATHINFO_EXTENSION) == 'hpp')) {
                 $machineNames[] = pathinfo($child['path'], PATHINFO_FILENAME);
             }
         }
