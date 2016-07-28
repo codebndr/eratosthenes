@@ -23,6 +23,29 @@ class LoadExternalLibraryExamplesData extends AbstractFixture implements Ordered
      */
     public function load(ObjectManager $objectManager)
     {
+        /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $jsonlibr */
+
+        $jsonlibr = $this->getReference('JsonLib');
+
+        $jsonexamplea = new Example();
+        $jsonexamplea->setName('JsonParserExample');
+        $jsonexamplea->setLibrary($jsonlibr);
+        $jsonexamplea->setPath('jsonlib/examples/JsonParserExample/JsonParserExample.ino');
+        $jsonexamplea->setBoards(null);
+
+        // Persist the new example
+        $objectManager->persist($jsonexamplea);
+
+        $jsonexampleb = new Example();
+        $jsonexampleb->setName('IndentedPrintExample');
+        $jsonexampleb->setLibrary($jsonlibr);
+        $jsonexampleb->setPath('jsonlib/examples/IndentedPrintExample/IndentedPrintExample.ino');
+        $jsonexampleb->setBoards(null);
+
+        // Persist the new example
+        $objectManager->persist($jsonexampleb);
+
+
         /* @var \Codebender\LibraryBundle\Entity\ExternalLibrary $defaultLibrary */
         $defaultLibrary = $this->getReference('defaultLibrary');
 

@@ -24,6 +24,20 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
      */
     public function load(ObjectManager $objectManager)
     {
+        // A fake JSON library with hpp files in examples
+        $jsonlibr = new ExternalLibrary();
+        $jsonlibr->setHumanName('JSON Library');
+        $jsonlibr->setMachineName('jsonlib');
+        $jsonlibr->setActive(true);
+        $jsonlibr->setVerified(false);
+        $jsonlibr->setDescription('A library containing hpp files in examples which should be correctly fetched');
+        $jsonlibr->setSourceUrl('https://some/source/url.com');
+
+        // Reference to MultiIno library
+        $this->setReference('JsonLib', $jsonlibr);
+        $objectManager->persist($jsonlibr);
+
+
         // A fake version of the Adafruit GPS library
         $defaultLibrary = new ExternalLibrary();
         $defaultLibrary->setHumanName('Default Arduino Library');
