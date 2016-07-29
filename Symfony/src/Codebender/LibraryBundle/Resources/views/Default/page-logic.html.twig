@@ -138,8 +138,20 @@
                     $el.append($("<option></option>")
                         .attr("value", $name).text($name));
 
+                }else if(endsWith(entry.filename, ".hpp") && !startsWith(entry.filename, ".")  && !startsWith(entry.filename, "_") )
+                {
+                    var $lastSlash = entry.filename.lastIndexOf("/");
+                    var $header = entry.filename.substr($lastSlash+1);
+                    var $name = $header.substr(0,$header.length -4);
+                    $el.append($("<option></option>")
+                        .attr("value", $name).text($name));
+
                 }
-            });
+                
+            }
+                           
+                           
+                           );
             $el.prop("selected", false);
             update_machineName();
         });

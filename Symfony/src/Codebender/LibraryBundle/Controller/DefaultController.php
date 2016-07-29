@@ -313,7 +313,7 @@ class DefaultController extends Controller
 
             // TODO: Not only .h and .cpp files in Arduino examples
             $notInoFilesFinder = new Finder();
-            $notInoFilesFinder->files()->name('*.h')->name('*.cpp');
+            $notInoFilesFinder->files()->name('*.h')->name('*.cpp')->name('*.hpp');
             $notInoFilesFinder->in($path . "/" . $example->getRelativePath());
 
             foreach ($notInoFilesFinder as $nonInoFile) {
@@ -448,7 +448,7 @@ class DefaultController extends Controller
     {
         $filesFinder = new Finder();
         $filesFinder->in($dir);
-        $filesFinder->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.pde')->name('*.ino');
+        $filesFinder->name('*.hpp')->name('*.cpp')->name('*.h')->name('*.c')->name('*.S')->name('*.pde')->name('*.ino');
 
         $files = array();
         foreach ($filesFinder as $file) {
