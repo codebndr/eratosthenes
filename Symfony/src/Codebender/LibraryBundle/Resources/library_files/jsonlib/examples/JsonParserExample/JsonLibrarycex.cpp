@@ -1,3 +1,0 @@
-#ifdef ARDUINO
-
-#endif

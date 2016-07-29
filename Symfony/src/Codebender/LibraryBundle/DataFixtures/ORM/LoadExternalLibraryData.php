@@ -33,7 +33,7 @@ class LoadExternalLibraryData extends AbstractFixture implements OrderedFixtureI
         $jsonlibr->setDescription('A library containing hpp files in examples which should be correctly fetched');
         $jsonlibr->setSourceUrl('https://some/source/url.com');
 
-        // Reference to MultiIno library
+        // Reference to jsonlib library
         $this->setReference('JsonLib', $jsonlibr);
         $objectManager->persist($jsonlibr);
 

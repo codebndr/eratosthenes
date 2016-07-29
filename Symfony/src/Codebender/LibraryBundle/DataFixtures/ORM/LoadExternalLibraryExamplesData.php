@@ -27,15 +27,6 @@ class LoadExternalLibraryExamplesData extends AbstractFixture implements Ordered
 
         $jsonlibr = $this->getReference('JsonLib');
 
-        $jsonexamplea = new Example();
-        $jsonexamplea->setName('JsonParserExample');
-        $jsonexamplea->setLibrary($jsonlibr);
-        $jsonexamplea->setPath('jsonlib/examples/JsonParserExample/JsonParserExample.ino');
-        $jsonexamplea->setBoards(null);
-
-        // Persist the new example
-        $objectManager->persist($jsonexamplea);
-
         $jsonexampleb = new Example();
         $jsonexampleb->setName('IndentedPrintExample');
         $jsonexampleb->setLibrary($jsonlibr);
